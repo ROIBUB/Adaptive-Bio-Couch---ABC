@@ -2,7 +2,7 @@
 const express = require('express');
 const logger = require('./middleware/logger');
 const authorize = require('./middleware/auth');
-const profilesRoutes = require('./routes/profiles.routes');
+const usersRoutes = require('./routes/users.routes');
 const app = express();
 app.use(logger);
 const port = 3000;
@@ -14,8 +14,9 @@ app.get('/', authorize(['admin']), (req, res) => {
         error: null
     });
 });
-// every request to /api/profiles is sent to profiles.routes.js
-app.use('/api/profiles', profilesRoutes);
+// every request to /api/users is sent to users.routes.js
+app.use('/api/users', usersRoutes);
+
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
