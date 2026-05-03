@@ -141,10 +141,42 @@ const updateUser = (req, res) => {
         error: null
     });
 };
+// a function to delete user
+const deleteUser = (req, res) => {
+    // we get the user id as a string and convert it to a int
+    const id = parseInt(req.params.id);
+    // we look for the requested user's index (in order to delete
+    // from the array we need the specific index
+    const userIndex = usersController.findIndex(u => u.userid === id);
+
+    // of index not found
+    if (userIndex === -1) {
+        return res.status(404).json({
+            success: false,
+            data: null,
+            error: {
+                code: "NOT_FOUND",
+                message: "User not found",
+                details: {}
+            }
+        });
+    }
+
+    // we delete the user from the array using splice
+    // (from were to delete, and how many cells)
+    const deletedUser = usersController.splice(userIndex, 1);
+
+    res.status(200).json({
+        success: true,
+        data: deletedUser[0],
+        error: null
+    });
+};
 // we export those function so other files can use them
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
+    deleteUser,
 };
