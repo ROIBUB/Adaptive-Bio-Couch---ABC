@@ -9,6 +9,6 @@ router.get('/:id', getUserById);
 // if u asked for POST /api/users
 router.post('/', createUser);
 // if u asked for PUT /api/users
-router.put('/:id', updateUser);
+// router.put('/:id', updateUser);
 
 module.exports = router;

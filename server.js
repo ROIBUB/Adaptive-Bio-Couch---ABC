@@ -3,6 +3,7 @@ const express = require('express');
 const logger = require('./middleware/logger');
 const authorize = require('./middleware/auth');
 const usersRoutes = require('./routes/users.routes');
+const exercisesRoutes = require('./routes/exercises.routes')
 const app = express();
 // to let the server get JSON and use it through req.body
 app.use(express.json())
@@ -18,6 +19,8 @@ app.get('/', authorize(['admin']), (req, res) => {
 });
 // every request to /api/users is sent to users.routes.js
 app.use('/api/users', usersRoutes);
+// every request to /api/exercises is sent to exercises.routes.js
+app.use('/api/exercises', exercisesRoutes);
 
 
 
