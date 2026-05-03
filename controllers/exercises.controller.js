@@ -50,18 +50,22 @@ const getExerciseById = (req, res) => {
 const createExercise = (req, res) => {
     const { name, muscleGroup, difficultyLevel, equipment, description } = req.body;
 
-    if (!name || !muscleGroup || !difficultyLevel) {
-        return res.status(400).json({
-            success: false,
-            data: null,
-            error: {
-                code: "VALIDATION_ERROR",
-                message: "Missing required fields",
-                details: {
-                    required: ["name", "muscleGroup", "difficultyLevel"]
+    const requiredFields = ["name", "muscleGroup", "difficultyLevel"];
+
+    for (let field of requiredFields) {
+        if (!req.body[field]) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                error: {
+                    code: "VALIDATION_ERROR",
+                    message: `Missing required field: ${field}`,
+                    details: {
+                        field: field
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     const newExercise = {
@@ -93,25 +97,31 @@ const updateExercise = (req, res) => {
             error: {
                 code: "VALIDATION_ERROR",
                 message: "Invalid exercise id",
-                details: { field: "id" }
+                details: {
+                    field: "id"
+                }
             }
         });
     }
 
     const { name, muscleGroup, difficultyLevel, equipment, description } = req.body;
 
-    if (!name || !muscleGroup || !difficultyLevel) {
-        return res.status(400).json({
-            success: false,
-            data: null,
-            error: {
-                code: "VALIDATION_ERROR",
-                message: "Missing required fields",
-                details: {
-                    required: ["name", "muscleGroup", "difficultyLevel"]
+    const requiredFields = ["name", "muscleGroup", "difficultyLevel"];
+
+    for (let field of requiredFields) {
+        if (!req.body[field]) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                error: {
+                    code: "VALIDATION_ERROR",
+                    message: `Missing required field: ${field}`,
+                    details: {
+                        field: field
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     const exerciseIndex = exercises.findIndex(ex => ex.exerciseId === id);
@@ -155,7 +165,9 @@ const deleteExercise = (req, res) => {
             error: {
                 code: "VALIDATION_ERROR",
                 message: "Invalid exercise id",
-                details: { field: "id" }
+                details: {
+                    field: "id"
+                }
             }
         });
     }
