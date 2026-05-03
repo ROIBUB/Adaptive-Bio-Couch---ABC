@@ -121,10 +121,6 @@ Body → raw → JSON
 
 The following header should be included:
 
-```http
-Content-Type: application/json
-```
-
 For protected routes, include:
 
 ```http
@@ -197,34 +193,21 @@ The Users API manages user records and fitness profile information.
 A user object currently includes the following fields:
 
 ```json
-{
-  "userid": 1,
-  "firstName": "Noam",
-  "lastName": "Maimon",
-  "userRole": "admin",
-  "age": 24,
-  "gender": "female",
-  "height": 158,
-  "weight": 50,
-  "activityLevel": "moderate",
-  "fitnessGoal": "muscle_gain",
-  "preferences": "strength training",
-  "createDate": "2026-05-03T10:00:00.000Z",
-  "updateDate": "2026-05-03T10:00:00.000Z"
-}
-```
-
-Important note:  
-In the current implementation, the user ID field is named:
-
-```text
-userid
-```
-
-not:
-
-```text
-userId
+    {
+      "userid": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "createDate": "DATE-FORMAT",
+      "updateDate": "DATE-FORMAT",
+      "userRole": "user",
+      "age": 25,
+      "gender": "male",
+      "height": 175,
+      "weight": 75,
+      "activityLevel": 1,
+      "fitnessGoal": "muscle gain",
+      "preferences": 5
+    }
 ```
 
 ---
@@ -249,18 +232,18 @@ No request body is required.
   "data": [
     {
       "userid": 1,
-      "firstName": "Noam",
-      "lastName": "Maimon",
-      "userRole": "admin",
-      "age": 24,
-      "gender": "female",
-      "height": 158,
-      "weight": 50,
-      "activityLevel": "moderate",
-      "fitnessGoal": "muscle_gain",
-      "preferences": "strength training",
-      "createDate": "2026-05-03T10:00:00.000Z",
-      "updateDate": "2026-05-03T10:00:00.000Z"
+      "firstName": "John",
+      "lastName": "Doe",
+      "createDate": "DATE-FORMAT",
+      "updateDate": "DATE-FORMAT",
+      "userRole": "user",
+      "age": 25,
+      "gender": "male",
+      "height": 175,
+      "weight": 75,
+      "activityLevel": 1,
+      "fitnessGoal": "muscle gain",
+      "preferences": 5
     }
   ],
   "error": null
@@ -302,25 +285,23 @@ No request body is required.
 ### Example Success Response
 
 ```json
-{
-  "success": true,
-  "data": {
+  {
     "userid": 1,
-    "firstName": "Noam",
-    "lastName": "Maimon",
-    "userRole": "admin",
-    "age": 24,
-    "gender": "female",
-    "height": 158,
-    "weight": 50,
-    "activityLevel": "moderate",
-    "fitnessGoal": "muscle_gain",
-    "preferences": "strength training",
-    "createDate": "2026-05-03T10:00:00.000Z",
-    "updateDate": "2026-05-03T10:00:00.000Z"
+    "firstName": "John",
+    "lastName": "Doe",
+    "createDate": "DATE-FORMAT",
+    "updateDate": "DATE-FORMAT",
+    "userRole": "user",
+    "age": 25,
+    "gender": "male",
+    "height": 175,
+    "weight": 75,
+    "activityLevel": 1,
+    "fitnessGoal": "muscle gain",
+    "preferences": 5
   },
   "error": null
-}
+
 ```
 
 ### Success Status Code
@@ -394,9 +375,9 @@ preferences
   "gender": "female",
   "height": 165,
   "weight": 60,
-  "activityLevel": "moderate",
+  "activityLevel": 2,
   "fitnessGoal": "fat_loss",
-  "preferences": "home workouts"
+  "preferences": 3
 }
 ```
 
@@ -414,9 +395,9 @@ preferences
     "gender": "female",
     "height": 165,
     "weight": 60,
-    "activityLevel": "moderate",
+    "activityLevel": 2,
     "fitnessGoal": "fat_loss",
-    "preferences": "home workouts",
+    "preferences": "1",
     "createDate": "2026-05-03T10:00:00.000Z",
     "updateDate": "2026-05-03T10:00:00.000Z"
   },
@@ -502,16 +483,16 @@ preferences
 
 ```json
 {
-  "firstName": "Noam",
-  "lastName": "Maimon",
-  "userRole": "manager",
+  "firstName": "Israela",
+  "lastName": "Israeli",
+  "userRole": "user",
   "age": 24,
   "gender": "female",
   "height": 158,
   "weight": 51,
-  "activityLevel": "active",
+  "activityLevel": 2,
   "fitnessGoal": "muscle_gain",
-  "preferences": "gym workouts"
+  "preferences": 5
 }
 ```
 
@@ -522,16 +503,16 @@ preferences
   "success": true,
   "data": {
     "userid": 1,
-    "firstName": "Noam",
-    "lastName": "Maimon",
-    "userRole": "manager",
+    "firstName": "Israela",
+    "lastName": "MaiIsraelimon",
+    "userRole": "manuserager",
     "age": 24,
     "gender": "female",
     "height": 158,
     "weight": 51,
-    "activityLevel": "active",
+    "activityLevel": 2,
     "fitnessGoal": "muscle_gain",
-    "preferences": "gym workouts",
+    "preferences": "5",
     "createDate": "2026-05-03T10:00:00.000Z",
     "updateDate": "2026-05-03T10:30:00.000Z"
   },
@@ -621,24 +602,22 @@ No request body is required.
 
 ```json
 {
-  "success": true,
-  "data": {
-    "userid": 1,
-    "firstName": "Noam",
-    "lastName": "Maimon",
-    "userRole": "admin",
-    "age": 24,
-    "gender": "female",
-    "height": 158,
-    "weight": 50,
-    "activityLevel": "moderate",
-    "fitnessGoal": "muscle_gain",
-    "preferences": "strength training",
-    "createDate": "2026-05-03T10:00:00.000Z",
-    "updateDate": "2026-05-03T10:00:00.000Z"
-  },
+  "userid": 1,
+  "firstName": "John",
+  "lastName": "Doe",
+  "createDate": "DATE-FORMAT",
+  "updateDate": "DATE-FORMAT",
+  "userRole": "user",
+  "age": 25,
+  "gender": "male",
+  "height": 175,
+  "weight": 75,
+  "activityLevel": 1,
+  "fitnessGoal": "muscle gain",
+  "preferences": 5
+},
   "error": null
-}
+
 ```
 
 ### Success Status Code
@@ -1369,11 +1348,7 @@ with the following error format:
     "code": "VALIDATION_ERROR",
     "message": "Missing required fields",
     "details": {
-      "required": [
-        "name",
-        "muscleGroup",
-        "difficultyLevel"
-      ]
+      "required": "fieldName"
     }
   }
 }
@@ -1441,13 +1416,7 @@ For every `POST` or `PUT` request:
 2. Select `raw`.
 3. Select `JSON`.
 4. Add the relevant JSON body.
-5. Add the following header:
-
-```http
-Content-Type: application/json
-```
-
-If the route is protected, also add:
+5. Add the following header if the route is protected:
 
 ```http
 x-user-role: admin
@@ -1457,33 +1426,6 @@ or another allowed role.
 
 ---
 
-## Required Postman Collection Content
-
-The Postman collection should include:
-
-```text
-Correct HTTP methods
-Request bodies for POST and PUT requests
-Path parameters where needed
-Authorization headers where needed
-Successful request examples
-At least one error response example
-```
-
-Screenshots of successful and error requests should be saved under:
-
-```text
-docs/screenshots/
-```
-
-The screenshots should include:
-
-```text
-At least one successful request per resource
-At least one error response example
-```
-
----
 
 # Example Postman Request Bodies
 
@@ -1508,7 +1450,7 @@ POST /api/users
   "weight": 60,
   "activityLevel": "moderate",
   "fitnessGoal": "fat_loss",
-  "preferences": "home workouts"
+  "preferences": 3
 }
 ```
 
@@ -1524,16 +1466,16 @@ PUT /api/users/1
 
 ```json
 {
-  "firstName": "Noam",
-  "lastName": "Maimon",
-  "userRole": "manager",
-  "age": 24,
-  "gender": "female",
-  "height": 158,
-  "weight": 51,
-  "activityLevel": "active",
+  "firstName": "John",
+  "lastName": "Doe",
+  "userRole": "User",
+  "age": 25,
+  "gender": "Male",
+  "height": 175,
+  "weight": 75,
+  "activityLevel": 1,
   "fitnessGoal": "muscle_gain",
-  "preferences": "gym workouts"
+  "preferences": "5
 }
 ```
 
