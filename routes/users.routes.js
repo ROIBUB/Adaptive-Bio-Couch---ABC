@@ -8,8 +8,6 @@ router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 // if u asked for POST /api/users
 router.post('/', createUser);
-// if u asked for PUT /api/users
-// router.put('/:id', updateUser);
 
 // if u asked for PUT /api/users/:id
 router.put('/:id', updateUser);
