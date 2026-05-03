@@ -25,6 +25,7 @@ FitWise/
 ├── README.md
 ├── server.js
 ├── package.json
+├── package-lock.json
 │
 ├── routes/
 │   ├── users.routes.js
@@ -41,10 +42,7 @@ FitWise/
 ├── middleware/
 │   ├── logger.js
 │   └── auth.js
-│
-└── docs/
-    ├── postman_collection.json
-    └── screenshots/
+
 ```
 
 ---
@@ -65,12 +63,6 @@ To start the server, run:
 
 ```bash
 node server.js
-```
-
-If a start script is defined in `package.json`, the server can also be started with:
-
-```bash
-npm start
 ```
 
 The server runs locally on port `3000`.
@@ -95,7 +87,6 @@ Current API base paths:
 ## General Assumptions
 
 - The project uses mock data only.
-- No MySQL or real database connection is used at this stage.
 - Data is stored in memory and resets when the server restarts.
 - IDs are generated based on the last item in the relevant mock data array.
 - Request and response bodies are in JSON format.
@@ -113,7 +104,6 @@ Supported example roles:
 
 ```text
 admin
-manager
 user
 ```
 
