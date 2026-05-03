@@ -4,6 +4,8 @@ const logger = require('./middleware/logger');
 const authorize = require('./middleware/auth');
 const usersRoutes = require('./routes/users.routes');
 const app = express();
+// to let the server get JSON and use it through req.body
+app.use(express.json())
 app.use(logger);
 const port = 3000;
 
@@ -16,6 +18,7 @@ app.get('/', authorize(['admin']), (req, res) => {
 });
 // every request to /api/users is sent to users.routes.js
 app.use('/api/users', usersRoutes);
+
 
 
 app.listen(port, () => {
