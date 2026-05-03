@@ -74,50 +74,63 @@ const getUserById = (req, res) => {
 };
 // a function to create a new user profile
 const createUser = (req, res) => {
-    // how the data comes from the user
-    const {firstName, lastName, userRole, age, gender, height,
-        weight, activityLevel, fitnessGoal, preferences} = req.body;
+    try {
+        // how the data comes from the user
+        const {firstName, lastName, userRole, age, gender, height,
+            weight, activityLevel, fitnessGoal, preferences} = req.body;
 
-    // validation test to all the fields
-    const requiredFields = ["firstName", "lastName", "userRole",
-        "age", "gender", "height", "weight", "activityLevel", "fitnessGoal"];
+        // validation test to all the fields
+        const requiredFields = ["firstName", "lastName", "userRole",
+            "age", "gender", "height", "weight", "activityLevel", "fitnessGoal"];
 
-    for (let field of requiredFields) {
-        if (!req.body[field]) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: `Missing required field: ${field}`,
-                    details: {
-                        field: field
+        for (let field of requiredFields) {
+            if (!req.body[field]) {
+                return res.status(400).json({
+                    success: false,
+                    data: null,
+                    error: {
+                        code: "VALIDATION_ERROR",
+                        message: `Missing required field: ${field}`,
+                        details: {
+                            field: field
+                        }
                     }
-                }
-            });
+                });
+            }
         }
+
+        // here we create a new id
+        const newId = usersController.length > 0
+            ? usersController[usersController.length - 1].userid + 1
+            : 1;
+
+        // we create the new user with the new id
+        const newUser = {userid: newId, firstName, lastName, userRole, age,
+            gender, height, weight, activityLevel, fitnessGoal, preferences,
+            createDate: new Date(), updateDate: new Date()
+        };
+
+        // we add the user to the mock DB
+        usersController.push(newUser);
+
+        // success status
+        res.status(201).json({
+            success: true,
+            data: newUser,
+            error: null
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            data: null,
+            error: {
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Something went wrong",
+                details: {}
+            }
+        });
     }
-
-    // here we create a new id
-    const newId = usersController.length > 0
-        ? usersController[usersController.length - 1].userid + 1
-        : 1;
-
-    // we create the new user with the new id
-    const newUser = {userid: newId, firstName, lastName, userRole, age,
-        gender, height, weight, activityLevel, fitnessGoal, preferences,
-        createDate: new Date(), updateDate: new Date()
-    };
-
-    // we add the user to the mock DB
-    usersController.push(newUser);
-
-    // success status
-    res.status(201).json({
-        success: true,
-        data: newUser,
-        error: null
-    });
 };
 // a function to update user's details
 const updateUser = (req, res) => {
