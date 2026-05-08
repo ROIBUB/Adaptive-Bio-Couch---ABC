@@ -12,10 +12,18 @@ const {
 } = require("../controllers/workoutPlans.controller");
 
 // GET /api/workout-plans
-router.get("/", getAllWorkoutPlans);
+router.get(
+    "/",
+    authorize(["user", "admin"]),
+    getAllWorkoutPlans
+);
 
 // GET /api/workout-plans/:id
-router.get("/:id", getWorkoutPlanById);
+router.get(
+    "/:id",
+    authorize(["user", "admin"]),
+    getWorkoutPlanById
+);
 
 // POST /api/workout-plans
 router.post("/", authorize(["admin"]), createWorkoutPlan);
