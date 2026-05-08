@@ -3,7 +3,7 @@ const checkIns = require("../models/checkIns.model");
 // GET /api/check-ins
 const getAllCheckIns = (req, res) => {
     try {
-        const userRole = req.headers.role;
+        const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
         if (userRole === "admin") {
@@ -86,7 +86,7 @@ const getCheckInById = (req, res) => {
             });
         }
 
-        const userRole = req.headers.role;
+        const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
         if (userRole !== "admin" && checkIn.userId !== requestUserId) {
@@ -167,7 +167,7 @@ const createCheckIn = (req, res) => {
             });
         }
 
-        const userRole = req.headers.role;
+        const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
         if (userRole !== "admin" && userId !== requestUserId) {
@@ -354,7 +354,7 @@ const updateCheckIn = (req, res) => {
             });
         }
 
-        const userRole = req.headers.role;
+        const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
         if (userRole !== "admin" && checkIns[checkInIndex].userId !== requestUserId) {

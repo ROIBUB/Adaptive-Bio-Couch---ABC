@@ -3,11 +3,46 @@ const workoutPlans = require("../models/workoutPlans.model");
 // GET /api/workout-plans
 const getAllWorkoutPlans = (req, res) => {
     try {
+
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = Number(req.headers.userid);
+
+        // admin gets all workout plans
+        if (userRole === "admin") {
+            return res.status(200).json({
+                success: true,
+                data: workoutPlans,
+                error: null
+            });
+        }
+
+        // invalid userid
+        if (isNaN(requestUserId)) {
+            return res.status(400).json({
+                success: false,
+                data: null,
+                error: {
+                    code: "VALIDATION_ERROR",
+                    message: "Missing or invalid user id in request headers",
+                    details: {
+                        field: "userid",
+                        value: req.headers.userid || null
+                    }
+                }
+            });
+        }
+
+        // regular user gets only his plans
+        const userWorkoutPlans = workoutPlans.filter(
+            plan => plan.userId === requestUserId
+        );
+
         res.status(200).json({
             success: true,
-            data: workoutPlans,
+            data: userWorkoutPlans,
             error: null
         });
+
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -25,7 +60,6 @@ const getAllWorkoutPlans = (req, res) => {
 const getWorkoutPlanById = (req, res) => {
     try {
         const id = Number(req.params.id);
-
         if (isNaN(id)) {
             return res.status(400).json({
                 success: false,
@@ -41,7 +75,9 @@ const getWorkoutPlanById = (req, res) => {
             });
         }
 
-        const workoutPlan = workoutPlans.find(plan => plan.workoutPlanId === id);
+        const workoutPlan = workoutPlans.find(
+            plan => plan.workoutPlanId === id
+        );
 
         if (!workoutPlan) {
             return res.status(404).json({
@@ -52,6 +88,28 @@ const getWorkoutPlanById = (req, res) => {
                     message: "Workout plan not found",
                     details: {
                         workoutPlanId: id
+                    }
+                }
+            });
+        }
+
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = Number(req.headers.userid);
+
+        // regular user can access only his own workout plan
+        if (
+            userRole !== "admin" &&
+            workoutPlan.userId !== requestUserId
+        ) {
+            return res.status(403).json({
+                success: false,
+                data: null,
+                error: {
+                    code: "FORBIDDEN",
+                    message: "You are not allowed to access this workout plan",
+                    details: {
+                        requiredOwnerUserId: workoutPlan.userId,
+                        requestUserId: requestUserId
                     }
                 }
             });
