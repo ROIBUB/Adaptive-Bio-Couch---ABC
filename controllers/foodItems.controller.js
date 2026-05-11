@@ -1,23 +1,25 @@
 const foodItems = require("../models/foodItems.model");
 
+const {
+    sendSuccess,
+    sendValidationError,
+    sendNotFound,
+    sendServerError
+} = require("../middleware/errorHandlers");
+
+const {
+    validateId,
+    getMissingFields,
+    validateNumericFields
+} = require("../middleware/validation");
+
 // GET /api/food-items
 const getAllFoodItems = (req, res) => {
     try {
-        res.status(200).json({
-            success: true,
-            data: foodItems,
-            error: null
-        });
+        return sendSuccess(res, 200, foodItems);
+
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            data: null,
-            error: {
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Something went wrong",
-                details: {}
-            }
-        });
+        return sendServerError(res);
     }
 };
 
@@ -26,51 +28,35 @@ const getFoodItemById = (req, res) => {
     try {
         const id = Number(req.params.id);
 
-        if (isNaN(id)) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Invalid food item id",
-                    details: {
-                        field: "id",
-                        value: req.params.id
-                    }
+        if (!validateId(id)) {
+            return sendValidationError(
+                res,
+                "Invalid food item id",
+                {
+                    field: "id",
+                    value: req.params.id
                 }
-            });
+            );
         }
 
-        const foodItem = foodItems.find(item => item.foodItemId === id);
+        const foodItem = foodItems.find(
+            item => item.foodItemId === id
+        );
 
         if (!foodItem) {
-            return res.status(404).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "NOT_FOUND",
-                    message: "Food item not found",
-                    details: { foodItemId: id }
+            return sendNotFound(
+                res,
+                "Food item not found",
+                {
+                    foodItemId: id
                 }
-            });
+            );
         }
 
-        res.status(200).json({
-            success: true,
-            data: foodItem,
-            error: null
-        });
+        return sendSuccess(res, 200, foodItem);
 
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            data: null,
-            error: {
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Something went wrong",
-                details: {}
-            }
-        });
+        return sendServerError(res);
     }
 };
 
@@ -95,20 +81,19 @@ const createFoodItem = (req, res) => {
             "fatPer100g"
         ];
 
-        const missingFields = requiredFields.filter(field => req.body[field] === undefined || req.body[field] === "");
+        const missingFields = getMissingFields(
+            req.body,
+            requiredFields
+        );
 
         if (missingFields.length > 0) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Missing required food item fields",
-                    details: {
-                        missingFields: missingFields
-                    }
+            return sendValidationError(
+                res,
+                "Missing required food item fields",
+                {
+                    missingFields: missingFields
                 }
-            });
+            );
         }
 
         const numericFields = [
@@ -118,22 +103,19 @@ const createFoodItem = (req, res) => {
             "fatPer100g"
         ];
 
-        const invalidFields = numericFields.filter(field => {
-            return typeof req.body[field] !== "number" || req.body[field] < 0;
-        });
+        const invalidFields = validateNumericFields(
+            req.body,
+            numericFields
+        );
 
         if (invalidFields.length > 0) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Invalid numeric food item fields",
-                    details: {
-                        invalidFields: invalidFields
-                    }
+            return sendValidationError(
+                res,
+                "Invalid numeric food item fields",
+                {
+                    invalidFields: invalidFields
                 }
-            });
+            );
         }
 
         const newFoodItem = {
@@ -150,22 +132,10 @@ const createFoodItem = (req, res) => {
 
         foodItems.push(newFoodItem);
 
-        res.status(201).json({
-            success: true,
-            data: newFoodItem,
-            error: null
-        });
+        return sendSuccess(res, 201, newFoodItem);
 
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            data: null,
-            error: {
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Something went wrong",
-                details: {}
-            }
-        });
+        return sendServerError(res);
     }
 };
 
@@ -174,19 +144,15 @@ const updateFoodItem = (req, res) => {
     try {
         const id = Number(req.params.id);
 
-        if (isNaN(id)) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Invalid food item id",
-                    details: {
-                        field: "id",
-                        value: req.params.id
-                    }
+        if (!validateId(id)) {
+            return sendValidationError(
+                res,
+                "Invalid food item id",
+                {
+                    field: "id",
+                    value: req.params.id
                 }
-            });
+            );
         }
 
         const {
@@ -207,20 +173,19 @@ const updateFoodItem = (req, res) => {
             "fatPer100g"
         ];
 
-        const missingFields = requiredFields.filter(field => req.body[field] === undefined || req.body[field] === "");
+        const missingFields = getMissingFields(
+            req.body,
+            requiredFields
+        );
 
         if (missingFields.length > 0) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Missing required food item fields",
-                    details: {
-                        missingFields: missingFields
-                    }
+            return sendValidationError(
+                res,
+                "Missing required food item fields",
+                {
+                    missingFields: missingFields
                 }
-            });
+            );
         }
 
         const numericFields = [
@@ -230,36 +195,33 @@ const updateFoodItem = (req, res) => {
             "fatPer100g"
         ];
 
-        const invalidFields = numericFields.filter(field => {
-            return typeof req.body[field] !== "number" || req.body[field] < 0;
-        });
+        const invalidFields = validateNumericFields(
+            req.body,
+            numericFields
+        );
 
         if (invalidFields.length > 0) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Invalid numeric food item fields",
-                    details: {
-                        invalidFields: invalidFields
-                    }
+            return sendValidationError(
+                res,
+                "Invalid numeric food item fields",
+                {
+                    invalidFields: invalidFields
                 }
-            });
+            );
         }
 
-        const foodItemIndex = foodItems.findIndex(item => item.foodItemId === id);
+        const foodItemIndex = foodItems.findIndex(
+            item => item.foodItemId === id
+        );
 
         if (foodItemIndex === -1) {
-            return res.status(404).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "NOT_FOUND",
-                    message: "Food item not found",
-                    details: { foodItemId: id }
+            return sendNotFound(
+                res,
+                "Food item not found",
+                {
+                    foodItemId: id
                 }
-            });
+            );
         }
 
         foodItems[foodItemIndex] = {
@@ -272,22 +234,14 @@ const updateFoodItem = (req, res) => {
             fatPer100g
         };
 
-        res.status(200).json({
-            success: true,
-            data: foodItems[foodItemIndex],
-            error: null
-        });
+        return sendSuccess(
+            res,
+            200,
+            foodItems[foodItemIndex]
+        );
 
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            data: null,
-            error: {
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Something went wrong",
-                details: {}
-            }
-        });
+        return sendServerError(res);
     }
 };
 
@@ -296,55 +250,46 @@ const deleteFoodItem = (req, res) => {
     try {
         const id = Number(req.params.id);
 
-        if (isNaN(id)) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "VALIDATION_ERROR",
-                    message: "Invalid food item id",
-                    details: {
-                        field: "id",
-                        value: req.params.id
-                    }
+        if (!validateId(id)) {
+            return sendValidationError(
+                res,
+                "Invalid food item id",
+                {
+                    field: "id",
+                    value: req.params.id
                 }
-            });
+            );
         }
 
-        const foodItemIndex = foodItems.findIndex(item => item.foodItemId === id);
+        const foodItemIndex = foodItems.findIndex(
+            item => item.foodItemId === id
+        );
 
         if (foodItemIndex === -1) {
-            return res.status(404).json({
-                success: false,
-                data: null,
-                error: {
-                    code: "NOT_FOUND",
-                    message: "Food item not found",
-                    details: { foodItemId: id }
+            return sendNotFound(
+                res,
+                "Food item not found",
+                {
+                    foodItemId: id
                 }
-            });
+            );
         }
 
-        const deletedFoodItem = foodItems.splice(foodItemIndex, 1)[0];
+        const deletedFoodItem = foodItems.splice(
+            foodItemIndex,
+            1
+        )[0];
 
-        res.status(200).json({
-            success: true,
-            data: {
+        return sendSuccess(
+            res,
+            200,
+            {
                 foodItemId: deletedFoodItem.foodItemId
-            },
-            error: null
-        });
+            }
+        );
 
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            data: null,
-            error: {
-                code: "INTERNAL_SERVER_ERROR",
-                message: "Something went wrong",
-                details: {}
-            }
-        });
+        return sendServerError(res);
     }
 };
 
