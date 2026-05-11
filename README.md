@@ -81,12 +81,6 @@ To start the server, run:
 node server.js
 ```
 
-If a `start` script is defined in `package.json`, the server can also be started with:
-
-```bash
-npm start
-```
-
 The server runs locally on port:
 
 ```text
