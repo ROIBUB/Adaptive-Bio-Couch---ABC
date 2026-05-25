@@ -1,21 +1,64 @@
-# FitWise Backend API
+# Adaptive Bio-Coach (ABC) — FitWise
 
-FitWise is a backend API skeleton for a fitness coaching web application.
+A fullstack fitness and nutrition coaching web application.
 
-The API is built with Node.js and Express and currently uses mock data only.
+```
+FitWise/
+├── backend/    ← Node.js + Express API (Assignment 2)
+├── client/     ← React frontend (Assignment 3)
+└── README.md
+```
 
-At this stage, the project does not connect to a real database.
-All data is stored in JavaScript arrays and is kept in memory while the server is running.
+---
+
+## How to Run
+
+Both servers must run at the same time in **two separate terminals**.
+
+### Terminal 1 — Backend
+
+```bash
+cd backend
+npm install
+node server.js
+```
+
+Runs at: `http://localhost:3000`
+
+### Terminal 2 — Frontend
+
+```bash
+cd client
+npm install
+npm start
+```
+
+Runs at: `http://localhost:3001`
+
+---
+
+## Demo Accounts (Login Page)
+
+| Email | Password | Role |
+|---|---|---|
+| john@fitwize.com | password123 | user |
+| noam@fitwize.com | password123 | admin |
+| dana@fitwize.com | password123 | user |
 
 ---
 
 ## Technologies
 
+**Backend**
 - Node.js
 - Express.js
-- JavaScript
-- Mock data stored in local model files
+- Mock data (in-memory arrays)
 - Postman for API testing
+
+**Frontend**
+- React 18
+- React Router v6
+- Fetch API
 
 ---
 

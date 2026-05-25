@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\server.js\" -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\server.js\")",
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\package.json\" -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\package.json\")",
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\controllers\" -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\controllers\")",
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\routes\"      -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\routes\")",
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\models\"      -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\models\")",
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\middleware\"   -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\middleware\")",
+      "PowerShell(Move-Item -Path \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\docs\"        -Destination \"C:\\\\Users\\\\Noam\\\\Dev\\\\University\\\\FitWise\\\\backend\\\\docs\")"
+    ]
+  }
+}
