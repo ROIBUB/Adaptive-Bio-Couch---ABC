@@ -415,10 +415,37 @@ const deleteUser = (req, res) => {
     }
 };
 
+// GET /api/users/me
+// Returns the profile of the currently logged-in user.
+// The frontend sends x-user-id (set from localStorage after login).
+const getMe = (req, res) => {
+    try {
+        const userId = parseInt(req.headers['x-user-id']);
+
+        if (!validateId(userId)) {
+            return sendValidationError(res, 'x-user-id header is required and must be a valid number', {});
+        }
+
+        const user = usersController.find(u => u.userid === userId);
+
+        if (!user) {
+            return sendNotFound(res, 'User not found', {});
+        }
+
+        // Omit the password field before sending to the client
+        const { password, ...safeUser } = user;
+        return sendSuccess(res, 200, safeUser);
+
+    } catch (err) {
+        return sendServerError(res);
+    }
+};
+
 // we export those function so other files can use them
 module.exports = {
     getAllUsers,
     getUserById,
+    getMe,
     createUser,
     updateUser,
     deleteUser,

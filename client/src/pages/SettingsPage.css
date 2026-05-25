@@ -1,0 +1,50 @@
+.settings-page {
+  /* Layout.jsx already provides padding and max-width */
+  max-width: 560px; /* narrower than dashboard — settings forms don't need full width */
+}
+
+.settings-header {
+  margin-bottom: 2rem;
+}
+
+.settings-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.settings-header p {
+  color: #636e72;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.settings-form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.save-btn {
+  width: 100%;
+  padding: 0.85rem;
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.save-btn:hover:not(:disabled) {
+  background-color: #5a4bd1;
+}
+
+.save-btn:disabled {
+  background-color: #b2bec3;
+  cursor: not-allowed;
+}

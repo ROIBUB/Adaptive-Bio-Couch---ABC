@@ -9,7 +9,19 @@ const workoutPlansRoutes = require("./routes/workoutPlans.routes");
 const workoutLogsRoutes = require("./routes/workoutLogs.routes");
 const dailyMealPlansRoutes = require("./routes/dailyMealPlans.routes");
 const checkInsRoutes = require("./routes/checkIns.routes");
+const authRoutes = require("./routes/auth.routes");
+const settingsRoutes = require("./routes/settings.routes");
 const app = express();
+
+// Allow the React frontend (localhost:3001) to call this API
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, x-user-role, x-user-id, userid');
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
+    next();
+});
+
 // to let the server get JSON and use it through req.body
 app.use(express.json())
 app.use(logger);
@@ -36,7 +48,10 @@ app.use("/api/workout-logs", workoutLogsRoutes);
 app.use("/api/daily-meal-plans", dailyMealPlansRoutes);
 // every request to /api/check-ins is sent to checkIns.routes.js
 app.use("/api/check-ins", checkInsRoutes);
-
+// every request to /api/auth is sent to auth.routes.js
+app.use("/api/auth", authRoutes);
+// every request to /api/settings is sent to settings.routes.js
+app.use("/api/settings", settingsRoutes);
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
