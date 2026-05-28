@@ -1,0 +1,17 @@
+.footer {
+  background-color: #1a1a2e;
+  color: #b2bec3;
+  text-align: center;
+  padding: 1rem 2rem;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.footer strong {
+  color: white;
+}
+
+.footer em {
+  color: #74b9ff;
+  font-style: normal;
+}

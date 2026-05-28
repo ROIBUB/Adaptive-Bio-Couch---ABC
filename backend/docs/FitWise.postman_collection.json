@@ -1,0 +1,1167 @@
+{
+  "info": {
+    "_postman_id": "2a1031a1-0758-450b-ad33-03570eab226a",
+    "name": "FitWise",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53462084",
+    "_collection_link": "https://go.postman.co/collection/53462084-2a1031a1-0758-450b-ad33-03570eab226a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/users/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Test\",\r\n  \"lastName\": \"User\",\r\n  \"userRole\": \"user\",\r\n  \"age\": 25,\r\n  \"gender\": \"male\",\r\n  \"height\": 175,\r\n  \"weight\": 75,\r\n  \"activityLevel\": 3,\r\n  \"fitnessGoal\": \"muscle gain\",\r\n  \"preferences\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Updated\",\r\n  \"lastName\": \"User\",\r\n  \"userRole\": \"admin\",\r\n  \"age\": 30,\r\n  \"gender\": \"male\",\r\n  \"height\": 180,\r\n  \"weight\": 80,\r\n  \"activityLevel\": 4,\r\n  \"fitnessGoal\": \"maintenance\",\r\n  \"preferences\": 4\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/users/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/users/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Get All Exercises",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/exercises",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "exercises"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Exercises By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/exercises/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "exercises",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Exercises",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Squat\",\r\n  \"muscleGroup\": \"Legs\",\r\n  \"difficultyLevel\": \"Intermediate\",\r\n  \"equipment\": \"Barbell\",\r\n  \"description\": \"Leg strength exercise\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/exercises",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "exercises"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Exercises",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"exerciseId\": \"2\",\r\n    \"name\": \"Chest Press\",\r\n    \"muscleGroup\": \"Chest\",\r\n    \"difficultyLevel\": \"Beginner\",\r\n    \"equipment\": \"Machine\",\r\n    \"description\": \"An upper-body pushing exercise that mainly targets the chest muscles.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/exercises/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "exercises",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Exercise",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/exercises/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "exercises",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "FoodItems",
+      "item": [
+        {
+          "name": "GET All FoodItems",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/food-items",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "food-items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Food-Items By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/food-items/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "food-items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Food-Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Fries\",\r\n    \"category\": \"carb\",\r\n    \"caloriesPer100g\": 300,\r\n    \"proteinPer100g\": 4,\r\n    \"carbsPer100g\": 25,\r\n    \"fatPer100g\": 7.3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/food-items",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "food-items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Food Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"foodItemId\": 1,\r\n    \"name\": \"Chicken Breast\",\r\n    \"category\": \"protein\",\r\n    \"caloriesPer100g\": 300,\r\n    \"proteinPer100g\": 31,\r\n    \"carbsPer100g\": 0,\r\n    \"fatPer100g\": 3.6\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/food-items/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "food-items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Food Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/food-items/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "food-items",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Check-Ins",
+      "item": [
+        {
+          "name": "GET All Check-Ins",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/check-ins",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "check-ins"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Check-In By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/check-ins/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "check-ins",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Check-In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n    \"userId\": 3,\r\n    \"date\": \"2026-05-12\",\r\n    \"currentWeight\": 60.3,\r\n    \"nutritionDeviation\": \"none\",\r\n    \"deviationFrequency\": 0,\r\n    \"hungerLevel\": \"low\",\r\n    \"energyLevel\": \"medium\",\r\n    \"generalFeedback\": \"Completed most workouts and followed the meal plan closely.\",\r\n    \"recommendationSummary\": \"Keep the current meal plan and continue progressing gradually in workouts.\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/check-ins",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "check-ins"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Check-In",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"checkInId\": 5,\r\n    \"userId\": 3,\r\n    \"date\": \"2026-05-12\",\r\n    \"currentWeight\": 60.3,\r\n    \"nutritionDeviation\": \"none\",\r\n    \"deviationFrequency\": 0,\r\n    \"hungerLevel\": \"low\",\r\n    \"energyLevel\": \"medium\",\r\n    \"generalFeedback\": \"Didn't completed most workouts and followed the meal plan closely.\",\r\n    \"recommendationSummary\": \"Keep the current meal plan and continue progressing gradually in workouts.\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/check-ins/5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "check-ins",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Check-In",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "3",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/check-ins/4",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "check-ins",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Daily Meal Plans",
+      "item": [
+        {
+          "name": "GET All Daily Meal Plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/daily-meal-plans",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "daily-meal-plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Daily Meal Plan By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/daily-meal-plans/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "daily-meal-plans",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Daily Meal Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "    {\r\n        \"userId\": 1,\r\n        \"name\": \"John Doe - Muscle Gain Daily Meal Plan\",\r\n        \"goal\": \"muscle gain\",\r\n        \"targetCalories\": 2800,\r\n        \"targetProtein\": 150,\r\n        \"isActive\": true,\r\n        \"meals\": [\r\n            {\r\n                \"mealType\": \"Breakfast\",\r\n                \"title\": \"Greek Yogurt With Oats\",\r\n                \"estimatedCalories\": 550,\r\n                \"estimatedProtein\": 35,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 2,\r\n                        \"foodName\": \"Greek Yogurt\",\r\n                        \"quantityGrams\": 250\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 6,\r\n                        \"foodName\": \"Oats\",\r\n                        \"quantityGrams\": 60\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"mealType\": \"Lunch\",\r\n                \"title\": \"Chicken Breast With Rice\",\r\n                \"estimatedCalories\": 750,\r\n                \"estimatedProtein\": 55,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 1,\r\n                        \"foodName\": \"Chicken Breast\",\r\n                        \"quantityGrams\": 180\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 3,\r\n                        \"foodName\": \"White Rice\",\r\n                        \"quantityGrams\": 250\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"mealType\": \"Dinner\",\r\n                \"title\": \"Salmon With Sweet Potato\",\r\n                \"estimatedCalories\": 800,\r\n                \"estimatedProtein\": 45,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 4,\r\n                        \"foodName\": \"Salmon\",\r\n                        \"quantityGrams\": 180\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 8,\r\n                        \"foodName\": \"Sweet Potato\",\r\n                        \"quantityGrams\": 250\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"mealType\": \"Snack\",\r\n                \"title\": \"Cottage Cheese And Egg\",\r\n                \"estimatedCalories\": 350,\r\n                \"estimatedProtein\": 30,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 9,\r\n                        \"foodName\": \"Cottage Cheese\",\r\n                        \"quantityGrams\": 200\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 5,\r\n                        \"foodName\": \"Egg\",\r\n                        \"quantityGrams\": 50\r\n                    }\r\n                ]\r\n            }\r\n        ],\r\n        \"createdAt\": \"2026-05-05\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/daily-meal-plans",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "daily-meal-plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Daily Meal Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "    {   \r\n        \"dailyMealPlanId\": 3,\r\n        \"userId\": 1,\r\n        \"name\": \"John Doe - Muscle Gain Daily Meal Plan\",\r\n        \"goal\": \"muscle gain\",\r\n        \"targetCalories\": 2000,\r\n        \"targetProtein\": 150,\r\n        \"isActive\": true,\r\n        \"meals\": [\r\n            {\r\n                \"mealType\": \"Breakfast\",\r\n                \"title\": \"Greek Yogurt With Oats\",\r\n                \"estimatedCalories\": 550,\r\n                \"estimatedProtein\": 35,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 2,\r\n                        \"foodName\": \"Greek Yogurt\",\r\n                        \"quantityGrams\": 250\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 6,\r\n                        \"foodName\": \"Oats\",\r\n                        \"quantityGrams\": 60\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"mealType\": \"Lunch\",\r\n                \"title\": \"Chicken Breast With Rice\",\r\n                \"estimatedCalories\": 750,\r\n                \"estimatedProtein\": 55,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 1,\r\n                        \"foodName\": \"Chicken Breast\",\r\n                        \"quantityGrams\": 180\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 3,\r\n                        \"foodName\": \"White Rice\",\r\n                        \"quantityGrams\": 250\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"mealType\": \"Dinner\",\r\n                \"title\": \"Salmon With Sweet Potato\",\r\n                \"estimatedCalories\": 800,\r\n                \"estimatedProtein\": 45,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 4,\r\n                        \"foodName\": \"Salmon\",\r\n                        \"quantityGrams\": 180\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 8,\r\n                        \"foodName\": \"Sweet Potato\",\r\n                        \"quantityGrams\": 250\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"mealType\": \"Snack\",\r\n                \"title\": \"Cottage Cheese And Egg\",\r\n                \"estimatedCalories\": 350,\r\n                \"estimatedProtein\": 30,\r\n                \"foodItems\": [\r\n                    {\r\n                        \"foodItemId\": 9,\r\n                        \"foodName\": \"Cottage Cheese\",\r\n                        \"quantityGrams\": 200\r\n                    },\r\n                    {\r\n                        \"foodItemId\": 5,\r\n                        \"foodName\": \"Egg\",\r\n                        \"quantityGrams\": 50\r\n                    }\r\n                ]\r\n            }\r\n        ],\r\n        \"createdAt\": \"2026-05-05\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/daily-meal-plans/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "daily-meal-plans",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Daily Meal Plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "3",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/daily-meal-plans/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "daily-meal-plans",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "WorkoutLogs",
+      "item": [
+        {
+          "name": "GET All WorkoutLogs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/workout-logs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-logs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Workout Logs By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/workout-logs/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-logs",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Workout Log",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "3",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n        \"userId\": 3,\r\n        \"workoutPlanId\": 2,\r\n        \"date\": \"2026-05-07\",\r\n        \"workoutTitle\": \"Lower Body And Core\",\r\n        \"exercises\": [\r\n            {\r\n                \"exerciseId\": 1,\r\n                \"exerciseName\": \"Leg Press\",\r\n                \"sets\": [\r\n                    {\r\n                        \"setNumber\": 1,\r\n                        \"reps\": 12,\r\n                        \"weight\": 60\r\n                    },\r\n                    {\r\n                        \"setNumber\": 2,\r\n                        \"reps\": 12,\r\n                        \"weight\": 60\r\n                    },\r\n                    {\r\n                        \"setNumber\": 3,\r\n                        \"reps\": 12,\r\n                        \"weight\": 60\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"exerciseId\": 7,\r\n                \"exerciseName\": \"Plank\",\r\n                \"sets\": [\r\n                    {\r\n                        \"setNumber\": 1,\r\n                        \"reps\": 40,\r\n                        \"weight\": 0\r\n                    },\r\n                    {\r\n                        \"setNumber\": 2,\r\n                        \"reps\": 35,\r\n                        \"weight\": 0\r\n                    },\r\n                    {\r\n                        \"setNumber\": 3,\r\n                        \"reps\": 30,\r\n                        \"weight\": 0\r\n                    }\r\n                ]\r\n            }\r\n        ],\r\n        \"durationMinutes\": 45,\r\n        \"difficultyRating\": 6,\r\n        \"notes\": \"Completed all planned leg press sets.\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/workout-logs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-logs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update WorkoutLog",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "    {\r\n        \"workoutLogId\": 2,\r\n        \"userId\": 1,\r\n        \"workoutPlanId\": 1,\r\n        \"date\": \"2026-05-08\",\r\n        \"workoutTitle\": \"Upper Body Focus\",\r\n        \"exercises\": [\r\n            {\r\n                \"exerciseId\": 4,\r\n                \"exerciseName\": \"Shoulder Press\",\r\n                \"sets\": [\r\n                    {\r\n                        \"setNumber\": 1,\r\n                        \"reps\": 10,\r\n                        \"weight\": 12\r\n                    },\r\n                    {\r\n                        \"setNumber\": 2,\r\n                        \"reps\": 9,\r\n                        \"weight\": 12\r\n                    },\r\n                    {\r\n                        \"setNumber\": 3,\r\n                        \"reps\": 12,\r\n                        \"weight\": 12\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"exerciseId\": 5,\r\n                \"exerciseName\": \"Biceps Curl\",\r\n                \"sets\": [\r\n                    {\r\n                        \"setNumber\": 1,\r\n                        \"reps\": 12,\r\n                        \"weight\": 10\r\n                    },\r\n                    {\r\n                        \"setNumber\": 2,\r\n                        \"reps\": 11,\r\n                        \"weight\": 10\r\n                    },\r\n                    {\r\n                        \"setNumber\": 3,\r\n                        \"reps\": 10,\r\n                        \"weight\": 10\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"exerciseId\": 6,\r\n                \"exerciseName\": \"Triceps Pushdown\",\r\n                \"sets\": [\r\n                    {\r\n                        \"setNumber\": 1,\r\n                        \"reps\": 12,\r\n                        \"weight\": 25\r\n                    },\r\n                    {\r\n                        \"setNumber\": 2,\r\n                        \"reps\": 12,\r\n                        \"weight\": 25\r\n                    },\r\n                    {\r\n                        \"setNumber\": 3,\r\n                        \"reps\": 10,\r\n                        \"weight\": 25\r\n                    }\r\n                ]\r\n            }\r\n        ],\r\n        \"durationMinutes\": 55,\r\n        \"difficultyRating\": 7,\r\n        \"notes\": \"Shoulder press was difficult in the last set.\"\r\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/workout-logs/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-logs",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Workout Log",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/workout-logs/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-logs",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Workout Plans",
+      "item": [
+        {
+          "name": "GET All Workout Plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "user",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "2",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/workout-plans",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Workout Plans By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "user",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/workout-plans/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-plans",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Workout Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "1",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\": 2,\r\n    \"name\": \"Mike Johnson - Beginner Full Body Plan\",\r\n    \"goal\": \"strength\",\r\n    \"isActive\": true,\r\n    \"days\": [\r\n        {\r\n            \"day\": \"Monday\",\r\n            \"title\": \"Full Body Workout A\",\r\n            \"exercises\": [\r\n                {\r\n                    \"exerciseId\": 1,\r\n                    \"exerciseName\": \"Leg Press\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 10,\r\n                    \"targetWeight\": 100\r\n                },\r\n                {\r\n                    \"exerciseId\": 2,\r\n                    \"exerciseName\": \"Chest Press\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 40\r\n                },\r\n                {\r\n                    \"exerciseId\": 3,\r\n                    \"exerciseName\": \"Lat Pulldown\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 45\r\n                },\r\n                {\r\n                    \"exerciseId\": 7,\r\n                    \"exerciseName\": \"Plank\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 60,\r\n                    \"targetWeight\": 0\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"day\": \"Wednesday\",\r\n            \"title\": \"Upper Body Focus\",\r\n            \"exercises\": [\r\n                {\r\n                    \"exerciseId\": 4,\r\n                    \"exerciseName\": \"Shoulder Press\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 10,\r\n                    \"targetWeight\": 14\r\n                },\r\n                {\r\n                    \"exerciseId\": 5,\r\n                    \"exerciseName\": \"Biceps Curl\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 12\r\n                },\r\n                {\r\n                    \"exerciseId\": 6,\r\n                    \"exerciseName\": \"Triceps Pushdown\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 30\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"day\": \"Friday\",\r\n            \"title\": \"Full Body Workout B\",\r\n            \"exercises\": [\r\n                {\r\n                    \"exerciseId\": 1,\r\n                    \"exerciseName\": \"Leg Press\",\r\n                    \"targetSets\": 5,\r\n                    \"targetReps\": 8,\r\n                    \"targetWeight\": 120\r\n                },\r\n                {\r\n                    \"exerciseId\": 2,\r\n                    \"exerciseName\": \"Chest Press\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 8,\r\n                    \"targetWeight\": 50\r\n                },\r\n                {\r\n                    \"exerciseId\": 3,\r\n                    \"exerciseName\": \"Lat Pulldown\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 10,\r\n                    \"targetWeight\": 50\r\n                },\r\n                {\r\n                    \"exerciseId\": 7,\r\n                    \"exerciseName\": \"Plank\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 75,\r\n                    \"targetWeight\": 0\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"createdAt\": \"2026-05-08\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/workout-plans",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Workout Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "2",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\": 2,\r\n    \"name\": \"Mike Johnson - Beginner Full Body Plan\",\r\n    \"goal\": \"strength\",\r\n    \"isActive\": true,\r\n    \"days\": [\r\n        {\r\n            \"day\": \"Monday\",\r\n            \"title\": \"Full Body Workout A\",\r\n            \"exercises\": [\r\n                {\r\n                    \"exerciseId\": 1,\r\n                    \"exerciseName\": \"Chest Press\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 10,\r\n                    \"targetWeight\": 100\r\n                },\r\n                {\r\n                    \"exerciseId\": 2,\r\n                    \"exerciseName\": \"Leg Press\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 40\r\n                },\r\n                {\r\n                    \"exerciseId\": 3,\r\n                    \"exerciseName\": \"Lat Pulldown\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 45\r\n                },\r\n                {\r\n                    \"exerciseId\": 7,\r\n                    \"exerciseName\": \"Plank\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 60,\r\n                    \"targetWeight\": 0\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"day\": \"Wednesday\",\r\n            \"title\": \"Upper Body Focus\",\r\n            \"exercises\": [\r\n                {\r\n                    \"exerciseId\": 4,\r\n                    \"exerciseName\": \"Shoulder Press\",\r\n                    \"targetSets\": 3,\r\n                    \"targetReps\": 10,\r\n                    \"targetWeight\": 14\r\n                },\r\n                {\r\n                    \"exerciseId\": 5,\r\n                    \"exerciseName\": \"Biceps Curl\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 12\r\n                },\r\n                {\r\n                    \"exerciseId\": 6,\r\n                    \"exerciseName\": \"Triceps Pushdown\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 12,\r\n                    \"targetWeight\": 30\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"day\": \"Friday\",\r\n            \"title\": \"Full Body Workout B\",\r\n            \"exercises\": [\r\n                {\r\n                    \"exerciseId\": 1,\r\n                    \"exerciseName\": \"Leg Press\",\r\n                    \"targetSets\": 5,\r\n                    \"targetReps\": 8,\r\n                    \"targetWeight\": 120\r\n                },\r\n                {\r\n                    \"exerciseId\": 2,\r\n                    \"exerciseName\": \"Chest Press\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 8,\r\n                    \"targetWeight\": 50\r\n                },\r\n                {\r\n                    \"exerciseId\": 3,\r\n                    \"exerciseName\": \"Lat Pulldown\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 10,\r\n                    \"targetWeight\": 50\r\n                },\r\n                {\r\n                    \"exerciseId\": 7,\r\n                    \"exerciseName\": \"Plank\",\r\n                    \"targetSets\": 4,\r\n                    \"targetReps\": 75,\r\n                    \"targetWeight\": 0\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/workout-plans/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-plans",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Workout Plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-role",
+                "value": "admin",
+                "type": "text"
+              },
+              {
+                "key": "userid",
+                "value": "2",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/workout-plans/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "workout-plans",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
