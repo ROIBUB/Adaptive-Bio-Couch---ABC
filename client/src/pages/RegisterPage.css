@@ -1,0 +1,158 @@
+/* Full-screen scrollable layout — same dark gradient as LoginPage */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  padding: 2.5rem 1rem;
+}
+
+/* Card — wider than login to fit two-column form */
+.register-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  margin-bottom: 2.5rem;
+}
+
+/* Header */
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-logo {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.register-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 0.4rem;
+}
+
+.register-header p {
+  color: #636e72;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+/* Form title */
+.register-form h2 {
+  font-size: 1.15rem;
+  color: #2d3436;
+  margin-bottom: 1.75rem;
+}
+
+/* ── Sections ── */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+/* Section heading with purple left-border accent */
+.section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6c5ce7;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-left: 0.75rem;
+  border-left: 3px solid #6c5ce7;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+/* ── Two-column grid ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.25rem;
+}
+
+/* Reset global form-group bottom margin inside grid so gap controls spacing */
+.form-grid .form-group {
+  margin-bottom: 1rem;
+}
+
+/* Span both columns (used for email) */
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+/* ── Submit button ── */
+.register-btn {
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.register-btn:hover:not(:disabled) {
+  background-color: #5a4bd1;
+}
+
+.register-btn:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.register-btn:disabled {
+  background-color: #b2bec3;
+  cursor: not-allowed;
+}
+
+/* Loading hint text */
+.loading-text {
+  text-align: center;
+  font-size: 0.84rem;
+  color: #636e72;
+  margin-top: 0.85rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Link to login */
+.register-nav-link {
+  text-align: center;
+  margin-top: 1.4rem;
+  font-size: 0.88rem;
+  color: #636e72;
+}
+
+.register-nav-link a {
+  color: #6c5ce7;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-nav-link a:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive ── */
+@media (max-width: 580px) {
+  .register-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group--full {
+    grid-column: 1;
+  }
+}

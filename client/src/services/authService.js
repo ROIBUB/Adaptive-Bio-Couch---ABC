@@ -23,4 +23,17 @@ const logout = async () => {
   return json.data;
 };
 
-export { login, logout };
+const register = async (formData) => {
+  const response = await fetch(`${BASE_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  });
+  const json = await response.json();
+  if (!json.success) {
+    throw new Error(json.error?.message || 'Registration failed');
+  }
+  return json.data;
+};
+
+export { login, logout, register };

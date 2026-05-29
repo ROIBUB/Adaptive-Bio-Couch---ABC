@@ -3,10 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 
 import LoginPage       from './pages/LoginPage';
+import RegisterPage    from './pages/RegisterPage';
 import DashboardPage   from './pages/DashboardPage';
 import SettingsPage    from './pages/SettingsPage';
 import WorkoutPlansPage from './pages/WorkoutPlansPage';
-import WorkoutLogsPage  from './pages/WorkoutLogsPage';
+import WorkoutLogsPage    from './pages/WorkoutLogsPage';
+import WorkoutLoggerPage  from './pages/WorkoutLoggerPage';
 import MealPlansPage    from './pages/MealPlansPage';
 import CheckInsPage     from './pages/CheckInsPage';
 
@@ -25,6 +27,7 @@ function App() {
       <Routes>
         {/* Public — no Navbar/Footer */}
         <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Protected — all wrapped in Layout automatically */}
         <Route
@@ -38,6 +41,10 @@ function App() {
         <Route
           path="/workout-plans"
           element={<ProtectedRoute><WorkoutPlansPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/workout-logs/new"
+          element={<ProtectedRoute><WorkoutLoggerPage /></ProtectedRoute>}
         />
         <Route
           path="/workout-logs"

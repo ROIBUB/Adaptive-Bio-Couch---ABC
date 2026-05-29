@@ -22,7 +22,7 @@
   margin-bottom: 1rem;
 }
 
-.toggle-btn {
+.new-workout-btn {
   background: #6c5ce7;
   color: white;
   border: none;
@@ -34,7 +34,7 @@
   transition: background-color 0.2s;
 }
 
-.toggle-btn:hover {
+.new-workout-btn:hover {
   background: #5a4bd1;
 }
 

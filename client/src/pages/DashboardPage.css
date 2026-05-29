@@ -1,39 +1,33 @@
 .dashboard {
-  /* Layout.jsx already provides padding and max-width — no need to repeat here */
+  /* Layout.jsx already provides padding and max-width */
 }
 
-.dashboard-header {
-  margin-bottom: 2rem;
-}
+/* ── Welcome ── */
+.welcome-section { margin-bottom: 2rem; }
+.welcome-section h1 { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
+.welcome-pills { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.pill { background: #f0f0f0; padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.9rem; }
 
-.dashboard-header h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1a1a2e;
-}
+/* ── Summary Cards ── */
+.summary-cards { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.summary-card { flex: 1; min-width: 200px; background: white; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid; }
+.summary-card-title { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #b2bec3; }
+.summary-card-value { font-size: 1.4rem; font-weight: 700; margin: 0.5rem 0 0.25rem; }
+.summary-card-subtitle { font-size: 0.85rem; color: #636e72; }
+.progress-bar-container { height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 0.75rem; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
 
-.dashboard-subtitle {
-  color: #636e72;
-  margin-top: 0.3rem;
-  font-size: 0.95rem;
-}
+/* ── Quick Nav ── */
+.quick-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.quick-nav-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; min-height: 100px; background: #f8f9fa; border: none; border-radius: 12px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.quick-nav-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.quick-nav-emoji { font-size: 2rem; }
+.quick-nav-label { font-size: 0.9rem; font-weight: 500; color: #2d3436; }
 
-.dashboard-section {
-  margin-bottom: 2.5rem;
-}
+/* ── Graph ── */
+.graph-section { background: white; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 2rem; }
+.graph-placeholder { text-align: center; color: #636e72; padding: 2rem; }
 
-.section-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #2d3436;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #dfe6e9;
-}
-
-/* Responsive card grid — fills the row with cards of minimum 260px width */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-}
+/* ── Activity + shared section titles ── */
+.activity-section { margin-bottom: 2rem; }
+.section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #2d3436; }

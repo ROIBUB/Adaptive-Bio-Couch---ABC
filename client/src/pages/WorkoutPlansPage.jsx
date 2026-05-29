@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import DataTable from '../components/DataTable';
 import { getWorkoutPlans } from '../services/workoutService';
@@ -13,6 +14,7 @@ const EXERCISE_COLUMNS = [
 ];
 
 function WorkoutPlansPage() {
+  const navigate = useNavigate();
   const [plans,   setPlans]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
@@ -80,21 +82,29 @@ function WorkoutPlansPage() {
           <div className="days-grid">
             {(plan.days || []).map((day, i) => (
               <div key={i} className="day-card">
-                <div className="day-header">
-                  <span className="day-name">{day.day}</span>
-                  <span className="day-title">{day.title}</span>
+                <div className="day-card-content">
+                  <div className="day-header">
+                    <span className="day-name">{day.day}</span>
+                    <span className="day-title">{day.title}</span>
+                  </div>
+                  <ul className="exercise-list">
+                    {(day.exercises || []).map((ex, j) => (
+                      <li key={j} className="exercise-item">
+                        <span className="ex-name">{ex.exerciseName}</span>
+                        <span className="ex-detail">
+                          {ex.targetSets} × {ex.targetReps}
+                          {ex.targetWeight > 0 ? ` @ ${ex.targetWeight} kg` : ' (Bodyweight)'}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="exercise-list">
-                  {(day.exercises || []).map((ex, j) => (
-                    <li key={j} className="exercise-item">
-                      <span className="ex-name">{ex.exerciseName}</span>
-                      <span className="ex-detail">
-                        {ex.targetSets} × {ex.targetReps}
-                        {ex.targetWeight > 0 ? ` @ ${ex.targetWeight} kg` : ' (Bodyweight)'}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <button
+                  className="start-workout-btn"
+                  onClick={() => navigate(`/workout-logs/new?planId=${plan.workoutPlanId}&dayId=${day.workoutDayId}`)}
+                >
+                  Start Workout
+                </button>
               </div>
             ))}
           </div>

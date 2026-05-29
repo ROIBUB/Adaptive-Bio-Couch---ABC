@@ -47,6 +47,8 @@
   padding: 1rem 1.2rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   border-top: 3px solid #b2bec3;
+  display: flex;
+  flex-direction: column;
 }
 
 .meal-card.meal-type-breakfast { border-top-color: #fdcb6e; }
@@ -89,6 +91,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  flex: 1;
 }
 
 .food-item {
@@ -110,4 +113,59 @@
 .food-qty {
   color: #636e72;
   font-size: 0.82rem;
+}
+
+/* Calories banner */
+.calories-today-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e8f8f4;
+  color: #00704a;
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.calories-today-banner strong {
+  font-size: 1rem;
+}
+
+/* Mark as Eaten button */
+.mark-eaten-btn {
+  margin-top: 0.9rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  border: 1.5px solid #00b894;
+  border-radius: 6px;
+  background: white;
+  color: #00b894;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.mark-eaten-btn:hover:not(:disabled) {
+  background: #f0fdf8;
+}
+
+.mark-eaten-btn.eaten {
+  background: #00b894;
+  color: white;
+  border-color: #00b894;
+  cursor: pointer;
+}
+
+.mark-eaten-btn.eaten:hover {
+  background: #e17055;
+  border-color: #e17055;
+}
+
+.mark-eaten-btn.saving {
+  background: #b2dfdb;
+  color: #00796b;
+  border-color: #b2dfdb;
+  cursor: not-allowed;
 }

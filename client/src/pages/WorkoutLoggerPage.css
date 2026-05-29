@@ -1,0 +1,254 @@
+.workout-logger-page {
+  /* Layout.jsx already provides padding and max-width */
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.page-header p {
+  color: #636e72;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.loading {
+  color: #636e72;
+  font-size: 0.95rem;
+}
+
+.error-banner {
+  background: #ffeaa7;
+  color: #d35400;
+  padding: 0.85rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.back-btn {
+  background: none;
+  border: 1px solid #6c5ce7;
+  color: #6c5ce7;
+  border-radius: 8px;
+  padding: 0.55rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.15s;
+}
+
+.back-btn:hover {
+  background: #6c5ce7;
+  color: white;
+}
+
+/* Header form fields */
+.header-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 600px) {
+  .header-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.form-group input {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #2d3436;
+  transition: border-color 0.15s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #6c5ce7;
+}
+
+/* Exercise cards */
+.exercises-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.exercise-card {
+  background: white;
+  border: 1px solid #dfe6e9;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.exercise-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.3rem;
+}
+
+.exercise-target {
+  font-size: 0.82rem;
+  color: #b2bec3;
+  margin-bottom: 1rem;
+}
+
+/* Sets table */
+.sets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+
+.sets-table th {
+  text-align: right;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #636e72;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 2px solid #dfe6e9;
+}
+
+.sets-table th:first-child {
+  text-align: left;
+}
+
+.sets-table td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid #f0f4f8;
+  text-align: right;
+}
+
+.sets-table td:first-child {
+  text-align: left;
+}
+
+.sets-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.set-number {
+  color: #636e72;
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-width: 2rem;
+}
+
+.set-input {
+  width: 70px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #dfe6e9;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  text-align: right;
+  color: #2d3436;
+  transition: border-color 0.15s;
+}
+
+.set-input:focus {
+  outline: none;
+  border-color: #6c5ce7;
+}
+
+.remove-set-btn {
+  background: none;
+  border: 1px solid #d63031;
+  color: #d63031;
+  border-radius: 5px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.remove-set-btn:hover {
+  background: #d63031;
+  color: white;
+}
+
+.add-set-btn {
+  background: none;
+  border: 1px dashed #00b894;
+  color: #00b894;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 0.25rem;
+}
+
+.add-set-btn:hover {
+  background: #00b894;
+  color: white;
+}
+
+/* Submit area */
+.submit-error-banner {
+  background: #fff5f5;
+  color: #d63031;
+  border: 1px solid #fab1a0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.save-workout-btn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  background: #00b894;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-workout-btn:hover:not(:disabled) {
+  background: #00a381;
+}
+
+.save-workout-btn:disabled {
+  background: #b2bec3;
+  cursor: not-allowed;
+}

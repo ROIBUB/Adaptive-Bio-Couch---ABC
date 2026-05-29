@@ -101,3 +101,20 @@
   font-size: 0.82rem;
   color: #2d3436;
 }
+
+.login-nav-link {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.88rem;
+  color: #636e72;
+}
+
+.login-nav-link a {
+  color: #6c5ce7;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-nav-link a:hover {
+  text-decoration: underline;
+}

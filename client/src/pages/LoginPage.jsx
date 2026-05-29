@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/authService';
 import './LoginPage.css';
 
@@ -134,6 +134,10 @@ function LoginPage() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <div className="login-nav-link">
+          Don't have an account? <Link to="/register">Sign up</Link>
+        </div>
 
         {/* Demo hint — helpful for testing and for the grader */}
         <div className="login-hint">
