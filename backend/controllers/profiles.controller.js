@@ -1,4 +1,4 @@
-const profiles = require('../models/profiles.model');
+const ProfilesModel = require('../models/profiles.model');
 
 const {
     sendSuccess,
@@ -25,14 +25,13 @@ const getProfileByUserId = (req, res) => {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
-        const profile = profiles.find(p => p.userId === userId);
+        const profile = ProfilesModel.getByUserId(userId);
 
         if (!profile) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
         return sendSuccess(res, 200, profile);
-
     } catch (err) {
         return sendServerError(res);
     }
@@ -46,26 +45,18 @@ const createProfile = (req, res) => {
             return sendValidationError(res, 'Missing user id', { field: 'userid header' });
         }
 
-        const requiredFields = ['fitnessGoal', 'workoutsPerWeek', 'mealsPerDay'];
-        const missingFields = getMissingFields(req.body, requiredFields);
-
+        const missingFields = getMissingFields(req.body, ['fitnessGoal', 'workoutsPerWeek', 'mealsPerDay']);
         if (missingFields.length > 0) {
             return sendValidationError(res, 'Missing required profile fields', { missingFields });
         }
 
-        const {
-            age, gender, height, currentWeight,
-            targetWeight, fitnessGoal, activityLevel,
-            workoutsPerWeek, mealsPerDay
-        } = req.body;
-
-        const existing = profiles.find(p => p.userId === userId);
-        if (existing) {
+        if (ProfilesModel.getByUserId(userId)) {
             return sendValidationError(res, 'A profile already exists for this user', { userId });
         }
 
-        const newProfile = {
-            profileId: profiles.length > 0 ? profiles[profiles.length - 1].profileId + 1 : 1,
+        const { age, gender, height, currentWeight, targetWeight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay } = req.body;
+
+        const newProfile = ProfilesModel.create({
             userId,
             age: age ?? null,
             gender: gender ?? null,
@@ -77,12 +68,9 @@ const createProfile = (req, res) => {
             workoutsPerWeek,
             mealsPerDay,
             onboardingCompleted: false
-        };
-
-        profiles.push(newProfile);
+        });
 
         return sendSuccess(res, 201, newProfile);
-
     } catch (err) {
         return sendServerError(res);
     }
@@ -104,35 +92,29 @@ const updateProfile = (req, res) => {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
-        const profileIndex = profiles.findIndex(p => p.userId === userId);
-
-        if (profileIndex === -1) {
+        if (!ProfilesModel.getByUserId(userId)) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
         const {
             age, gender, height, currentWeight, targetWeight,
-            fitnessGoal, activityLevel, workoutsPerWeek,
-            mealsPerDay, onboardingCompleted
+            fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay, onboardingCompleted
         } = req.body;
 
-        const updated = { ...profiles[profileIndex] };
+        const updates = {};
+        if (age !== undefined)                updates.age = age;
+        if (gender !== undefined)             updates.gender = gender;
+        if (height !== undefined)             updates.height = height;
+        if (currentWeight !== undefined)      updates.currentWeight = currentWeight;
+        if (targetWeight !== undefined)       updates.targetWeight = targetWeight;
+        if (fitnessGoal !== undefined)        updates.fitnessGoal = fitnessGoal;
+        if (activityLevel !== undefined)      updates.activityLevel = activityLevel;
+        if (workoutsPerWeek !== undefined)    updates.workoutsPerWeek = workoutsPerWeek;
+        if (mealsPerDay !== undefined)        updates.mealsPerDay = mealsPerDay;
+        if (onboardingCompleted !== undefined) updates.onboardingCompleted = onboardingCompleted;
 
-        if (age !== undefined)                updated.age = age;
-        if (gender !== undefined)             updated.gender = gender;
-        if (height !== undefined)             updated.height = height;
-        if (currentWeight !== undefined)      updated.currentWeight = currentWeight;
-        if (targetWeight !== undefined)       updated.targetWeight = targetWeight;
-        if (fitnessGoal !== undefined)        updated.fitnessGoal = fitnessGoal;
-        if (activityLevel !== undefined)      updated.activityLevel = activityLevel;
-        if (workoutsPerWeek !== undefined)    updated.workoutsPerWeek = workoutsPerWeek;
-        if (mealsPerDay !== undefined)        updated.mealsPerDay = mealsPerDay;
-        if (onboardingCompleted !== undefined) updated.onboardingCompleted = onboardingCompleted;
-
-        profiles[profileIndex] = updated;
-
-        return sendSuccess(res, 200, profiles[profileIndex]);
-
+        const updated = ProfilesModel.update(userId, updates);
+        return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
     }

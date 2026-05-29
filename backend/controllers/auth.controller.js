@@ -1,9 +1,7 @@
-const usersModel = require('../models/users.model');
+const UsersModel = require('../models/users.model');
 const { sendSuccess, sendValidationError, sendServerError } = require('../middleware/errorHandlers');
 
 // POST /api/auth/login
-// Finds the user by email + password and returns safe user info (no password).
-// The frontend stores this and uses it as the "session" (no real sessions here).
 const login = (req, res) => {
     try {
         const { email, password } = req.body;
@@ -14,17 +12,13 @@ const login = (req, res) => {
             });
         }
 
-        const user = usersModel.find(u => u.email === email && u.password === password);
+        const user = UsersModel.findByEmail(email);
 
-        if (!user) {
+        if (!user || user.password !== password) {
             return res.status(401).json({
                 success: false,
                 data: null,
-                error: {
-                    code: 'UNAUTHORIZED',
-                    message: 'Invalid email or password',
-                    details: {}
-                }
+                error: { code: 'UNAUTHORIZED', message: 'Invalid email or password', details: {} }
             });
         }
 
@@ -42,7 +36,6 @@ const login = (req, res) => {
 };
 
 // POST /api/auth/logout
-// No real session to destroy — just signals success so the frontend can clear localStorage.
 const logout = (req, res) => {
     return sendSuccess(res, 200, { message: 'Logged out successfully' });
 };

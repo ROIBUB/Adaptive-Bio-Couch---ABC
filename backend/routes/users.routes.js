@@ -6,7 +6,7 @@ const { getAllUsers, getUserById, getMe, createUser, updateUser, deleteUser} = r
 
 // if u asked for GET /api/users
 // todo: should every user be able to see all users? 
-router.get('/', getAllUsers);
+router.get('/', authorize(['admin']), getAllUsers);
 // /me MUST come before /:id — otherwise "me" is captured as an id param
 router.get('/me', getMe);
 // if u asked for GET /api/users/:id

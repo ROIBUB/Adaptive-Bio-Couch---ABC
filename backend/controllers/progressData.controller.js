@@ -1,4 +1,4 @@
-const progressData = require('../models/progressData.model');
+const ProgressDataModel = require('../models/progressData.model');
 
 const {
     sendSuccess,
@@ -16,20 +16,14 @@ const getAllProgress = (req, res) => {
         const requestUserId = Number(req.headers.userid);
 
         if (userRole === 'admin') {
-            return sendSuccess(res, 200, progressData);
+            return sendSuccess(res, 200, ProgressDataModel.getAll());
         }
 
         if (!validateId(requestUserId)) {
-            return sendValidationError(res, 'Missing or invalid user id in request headers', {
-                field: 'userid',
-                value: req.headers.userid || null
-            });
+            return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
 
-        const userProgress = progressData.filter(p => p.userId === requestUserId);
-
-        return sendSuccess(res, 200, userProgress);
-
+        return sendSuccess(res, 200, ProgressDataModel.getByUserId(requestUserId));
     } catch (err) {
         return sendServerError(res);
     }
@@ -46,20 +40,16 @@ const getProgressByDate = (req, res) => {
         }
 
         if (!validateId(requestUserId)) {
-            return sendValidationError(res, 'Missing or invalid user id in request headers', {
-                field: 'userid',
-                value: req.headers.userid || null
-            });
+            return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
 
-        const record = progressData.find(p => p.userId === requestUserId && p.date === date);
+        const record = ProgressDataModel.getByUserAndDate(requestUserId, date);
 
         if (!record) {
             return sendNotFound(res, 'Progress record not found', { date, userId: requestUserId });
         }
 
         return sendSuccess(res, 200, record);
-
     } catch (err) {
         return sendServerError(res);
     }
@@ -68,15 +58,12 @@ const getProgressByDate = (req, res) => {
 // POST /api/progress
 const createProgress = (req, res) => {
     try {
-        const requiredFields = ['date', 'caloriesConsumed', 'workoutsCompleted', 'activeMinutes'];
-        const missingFields = getMissingFields(req.body, requiredFields);
-
+        const missingFields = getMissingFields(req.body, ['date', 'caloriesConsumed', 'workoutsCompleted', 'activeMinutes']);
         if (missingFields.length > 0) {
             return sendValidationError(res, 'Missing required progress fields', { missingFields });
         }
 
         const requestUserId = Number(req.headers.userid);
-
         if (!validateId(requestUserId)) {
             return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid' });
         }
@@ -95,19 +82,8 @@ const createProgress = (req, res) => {
             return sendValidationError(res, 'Invalid active minutes', { field: 'activeMinutes', value: activeMinutes });
         }
 
-        const newRecord = {
-            progressId: progressData.length > 0 ? progressData[progressData.length - 1].progressId + 1 : 1,
-            userId: requestUserId,
-            date,
-            caloriesConsumed,
-            workoutsCompleted,
-            activeMinutes
-        };
-
-        progressData.push(newRecord);
-
+        const newRecord = ProgressDataModel.create({ userId: requestUserId, date, caloriesConsumed, workoutsCompleted, activeMinutes });
         return sendSuccess(res, 201, newRecord);
-
     } catch (err) {
         return sendServerError(res);
     }
@@ -123,20 +99,18 @@ const updateProgress = (req, res) => {
             return sendValidationError(res, 'Invalid progress id', { field: 'id', value: req.params.id });
         }
 
-        const progressIndex = progressData.findIndex(p => p.progressId === id);
+        const record = ProgressDataModel.getById(id);
 
-        if (progressIndex === -1) {
+        if (!record) {
             return sendNotFound(res, 'Progress record not found', { progressId: id });
         }
 
         const userRole = req.headers['x-user-role'];
-        if (userRole !== 'admin' && progressData[progressIndex].userId !== requestUserId) {
+        if (userRole !== 'admin' && record.userId !== requestUserId) {
             return sendNotFound(res, 'Progress record not found', { progressId: id });
         }
 
-        const requiredFields = ['date', 'caloriesConsumed', 'workoutsCompleted', 'activeMinutes'];
-        const missingFields = getMissingFields(req.body, requiredFields);
-
+        const missingFields = getMissingFields(req.body, ['date', 'caloriesConsumed', 'workoutsCompleted', 'activeMinutes']);
         if (missingFields.length > 0) {
             return sendValidationError(res, 'Missing required progress fields', { missingFields });
         }
@@ -155,16 +129,8 @@ const updateProgress = (req, res) => {
             return sendValidationError(res, 'Invalid active minutes', { field: 'activeMinutes', value: activeMinutes });
         }
 
-        progressData[progressIndex] = {
-            ...progressData[progressIndex],
-            date,
-            caloriesConsumed,
-            workoutsCompleted,
-            activeMinutes
-        };
-
-        return sendSuccess(res, 200, progressData[progressIndex]);
-
+        const updated = ProgressDataModel.update(id, { date, caloriesConsumed, workoutsCompleted, activeMinutes });
+        return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
     }

@@ -1,48 +1,24 @@
-const workoutLogs = require("../models/workoutLogs.model");
+const WorkoutLogsModel = require('../models/workoutLogs.model');
 
-const {
-    sendSuccess,
-    sendValidationError,
-    sendNotFound,
-    sendServerError
-} = require("../middleware/errorHandlers");
+const { sendSuccess, sendValidationError, sendNotFound, sendServerError } = require('../middleware/errorHandlers');
 
-const {
-    validateId,
-    getMissingFields
-} = require("../middleware/validation");
+const { validateId, getMissingFields } = require('../middleware/validation');
 
 // GET /api/workout-logs
 const getAllWorkoutLogs = (req, res) => {
     try {
-        const userRole = req.headers["x-user-role"];
+        const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole === "admin") {
-            return sendSuccess(res, 200, workoutLogs);
+        if (userRole === 'admin') {
+            return sendSuccess(res, 200, WorkoutLogsModel.getAll());
         }
 
         if (!validateId(requestUserId)) {
-            return sendValidationError(
-                res,
-                "Missing or invalid user id in request headers",
-                {
-                    field: "userid",
-                    value: req.headers.userid || null
-                }
-            );
+            return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
 
-        const userWorkoutLogs = workoutLogs.filter(
-            log => log.userId === requestUserId
-        );
-
-        return sendSuccess(
-            res,
-            200,
-            userWorkoutLogs
-        );
-
+        return sendSuccess(res, 200, WorkoutLogsModel.getByUserId(requestUserId));
     } catch (err) {
         return sendServerError(res);
     }
@@ -54,50 +30,23 @@ const getWorkoutLogById = (req, res) => {
         const id = Number(req.params.id);
 
         if (!validateId(id)) {
-            return sendValidationError(
-                res,
-                "Invalid workout log id",
-                {
-                    field: "id",
-                    value: req.params.id
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log id', { field: 'id', value: req.params.id });
         }
 
-        const workoutLog = workoutLogs.find(
-            log => log.workoutLogId === id
-        );
+        const log = WorkoutLogsModel.getById(id);
 
-        if (!workoutLog) {
-            return sendNotFound(
-                res,
-                "Workout log not found",
-                {
-                    workoutLogId: id
-                }
-            );
+        if (!log) {
+            return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        const userRole = req.headers["x-user-role"];
+        const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (
-            userRole !== "admin" &&
-            workoutLog.userId !== requestUserId
-        ) {
-            return sendNotFound(
-                res,
-                "Workout log not found",
-                { workoutLogId: id }
-            );
+        if (userRole !== 'admin' && log.userId !== requestUserId) {
+            return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        return sendSuccess(
-            res,
-            200,
-            workoutLog
-        );
-
+        return sendSuccess(res, 200, log);
     } catch (err) {
         return sendServerError(res);
     }
@@ -106,237 +55,91 @@ const getWorkoutLogById = (req, res) => {
 // POST /api/workout-logs
 const createWorkoutLog = (req, res) => {
     try {
-
-        const userId = parseInt(req.headers["userid"]);
+        const userId = parseInt(req.headers['userid']);
         if (!userId || isNaN(userId)) {
-            return sendValidationError(res, "Missing user id", { field: "userid header" });
+            return sendValidationError(res, 'Missing user id', { field: 'userid header' });
         }
 
-        const {
-            workoutPlanId,
-            date,
-            workoutTitle,
-            exercises,
-            durationMinutes,
-            difficultyRating,
-            notes
-        } = req.body;
+        const { workoutPlanId, date, workoutTitle, exercises, durationMinutes, difficultyRating, notes } = req.body;
 
-        const requiredFields = [
-            "workoutPlanId",
-            "date",
-            "workoutTitle",
-            "exercises",
-            "durationMinutes",
-            "difficultyRating"
-        ];
-
-        const missingFields = getMissingFields(
-            req.body,
-            requiredFields
-        );
-
+        const missingFields = getMissingFields(req.body, ['workoutPlanId', 'date', 'workoutTitle', 'exercises', 'durationMinutes', 'difficultyRating']);
         if (missingFields.length > 0) {
-            return sendValidationError(
-                res,
-                "Missing required workout log fields",
-                {
-                    missingFields: missingFields
-                }
-            );
+            return sendValidationError(res, 'Missing required workout log fields', { missingFields });
         }
 
-        if (
-            typeof workoutPlanId !== "number" ||
-            workoutPlanId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid workout plan id",
-                {
-                    field: "workoutPlanId",
-                    value: workoutPlanId
-                }
-            );
+        if (typeof workoutPlanId !== 'number' || workoutPlanId <= 0) {
+            return sendValidationError(res, 'Invalid workout plan id', { field: 'workoutPlanId', value: workoutPlanId });
         }
 
-        if (
-            !Array.isArray(exercises) ||
-            exercises.length === 0
-        ) {
-            return sendValidationError(
-                res,
-                "Exercises must be a non-empty array",
-                {
-                    field: "exercises"
-                }
-            );
+        if (!Array.isArray(exercises) || exercises.length === 0) {
+            return sendValidationError(res, 'Exercises must be a non-empty array', { field: 'exercises' });
         }
 
-        if (
-            typeof durationMinutes !== "number" ||
-            durationMinutes <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid workout duration",
-                {
-                    field: "durationMinutes",
-                    value: durationMinutes
-                }
-            );
+        if (typeof durationMinutes !== 'number' || durationMinutes <= 0) {
+            return sendValidationError(res, 'Invalid workout duration', { field: 'durationMinutes', value: durationMinutes });
         }
 
-        if (
-            typeof difficultyRating !== "number" ||
-            difficultyRating < 1 ||
-            difficultyRating > 10
-        ) {
-            return sendValidationError(
-                res,
-                "Difficulty rating must be a number between 1 and 10",
-                {
-                    field: "difficultyRating",
-                    value: difficultyRating
-                }
-            );
+        if (typeof difficultyRating !== 'number' || difficultyRating < 1 || difficultyRating > 10) {
+            return sendValidationError(res, 'Difficulty rating must be a number between 1 and 10', { field: 'difficultyRating', value: difficultyRating });
         }
 
         const invalidExercises = [];
-
-        exercises.forEach(
-            (exercise, exerciseIndex) => {
-
-                if (
-                    typeof exercise.exerciseId !== "number" ||
-                    exercise.exerciseId <= 0
-                ) {
-                    invalidExercises.push({
-                        exerciseIndex: exerciseIndex,
-                        field: "exerciseId",
-                        value: exercise.exerciseId
-                    });
-                }
-
-                if (!exercise.exerciseName) {
-                    invalidExercises.push({
-                        exerciseIndex: exerciseIndex,
-                        field: "exerciseName"
-                    });
-                }
-
-                if (
-                    !Array.isArray(exercise.sets) ||
-                    exercise.sets.length === 0
-                ) {
-                    invalidExercises.push({
-                        exerciseIndex: exerciseIndex,
-                        field: "sets"
-                    });
-                }
+        exercises.forEach((exercise, exerciseIndex) => {
+            if (typeof exercise.exerciseId !== 'number' || exercise.exerciseId <= 0) {
+                invalidExercises.push({ exerciseIndex, field: 'exerciseId', value: exercise.exerciseId });
             }
-        );
+            if (!exercise.exerciseName) {
+                invalidExercises.push({ exerciseIndex, field: 'exerciseName' });
+            }
+            if (!Array.isArray(exercise.sets) || exercise.sets.length === 0) {
+                invalidExercises.push({ exerciseIndex, field: 'sets' });
+            }
+        });
 
         if (invalidExercises.length > 0) {
-            return sendValidationError(
-                res,
-                "Invalid workout log exercises",
-                {
-                    invalidExercises:
-                    invalidExercises
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log exercises', { invalidExercises });
         }
 
         const invalidSets = [];
-
-        exercises.forEach(
-            (exercise, exerciseIndex) => {
-
-                if (Array.isArray(exercise.sets)) {
-
-                    exercise.sets.forEach(
-                        (set, setIndex) => {
-
-                            if (
-                                typeof set.setNumber !== "number" ||
-                                set.setNumber <= 0
-                            ) {
-                                invalidSets.push({
-                                    exerciseIndex:
-                                    exerciseIndex,
-                                    setIndex: setIndex,
-                                    field: "setNumber",
-                                    value: set.setNumber
-                                });
-                            }
-
-                            if (
-                                typeof set.reps !== "number" ||
-                                set.reps < 0
-                            ) {
-                                invalidSets.push({
-                                    exerciseIndex:
-                                    exerciseIndex,
-                                    setIndex: setIndex,
-                                    field: "reps",
-                                    value: set.reps
-                                });
-                            }
-
-                            if (
-                                typeof set.weight !== "number" ||
-                                set.weight < 0
-                            ) {
-                                invalidSets.push({
-                                    exerciseIndex:
-                                    exerciseIndex,
-                                    setIndex: setIndex,
-                                    field: "weight",
-                                    value: set.weight
-                                });
-                            }
-                        }
-                    );
-                }
+        exercises.forEach((exercise, exerciseIndex) => {
+            if (Array.isArray(exercise.sets)) {
+                exercise.sets.forEach((set, setIndex) => {
+                    if (typeof set.setNumber !== 'number' || set.setNumber <= 0) {
+                        invalidSets.push({ exerciseIndex, setIndex, field: 'setNumber', value: set.setNumber });
+                    }
+                    if (typeof set.reps !== 'number' || set.reps < 0) {
+                        invalidSets.push({ exerciseIndex, setIndex, field: 'reps', value: set.reps });
+                    }
+                    if (typeof set.weight !== 'number' || set.weight < 0) {
+                        invalidSets.push({ exerciseIndex, setIndex, field: 'weight', value: set.weight });
+                    }
+                });
             }
-        );
+        });
 
         if (invalidSets.length > 0) {
-            return sendValidationError(
-                res,
-                "Invalid workout log sets",
-                {
-                    invalidSets: invalidSets
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log sets', { invalidSets });
         }
 
-        const newWorkoutLog = {
-            workoutLogId:
-                workoutLogs.length > 0
-                    ? workoutLogs[
-                workoutLogs.length - 1
-                    ].workoutLogId + 1
-                    : 1,
-            userId,
-            workoutPlanId,
-            date,
-            workoutTitle,
-            exercises,
-            durationMinutes,
-            difficultyRating,
-            notes: notes || ""
-        };
+        const newLog = WorkoutLogsModel.create({ userId, workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
 
-        workoutLogs.push(newWorkoutLog);
+        exercises.forEach(exercise => {
+            const newExercise = WorkoutLogsModel.createLogExercise({
+                workoutLogId: newLog.workoutLogId,
+                exerciseId: exercise.exerciseId,
+                exerciseName: exercise.exerciseName
+            });
+            exercise.sets.forEach(set => {
+                WorkoutLogsModel.createLogSet({
+                    workoutLogExerciseId: newExercise.id,
+                    setNumber: set.setNumber,
+                    reps: set.reps,
+                    weight: set.weight
+                });
+            });
+        });
 
-        return sendSuccess(
-            res,
-            201,
-            newWorkoutLog
-        );
-
+        return sendSuccess(res, 201, WorkoutLogsModel.getById(newLog.workoutLogId));
     } catch (err) {
         return sendServerError(res);
     }
@@ -345,260 +148,107 @@ const createWorkoutLog = (req, res) => {
 // PUT /api/workout-logs/:id
 const updateWorkoutLog = (req, res) => {
     try {
-
         const id = Number(req.params.id);
 
         if (!validateId(id)) {
-            return sendValidationError(
-                res,
-                "Invalid workout log id",
-                {
-                    field: "id",
-                    value: req.params.id
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log id', { field: 'id', value: req.params.id });
         }
 
-        const workoutLogIndex =
-            workoutLogs.findIndex(
-                log => log.workoutLogId === id
-            );
+        const log = WorkoutLogsModel.getById(id);
 
-        if (workoutLogIndex === -1) {
-            return sendNotFound(
-                res,
-                "Workout log not found",
-                {
-                    workoutLogId: id
-                }
-            );
+        if (!log) {
+            return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        const userRole = req.headers["x-user-role"];
-        const requestUserId = parseInt(req.headers["userid"]);
+        const userRole = req.headers['x-user-role'];
+        const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== "admin" && workoutLogs[workoutLogIndex].userId !== requestUserId) {
-            return sendNotFound(res, "Workout log not found", { workoutLogId: id });
+        if (userRole !== 'admin' && log.userId !== requestUserId) {
+            return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        const {
-            workoutPlanId,
-            date,
-            workoutTitle,
-            exercises,
-            durationMinutes,
-            difficultyRating,
-            notes
-        } = req.body;
+        const { workoutPlanId, date, workoutTitle, exercises, durationMinutes, difficultyRating, notes } = req.body;
 
-        const requiredFields = [
-            "workoutPlanId",
-            "date",
-            "workoutTitle",
-            "exercises",
-            "durationMinutes",
-            "difficultyRating"
-        ];
-
-        const missingFields = getMissingFields(
-            req.body,
-            requiredFields
-        );
-
+        const missingFields = getMissingFields(req.body, ['workoutPlanId', 'date', 'workoutTitle', 'exercises', 'durationMinutes', 'difficultyRating']);
         if (missingFields.length > 0) {
-            return sendValidationError(
-                res,
-                "Missing required workout log fields",
-                {
-                    missingFields: missingFields
-                }
-            );
+            return sendValidationError(res, 'Missing required workout log fields', { missingFields });
         }
 
-        if (
-            typeof workoutPlanId !== "number" ||
-            workoutPlanId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid workout plan id",
-                {
-                    field: "workoutPlanId",
-                    value: workoutPlanId
-                }
-            );
+        if (typeof workoutPlanId !== 'number' || workoutPlanId <= 0) {
+            return sendValidationError(res, 'Invalid workout plan id', { field: 'workoutPlanId', value: workoutPlanId });
         }
 
-        if (
-            !Array.isArray(exercises) ||
-            exercises.length === 0
-        ) {
-            return sendValidationError(
-                res,
-                "Exercises must be a non-empty array",
-                {
-                    field: "exercises"
-                }
-            );
+        if (!Array.isArray(exercises) || exercises.length === 0) {
+            return sendValidationError(res, 'Exercises must be a non-empty array', { field: 'exercises' });
         }
 
-        if (
-            typeof durationMinutes !== "number" ||
-            durationMinutes <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid workout duration",
-                {
-                    field: "durationMinutes",
-                    value: durationMinutes
-                }
-            );
+        if (typeof durationMinutes !== 'number' || durationMinutes <= 0) {
+            return sendValidationError(res, 'Invalid workout duration', { field: 'durationMinutes', value: durationMinutes });
         }
 
-        if (
-            typeof difficultyRating !== "number" ||
-            difficultyRating < 1 ||
-            difficultyRating > 10
-        ) {
-            return sendValidationError(
-                res,
-                "Difficulty rating must be a number between 1 and 10",
-                {
-                    field: "difficultyRating",
-                    value: difficultyRating
-                }
-            );
+        if (typeof difficultyRating !== 'number' || difficultyRating < 1 || difficultyRating > 10) {
+            return sendValidationError(res, 'Difficulty rating must be a number between 1 and 10', { field: 'difficultyRating', value: difficultyRating });
         }
 
         const invalidExercises = [];
-
-        exercises.forEach(
-            (exercise, exerciseIndex) => {
-
-                if (
-                    typeof exercise.exerciseId !== "number" ||
-                    exercise.exerciseId <= 0
-                ) {
-                    invalidExercises.push({
-                        exerciseIndex: exerciseIndex,
-                        field: "exerciseId",
-                        value: exercise.exerciseId
-                    });
-                }
-
-                if (!exercise.exerciseName) {
-                    invalidExercises.push({
-                        exerciseIndex: exerciseIndex,
-                        field: "exerciseName"
-                    });
-                }
-
-                if (
-                    !Array.isArray(exercise.sets) ||
-                    exercise.sets.length === 0
-                ) {
-                    invalidExercises.push({
-                        exerciseIndex: exerciseIndex,
-                        field: "sets"
-                    });
-                }
+        exercises.forEach((exercise, exerciseIndex) => {
+            if (typeof exercise.exerciseId !== 'number' || exercise.exerciseId <= 0) {
+                invalidExercises.push({ exerciseIndex, field: 'exerciseId', value: exercise.exerciseId });
             }
-        );
+            if (!exercise.exerciseName) {
+                invalidExercises.push({ exerciseIndex, field: 'exerciseName' });
+            }
+            if (!Array.isArray(exercise.sets) || exercise.sets.length === 0) {
+                invalidExercises.push({ exerciseIndex, field: 'sets' });
+            }
+        });
 
         if (invalidExercises.length > 0) {
-            return sendValidationError(
-                res,
-                "Invalid workout log exercises",
-                {
-                    invalidExercises:
-                    invalidExercises
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log exercises', { invalidExercises });
         }
 
         const invalidSets = [];
-
-        exercises.forEach(
-            (exercise, exerciseIndex) => {
-
-                if (Array.isArray(exercise.sets)) {
-
-                    exercise.sets.forEach(
-                        (set, setIndex) => {
-
-                            if (
-                                typeof set.setNumber !== "number" ||
-                                set.setNumber <= 0
-                            ) {
-                                invalidSets.push({
-                                    exerciseIndex:
-                                    exerciseIndex,
-                                    setIndex: setIndex,
-                                    field: "setNumber",
-                                    value: set.setNumber
-                                });
-                            }
-
-                            if (
-                                typeof set.reps !== "number" ||
-                                set.reps < 0
-                            ) {
-                                invalidSets.push({
-                                    exerciseIndex:
-                                    exerciseIndex,
-                                    setIndex: setIndex,
-                                    field: "reps",
-                                    value: set.reps
-                                });
-                            }
-
-                            if (
-                                typeof set.weight !== "number" ||
-                                set.weight < 0
-                            ) {
-                                invalidSets.push({
-                                    exerciseIndex:
-                                    exerciseIndex,
-                                    setIndex: setIndex,
-                                    field: "weight",
-                                    value: set.weight
-                                });
-                            }
-                        }
-                    );
-                }
+        exercises.forEach((exercise, exerciseIndex) => {
+            if (Array.isArray(exercise.sets)) {
+                exercise.sets.forEach((set, setIndex) => {
+                    if (typeof set.setNumber !== 'number' || set.setNumber <= 0) {
+                        invalidSets.push({ exerciseIndex, setIndex, field: 'setNumber', value: set.setNumber });
+                    }
+                    if (typeof set.reps !== 'number' || set.reps < 0) {
+                        invalidSets.push({ exerciseIndex, setIndex, field: 'reps', value: set.reps });
+                    }
+                    if (typeof set.weight !== 'number' || set.weight < 0) {
+                        invalidSets.push({ exerciseIndex, setIndex, field: 'weight', value: set.weight });
+                    }
+                });
             }
-        );
+        });
 
         if (invalidSets.length > 0) {
-            return sendValidationError(
-                res,
-                "Invalid workout log sets",
-                {
-                    invalidSets: invalidSets
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log sets', { invalidSets });
         }
 
-        workoutLogs[workoutLogIndex] = {
-            workoutLogId: id,
-            userId: workoutLogs[workoutLogIndex].userId,
-            workoutPlanId,
-            date,
-            workoutTitle,
-            exercises,
-            durationMinutes,
-            difficultyRating,
-            notes: notes || ""
-        };
+        WorkoutLogsModel.getLogExercises(id).forEach(e => WorkoutLogsModel.removeLogExercise(e.id));
 
-        return sendSuccess(
-            res,
-            200,
-            workoutLogs[workoutLogIndex]
-        );
+        WorkoutLogsModel.update(id, { workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
 
+        exercises.forEach(exercise => {
+            const newExercise = WorkoutLogsModel.createLogExercise({
+                workoutLogId: id,
+                exerciseId: exercise.exerciseId,
+                exerciseName: exercise.exerciseName
+            });
+            exercise.sets.forEach(set => {
+                WorkoutLogsModel.createLogSet({
+                    workoutLogExerciseId: newExercise.id,
+                    setNumber: set.setNumber,
+                    reps: set.reps,
+                    weight: set.weight
+                });
+            });
+        });
+
+        return sendSuccess(res, 200, WorkoutLogsModel.getById(id));
     } catch (err) {
         return sendServerError(res);
     }
@@ -607,66 +257,30 @@ const updateWorkoutLog = (req, res) => {
 // DELETE /api/workout-logs/:id
 const deleteWorkoutLog = (req, res) => {
     try {
-
         const id = Number(req.params.id);
 
         if (!validateId(id)) {
-            return sendValidationError(
-                res,
-                "Invalid workout log id",
-                {
-                    field: "id",
-                    value: req.params.id
-                }
-            );
+            return sendValidationError(res, 'Invalid workout log id', { field: 'id', value: req.params.id });
         }
 
-        const workoutLogIndex =
-            workoutLogs.findIndex(
-                log => log.workoutLogId === id
-            );
+        const log = WorkoutLogsModel.getById(id);
 
-        if (workoutLogIndex === -1) {
-            return sendNotFound(
-                res,
-                "Workout log not found",
-                {
-                    workoutLogId: id
-                }
-            );
+        if (!log) {
+            return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        const userRole = req.headers["x-user-role"];
-        const requestUserId = parseInt(req.headers["userid"]);
+        const userRole = req.headers['x-user-role'];
+        const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== "admin" && workoutLogs[workoutLogIndex].userId !== requestUserId) {
-            return sendNotFound(res, "Workout log not found", { workoutLogId: id });
+        if (userRole !== 'admin' && log.userId !== requestUserId) {
+            return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        const deletedWorkoutLog =
-            workoutLogs.splice(
-                workoutLogIndex,
-                1
-            )[0];
-
-        return sendSuccess(
-            res,
-            200,
-            {
-                workoutLogId:
-                deletedWorkoutLog.workoutLogId
-            }
-        );
-
+        const deleted = WorkoutLogsModel.remove(id);
+        return sendSuccess(res, 200, { workoutLogId: deleted.workoutLogId });
     } catch (err) {
         return sendServerError(res);
     }
 };
 
-module.exports = {
-    getAllWorkoutLogs,
-    getWorkoutLogById,
-    createWorkoutLog,
-    updateWorkoutLog,
-    deleteWorkoutLog
-};
+module.exports = { getAllWorkoutLogs, getWorkoutLogById, createWorkoutLog, updateWorkoutLog, deleteWorkoutLog };

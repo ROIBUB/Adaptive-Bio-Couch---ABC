@@ -1,4 +1,5 @@
-const settingsModel = require('../models/settings.model');
+const SettingsModel = require('../models/settings.model');
+
 const {
     sendSuccess,
     sendValidationError,
@@ -7,7 +8,6 @@ const {
 } = require('../middleware/errorHandlers');
 
 // GET /api/settings
-// Returns the settings for the logged-in user (identified by x-user-id header).
 const getSettings = (req, res) => {
     try {
         const userId = parseInt(req.headers['x-user-id']);
@@ -16,22 +16,19 @@ const getSettings = (req, res) => {
             return sendValidationError(res, 'x-user-id header is required', {});
         }
 
-        const settings = settingsModel.find(s => s.userId === userId);
+        const settings = SettingsModel.getByUserId(userId);
 
         if (!settings) {
             return sendNotFound(res, 'Settings not found for this user', {});
         }
 
         return sendSuccess(res, 200, settings);
-
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // PUT /api/settings
-// Updates the three required fields: displayName, email, theme.
-// Also optionally updates fitnessGoal and activityLevel.
 const updateSettings = (req, res) => {
     try {
         const userId = parseInt(req.headers['x-user-id']);
@@ -40,9 +37,7 @@ const updateSettings = (req, res) => {
             return sendValidationError(res, 'x-user-id header is required', {});
         }
 
-        const settings = settingsModel.find(s => s.userId === userId);
-
-        if (!settings) {
+        if (!SettingsModel.getByUserId(userId)) {
             return sendNotFound(res, 'Settings not found for this user', {});
         }
 
@@ -50,22 +45,16 @@ const updateSettings = (req, res) => {
 
         if (!displayName || !email || !theme) {
             return sendValidationError(res, 'displayName, email, and theme are required', {
-                missingFields: [
-                    !displayName && 'displayName',
-                    !email && 'email',
-                    !theme && 'theme'
-                ].filter(Boolean)
+                missingFields: [!displayName && 'displayName', !email && 'email', !theme && 'theme'].filter(Boolean)
             });
         }
 
-        settings.displayName = displayName;
-        settings.email = email;
-        settings.theme = theme;
-        if (fitnessGoal !== undefined) settings.fitnessGoal = fitnessGoal;
-        if (activityLevel !== undefined) settings.activityLevel = activityLevel;
+        const updates = { displayName, email, theme };
+        if (fitnessGoal !== undefined) updates.fitnessGoal = fitnessGoal;
+        if (activityLevel !== undefined) updates.activityLevel = activityLevel;
 
-        return sendSuccess(res, 200, settings);
-
+        const updated = SettingsModel.update(userId, updates);
+        return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
     }
