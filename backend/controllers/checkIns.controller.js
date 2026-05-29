@@ -1,9 +1,10 @@
 const checkIns = require("../models/checkIns.model");
 
 const {
-    sendSuccess, sendValidationError, sendForbidden, sendNotFound, sendServerError} = require("../middleware/errorHandlers");
+    sendSuccess, sendValidationError, sendNotFound, sendServerError
+} = require("../middleware/errorHandlers");
 
-const {validateId, getMissingFields} = require("../middleware/validation");
+const { validateId, getMissingFields } = require("../middleware/validation");
 
 // GET /api/check-ins
 const getAllCheckIns = (req, res) => {
@@ -19,16 +20,11 @@ const getAllCheckIns = (req, res) => {
             return sendValidationError(
                 res,
                 "Missing or invalid user id in request headers",
-                {
-                    field: "userid",
-                    value: req.headers.userid || null
-                }
+                { field: "userid", value: req.headers.userid || null }
             );
         }
 
-        const userCheckIns = checkIns.filter(
-            checkIn => checkIn.userId === requestUserId
-        );
+        const userCheckIns = checkIns.filter(ci => ci.userId === requestUserId);
 
         return sendSuccess(res, 200, userCheckIns);
 
@@ -43,48 +39,20 @@ const getCheckInById = (req, res) => {
         const id = Number(req.params.id);
 
         if (!validateId(id)) {
-            return sendValidationError(
-                res,
-                "Invalid check-in id",
-                {
-                    field: "id",
-                    value: req.params.id
-                }
-            );
+            return sendValidationError(res, "Invalid check-in id", { field: "id", value: req.params.id });
         }
 
-        const checkIn = checkIns.find(
-            item => item.checkInId === id
-        );
+        const checkIn = checkIns.find(ci => ci.checkInId === id);
 
         if (!checkIn) {
-            return sendNotFound(
-                res,
-                "Check-in not found",
-                {
-                    checkInId: id
-                }
-            );
+            return sendNotFound(res, "Check-in not found", { checkInId: id });
         }
 
         const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
-        if (
-            userRole !== "admin" &&
-            checkIn.userId !== requestUserId
-        ) {
-            return sendForbidden(
-                res,
-                "You are not allowed to access this check-in",
-                {
-                    requiredOwnerUserId: checkIn.userId,
-                    requestUserId: isNaN(requestUserId)
-                        ? null
-                        : requestUserId,
-                    role: userRole || null
-                }
-            );
+        if (userRole !== "admin" && checkIn.userId !== requestUserId) {
+            return sendNotFound(res, "Check-in not found", { checkInId: id });
         }
 
         return sendSuccess(res, 200, checkIn);
@@ -97,125 +65,38 @@ const getCheckInById = (req, res) => {
 // POST /api/check-ins
 const createCheckIn = (req, res) => {
     try {
-        const {userId, date, currentWeight, nutritionDeviation, deviationFrequency, hungerLevel,
-            energyLevel, generalFeedback, recommendationSummary} = req.body;
-
-        const requiredFields = ["userId", "date", "currentWeight", "nutritionDeviation",
-            "deviationFrequency", "hungerLevel", "energyLevel"];
-
+        const requiredFields = ["checkInDate", "weight", "workoutsCompleted"];
         const missingFields = getMissingFields(req.body, requiredFields);
 
         if (missingFields.length > 0) {
-            return sendValidationError(
-                res,
-                "Missing required check-in fields",
-                {
-                    missingFields: missingFields
-                }
-            );
+            return sendValidationError(res, "Missing required check-in fields", { missingFields });
         }
+
+        const { checkInDate, weight, workoutsCompleted, feedback } = req.body;
 
         const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
-        if (
-            userRole !== "admin" &&
-            userId !== requestUserId
-        ) {
-            return sendForbidden(
-                res,
-                "You are not allowed to create a check-in for another user",
-                {
-                    bodyUserId: userId,
-                    requestUserId: isNaN(requestUserId)
-                        ? null
-                        : requestUserId,
-                    role: userRole || null
-                }
-            );
+        if (!validateId(requestUserId)) {
+            return sendValidationError(res, "Missing or invalid user id in request headers", { field: "userid" });
         }
 
-        if (typeof userId !== "number" || userId <= 0) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
-                }
-            );
+        if (typeof weight !== "number" || weight <= 0) {
+            return sendValidationError(res, "Invalid weight value", { field: "weight", value: weight });
         }
 
-        if (typeof currentWeight !== "number" || currentWeight <= 0) {
-            return sendValidationError(
-                res,
-                "Invalid current weight",
-                {
-                    field: "currentWeight",
-                    value: currentWeight
-                }
-            );
+        if (typeof workoutsCompleted !== "number" || workoutsCompleted < 0) {
+            return sendValidationError(res, "Invalid workouts completed value", { field: "workoutsCompleted", value: workoutsCompleted });
         }
 
-        const allowedNutritionDeviation = ["none", "small", "moderate", "large"];
-
-        if (!allowedNutritionDeviation.includes(
-                nutritionDeviation
-            )
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid nutrition deviation value",
-                {
-                    field: "nutritionDeviation",
-                    allowedValues: allowedNutritionDeviation,
-                    value: nutritionDeviation
-                }
-            );
-        }
-
-        if (typeof deviationFrequency !== "number" ||
-            deviationFrequency < 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid deviation frequency",
-                {
-                    field: "deviationFrequency",
-                    value: deviationFrequency
-                }
-            );
-        }
-
-        const allowedLevels = ["low", "medium", "high"];
-
-        if (!allowedLevels.includes(hungerLevel)) {
-            return sendValidationError(
-                res,
-                "Invalid hunger level",
-                {
-                    field: "hungerLevel",
-                    allowedValues: allowedLevels,
-                    value: hungerLevel
-                }
-            );
-        }
-
-        if (!allowedLevels.includes(energyLevel)) {
-            return sendValidationError(
-                res,
-                "Invalid energy level",
-                {
-                    field: "energyLevel",
-                    allowedValues: allowedLevels,
-                    value: energyLevel
-                }
-            );
-        }
-
-        const newCheckIn = {checkInId: checkIns.length > 0 ? checkIns[checkIns.length - 1].checkInId + 1 : 1,
-            userId, date, currentWeight, nutritionDeviation, deviationFrequency, hungerLevel, energyLevel,
-            generalFeedback: generalFeedback || "", recommendationSummary: recommendationSummary || ""};
+        const newCheckIn = {
+            checkInId: checkIns.length > 0 ? checkIns[checkIns.length - 1].checkInId + 1 : 1,
+            userId: requestUserId,
+            weight,
+            workoutsCompleted,
+            feedback: feedback || "",
+            checkInDate
+        };
 
         checkIns.push(newCheckIn);
 
@@ -232,177 +113,49 @@ const updateCheckIn = (req, res) => {
         const id = Number(req.params.id);
 
         if (!validateId(id)) {
-            return sendValidationError(
-                res,
-                "Invalid check-in id",
-                {
-                    field: "id",
-                    value: req.params.id
-                }
-            );
+            return sendValidationError(res, "Invalid check-in id", { field: "id", value: req.params.id });
         }
 
-        const checkInIndex = checkIns.findIndex(
-            item => item.checkInId === id
-        );
+        const checkInIndex = checkIns.findIndex(ci => ci.checkInId === id);
 
         if (checkInIndex === -1) {
-            return sendNotFound(
-                res,
-                "Check-in not found",
-                {
-                    checkInId: id
-                }
-            );
+            return sendNotFound(res, "Check-in not found", { checkInId: id });
         }
 
         const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== "admin" &&
-            checkIns[checkInIndex].userId !== requestUserId
-        ) {
-            return sendForbidden(
-                res,
-                "You are not allowed to update this check-in",
-                {
-                    requiredOwnerUserId:
-                    checkIns[checkInIndex].userId,
-                    requestUserId: isNaN(requestUserId)
-                        ? null
-                        : requestUserId,
-                    role: userRole || null
-                }
-            );
+        if (userRole !== "admin" && checkIns[checkInIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Check-in not found", { checkInId: id });
         }
 
-        const {userId, date, currentWeight, nutritionDeviation, deviationFrequency, hungerLevel,
-            energyLevel, generalFeedback, recommendationSummary} = req.body;
-
-        const requiredFields = ["userId", "date", "currentWeight", "nutritionDeviation", "deviationFrequency",
-            "hungerLevel", "energyLevel"];
-
+        const requiredFields = ["checkInDate", "weight", "workoutsCompleted"];
         const missingFields = getMissingFields(req.body, requiredFields);
 
         if (missingFields.length > 0) {
-            return sendValidationError(
-                res,
-                "Missing required check-in fields",
-                {
-                    missingFields: missingFields
-                }
-            );
+            return sendValidationError(res, "Missing required check-in fields", { missingFields });
         }
 
-        if (userRole !== "admin" &&
-            userId !== requestUserId
-        ) {
-            return sendForbidden(
-                res,
-                "You are not allowed to change the user id of this check-in",
-                {
-                    bodyUserId: userId,
-                    requestUserId: isNaN(requestUserId)
-                        ? null
-                        : requestUserId,
-                    role: userRole || null
-                }
-            );
+        const { checkInDate, weight, workoutsCompleted, feedback } = req.body;
+
+        if (typeof weight !== "number" || weight <= 0) {
+            return sendValidationError(res, "Invalid weight value", { field: "weight", value: weight });
         }
 
-        if (typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
-                }
-            );
+        if (typeof workoutsCompleted !== "number" || workoutsCompleted < 0) {
+            return sendValidationError(res, "Invalid workouts completed value", { field: "workoutsCompleted", value: workoutsCompleted });
         }
 
-        if (typeof currentWeight !== "number" ||
-            currentWeight <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid current weight",
-                {
-                    field: "currentWeight",
-                    value: currentWeight
-                }
-            );
-        }
+        checkIns[checkInIndex] = {
+            checkInId: id,
+            userId: checkIns[checkInIndex].userId,
+            weight,
+            workoutsCompleted,
+            feedback: feedback || "",
+            checkInDate
+        };
 
-        const allowedNutritionDeviation = ["none", "small", "moderate", "large"];
-
-        if (
-            !allowedNutritionDeviation.includes(
-                nutritionDeviation
-            )
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid nutrition deviation value",
-                {
-                    field: "nutritionDeviation",
-                    allowedValues: allowedNutritionDeviation,
-                    value: nutritionDeviation
-                }
-            );
-        }
-
-        if (
-            typeof deviationFrequency !== "number" ||
-            deviationFrequency < 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid deviation frequency",
-                {
-                    field: "deviationFrequency",
-                    value: deviationFrequency
-                }
-            );
-        }
-
-        const allowedLevels = ["low", "medium", "high"];
-
-        if (!allowedLevels.includes(hungerLevel)) {
-            return sendValidationError(
-                res,
-                "Invalid hunger level",
-                {
-                    field: "hungerLevel",
-                    allowedValues: allowedLevels,
-                    value: hungerLevel
-                }
-            );
-        }
-
-        if (!allowedLevels.includes(energyLevel)) {
-            return sendValidationError(
-                res,
-                "Invalid energy level",
-                {
-                    field: "energyLevel",
-                    allowedValues: allowedLevels,
-                    value: energyLevel
-                }
-            );
-        }
-
-        checkIns[checkInIndex] = {checkInId: id, userId, date, currentWeight, nutritionDeviation, deviationFrequency,
-            hungerLevel, energyLevel, generalFeedback: generalFeedback || "", recommendationSummary:
-                recommendationSummary || ""};
-
-        return sendSuccess(
-            res,
-            200,
-            checkIns[checkInIndex]
-        );
+        return sendSuccess(res, 200, checkIns[checkInIndex]);
 
     } catch (err) {
         return sendServerError(res);
@@ -415,60 +168,25 @@ const deleteCheckIn = (req, res) => {
         const id = Number(req.params.id);
 
         if (!validateId(id)) {
-            return sendValidationError(
-                res,
-                "Invalid check-in id",
-                {
-                    field: "id",
-                    value: req.params.id
-                }
-            );
+            return sendValidationError(res, "Invalid check-in id", { field: "id", value: req.params.id });
         }
 
-        const checkInIndex = checkIns.findIndex(
-            item => item.checkInId === id
-        );
+        const checkInIndex = checkIns.findIndex(ci => ci.checkInId === id);
 
         if (checkInIndex === -1) {
-            return sendNotFound(
-                res,
-                "Check-in not found",
-                {
-                    checkInId: id
-                }
-            );
+            return sendNotFound(res, "Check-in not found", { checkInId: id });
         }
 
         const userRole = req.headers["x-user-role"];
         const requestUserId = Number(req.headers.userid);
 
-        if (
-            userRole !== "admin" &&
-            checkIns[checkInIndex].userId !== requestUserId
-        ) {
-            return sendForbidden(
-                res,
-                "You are not allowed to delete this check-in",
-                {
-                    requiredOwnerUserId:
-                    checkIns[checkInIndex].userId,
-                    requestUserId: isNaN(requestUserId)
-                        ? null
-                        : requestUserId,
-                    role: userRole || null
-                }
-            );
+        if (userRole !== "admin" && checkIns[checkInIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Check-in not found", { checkInId: id });
         }
 
         const deletedCheckIn = checkIns.splice(checkInIndex, 1)[0];
 
-        return sendSuccess(
-            res,
-            200,
-            {
-                checkInId: deletedCheckIn.checkInId
-            }
-        );
+        return sendSuccess(res, 200, { checkInId: deletedCheckIn.checkInId });
 
     } catch (err) {
         return sendServerError(res);

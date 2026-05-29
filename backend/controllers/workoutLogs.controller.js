@@ -3,7 +3,6 @@ const workoutLogs = require("../models/workoutLogs.model");
 const {
     sendSuccess,
     sendValidationError,
-    sendForbidden,
     sendNotFound,
     sendServerError
 } = require("../middleware/errorHandlers");
@@ -86,18 +85,10 @@ const getWorkoutLogById = (req, res) => {
             userRole !== "admin" &&
             workoutLog.userId !== requestUserId
         ) {
-            return sendForbidden(
+            return sendNotFound(
                 res,
-                "You are not allowed to access this workout log",
-                {
-                    requiredOwnerUserId:
-                    workoutLog.userId,
-                    requestUserId:
-                        isNaN(requestUserId)
-                            ? null
-                            : requestUserId,
-                    role: userRole || null
-                }
+                "Workout log not found",
+                { workoutLogId: id }
             );
         }
 
@@ -116,8 +107,12 @@ const getWorkoutLogById = (req, res) => {
 const createWorkoutLog = (req, res) => {
     try {
 
+        const userId = parseInt(req.headers["userid"]);
+        if (!userId || isNaN(userId)) {
+            return sendValidationError(res, "Missing user id", { field: "userid header" });
+        }
+
         const {
-            userId,
             workoutPlanId,
             date,
             workoutTitle,
@@ -128,7 +123,6 @@ const createWorkoutLog = (req, res) => {
         } = req.body;
 
         const requiredFields = [
-            "userId",
             "workoutPlanId",
             "date",
             "workoutTitle",
@@ -148,20 +142,6 @@ const createWorkoutLog = (req, res) => {
                 "Missing required workout log fields",
                 {
                     missingFields: missingFields
-                }
-            );
-        }
-
-        if (
-            typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
                 }
             );
         }
@@ -394,8 +374,14 @@ const updateWorkoutLog = (req, res) => {
             );
         }
 
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["userid"]);
+
+        if (userRole !== "admin" && workoutLogs[workoutLogIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Workout log not found", { workoutLogId: id });
+        }
+
         const {
-            userId,
             workoutPlanId,
             date,
             workoutTitle,
@@ -406,7 +392,6 @@ const updateWorkoutLog = (req, res) => {
         } = req.body;
 
         const requiredFields = [
-            "userId",
             "workoutPlanId",
             "date",
             "workoutTitle",
@@ -426,20 +411,6 @@ const updateWorkoutLog = (req, res) => {
                 "Missing required workout log fields",
                 {
                     missingFields: missingFields
-                }
-            );
-        }
-
-        if (
-            typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
                 }
             );
         }
@@ -612,7 +583,7 @@ const updateWorkoutLog = (req, res) => {
 
         workoutLogs[workoutLogIndex] = {
             workoutLogId: id,
-            userId,
+            userId: workoutLogs[workoutLogIndex].userId,
             workoutPlanId,
             date,
             workoutTitle,
@@ -663,6 +634,13 @@ const deleteWorkoutLog = (req, res) => {
                     workoutLogId: id
                 }
             );
+        }
+
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["userid"]);
+
+        if (userRole !== "admin" && workoutLogs[workoutLogIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Workout log not found", { workoutLogId: id });
         }
 
         const deletedWorkoutLog =

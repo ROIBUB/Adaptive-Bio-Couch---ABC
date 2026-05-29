@@ -7,7 +7,29 @@ const {validateId, getMissingFields} = require("../middleware/validation");
 // GET /api/daily-meal-plans
 const getAllDailyMealPlans = (req, res) => {
     try {
-        return sendSuccess(res, 200, dailyMealPlans);
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = Number(req.headers.userid);
+
+        if (userRole === "admin") {
+            return sendSuccess(res, 200, dailyMealPlans);
+        }
+
+        if (!validateId(requestUserId)) {
+            return sendValidationError(
+                res,
+                "Missing or invalid user id in request headers",
+                {
+                    field: "userid",
+                    value: req.headers.userid || null
+                }
+            );
+        }
+
+        const userMealPlans = dailyMealPlans.filter(
+            plan => plan.userId === requestUserId
+        );
+
+        return sendSuccess(res, 200, userMealPlans);
 
     } catch (err) {
         return sendServerError(res);
@@ -42,6 +64,13 @@ const getDailyMealPlanById = (req, res) => {
             );
         }
 
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = Number(req.headers.userid);
+
+        if (userRole !== "admin" && dailyMealPlan.userId !== requestUserId) {
+            return sendNotFound(res, "Daily meal plan not found", { dailyMealPlanId: id });
+        }
+
         return sendSuccess(res, 200, dailyMealPlan);
 
     } catch (err) {
@@ -52,9 +81,14 @@ const getDailyMealPlanById = (req, res) => {
 // POST /api/daily-meal-plans
 const createDailyMealPlan = (req, res) => {
     try {
-        const {userId, name, goal, targetCalories, targetProtein, isActive, meals} = req.body;
+        const userId = parseInt(req.headers["userid"]);
+        if (!userId || isNaN(userId)) {
+            return sendValidationError(res, "Missing user id", { field: "userid header" });
+        }
 
-        const requiredFields = ["userId", "name", "goal", "targetCalories", "targetProtein", "isActive", "meals"];
+        const {name, goal, targetCalories, targetProtein, isActive, meals} = req.body;
+
+        const requiredFields = ["name", "goal", "targetCalories", "targetProtein", "isActive", "meals"];
 
         const missingFields = getMissingFields(
             req.body,
@@ -67,20 +101,6 @@ const createDailyMealPlan = (req, res) => {
                 "Missing required daily meal plan fields",
                 {
                     missingFields: missingFields
-                }
-            );
-        }
-
-        if (
-            typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
                 }
             );
         }
@@ -308,8 +328,14 @@ const updateDailyMealPlan = (req, res) => {
             );
         }
 
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["userid"]);
+
+        if (userRole !== "admin" && dailyMealPlans[dailyMealPlanIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Daily meal plan not found", { dailyMealPlanId: id });
+        }
+
         const {
-            userId,
             name,
             goal,
             targetCalories,
@@ -319,7 +345,6 @@ const updateDailyMealPlan = (req, res) => {
         } = req.body;
 
         const requiredFields = [
-            "userId",
             "name",
             "goal",
             "targetCalories",
@@ -339,20 +364,6 @@ const updateDailyMealPlan = (req, res) => {
                 "Missing required daily meal plan fields",
                 {
                     missingFields: missingFields
-                }
-            );
-        }
-
-        if (
-            typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
                 }
             );
         }
@@ -522,7 +533,7 @@ const updateDailyMealPlan = (req, res) => {
 
         dailyMealPlans[dailyMealPlanIndex] = {
             dailyMealPlanId: id,
-            userId,
+            userId: dailyMealPlans[dailyMealPlanIndex].userId,
             name,
             goal,
             targetCalories,
@@ -573,6 +584,13 @@ const deleteDailyMealPlan = (req, res) => {
                     dailyMealPlanId: id
                 }
             );
+        }
+
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["userid"]);
+
+        if (userRole !== "admin" && dailyMealPlans[dailyMealPlanIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Daily meal plan not found", { dailyMealPlanId: id });
         }
 
         const deletedDailyMealPlan =

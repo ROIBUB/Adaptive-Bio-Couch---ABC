@@ -1,0 +1,71 @@
+.check-ins-page {
+  /* Layout.jsx already provides padding and max-width */
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.page-header p {
+  color: #636e72;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.add-checkin-toggle {
+  margin-bottom: 1rem;
+}
+
+.toggle-btn {
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #5a4bd1;
+}
+
+.checkin-form {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+  max-width: 480px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #e17055;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #d35f47;
+}
+
+.submit-btn:disabled {
+  background-color: #b2bec3;
+  cursor: not-allowed;
+}

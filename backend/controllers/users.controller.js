@@ -5,7 +5,8 @@ const {
     sendSuccess,
     sendValidationError,
     sendNotFound,
-    sendServerError
+    sendServerError,
+    sendForbidden
 } = require("../middleware/errorHandlers");
 
 const {
@@ -17,6 +18,10 @@ const {
 // function to get all the users and its response JSON
 const getAllUsers = (req, res) => {
     try {
+        const userRole = req.headers["x-user-role"];
+        if (userRole !== "admin") {
+            return sendForbidden(res, "You do not have permission to perform this action.", {});
+        }
         return sendSuccess(res, 200, usersController);
 
     } catch (err) {
@@ -46,15 +51,19 @@ const getUserById = (req, res) => {
         );
 
         if (!user) {
-            return sendNotFound(
-                res,
-                "User not found",
-                {}
-            );
+            return sendNotFound(res, "User not found", {});
         }
 
-        // if he did find
-        return sendSuccess(res, 200, user);
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["x-user-id"]);
+
+        if (userRole !== "admin" && requestUserId !== id) {
+            return sendNotFound(res, "User not found", {});
+        }
+
+        // Omit password before returning
+        const { password, ...safeUser } = user;
+        return sendSuccess(res, 200, safeUser);
 
     } catch (err) {
         return sendServerError(res);

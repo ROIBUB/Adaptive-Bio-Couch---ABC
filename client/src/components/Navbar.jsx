@@ -33,6 +33,7 @@ function Navbar() {
       <ul className="navbar-links">
         <li><Link to="/dashboard">Dashboard</Link></li>
         <li><Link to="/workout-plans">Workout Plans</Link></li>
+        <li><Link to="/workout-logs">Workout Logs</Link></li>
         <li><Link to="/meal-plans">Meal Plans</Link></li>
         <li><Link to="/check-ins">Check-ins</Link></li>
         <li><Link to="/settings">Settings</Link></li>

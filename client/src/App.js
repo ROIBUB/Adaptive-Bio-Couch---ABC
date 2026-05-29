@@ -2,17 +2,16 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 
-// Pages — LoginPage has no Layout (full-screen design).
-// The others will be added one by one in the next steps.
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-import SettingsPage from './pages/SettingsPage';
+import LoginPage       from './pages/LoginPage';
+import DashboardPage   from './pages/DashboardPage';
+import SettingsPage    from './pages/SettingsPage';
+import WorkoutPlansPage from './pages/WorkoutPlansPage';
+import WorkoutLogsPage  from './pages/WorkoutLogsPage';
+import MealPlansPage    from './pages/MealPlansPage';
+import CheckInsPage     from './pages/CheckInsPage';
 
-// Checks whether a user is stored in the browser from a previous login
 const isLoggedIn = () => !!localStorage.getItem('user');
 
-// ProtectedRoute: if not logged in → redirect to /
-// if logged in → render the page wrapped in Layout (Navbar + content + Footer)
 const ProtectedRoute = ({ children }) => {
   if (!isLoggedIn()) {
     return <Navigate to="/" replace />;
@@ -30,26 +29,28 @@ function App() {
         {/* Protected — all wrapped in Layout automatically */}
         <Route
           path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
+          element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}
         />
         <Route
           path="/settings"
-          element={
-            <ProtectedRoute>
-              <SettingsPage />
-            </ProtectedRoute>
-          }
+          element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
         />
-
-        {/* Placeholder routes for future pages — prevents Navbar links from crashing.
-            Replace Navigate with real pages when they are built. */}
-        <Route path="/workout-plans" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/meal-plans"    element={<Navigate to="/dashboard" replace />} />
-        <Route path="/check-ins"     element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/workout-plans"
+          element={<ProtectedRoute><WorkoutPlansPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/workout-logs"
+          element={<ProtectedRoute><WorkoutLogsPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/meal-plans"
+          element={<ProtectedRoute><MealPlansPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/check-ins"
+          element={<ProtectedRoute><CheckInsPage /></ProtectedRoute>}
+        />
 
         {/* Any unknown URL → login */}
         <Route path="*" element={<Navigate to="/" replace />} />

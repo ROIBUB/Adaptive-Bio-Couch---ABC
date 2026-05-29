@@ -1,0 +1,169 @@
+.workout-logs-page {
+  /* Layout.jsx already provides padding and max-width */
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.page-header p {
+  color: #636e72;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.add-log-toggle {
+  margin-bottom: 1rem;
+}
+
+.toggle-btn {
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #5a4bd1;
+}
+
+.log-form {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  margin-bottom: 1.5rem;
+  max-width: 480px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #00b894;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #00a381;
+}
+
+.submit-btn:disabled {
+  background-color: #b2bec3;
+  cursor: not-allowed;
+}
+
+/* Logs table */
+.logs-table-wrapper {
+  overflow-x: auto;
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-size: 0.9rem;
+}
+
+.logs-table thead tr {
+  background: #f8f9fa;
+}
+
+.logs-table th {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #636e72;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #dfe6e9;
+}
+
+.logs-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f0f4f8;
+  color: #2d3436;
+}
+
+.logs-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.logs-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.row-expanded {
+  background: #f5f3ff !important;
+}
+
+.notes-cell {
+  color: #636e72;
+  font-style: italic;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.details-btn {
+  background: none;
+  border: 1px solid #6c5ce7;
+  color: #6c5ce7;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.details-btn:hover {
+  background: #6c5ce7;
+  color: white;
+}
+
+/* Expanded exercise panel */
+.expand-row td {
+  background: #faf9ff;
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.expand-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.ex-block {
+  min-width: 260px;
+}
+
+.ex-block-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 0.5rem;
+}

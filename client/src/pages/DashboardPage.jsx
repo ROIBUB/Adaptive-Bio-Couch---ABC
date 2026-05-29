@@ -142,13 +142,12 @@ function DashboardPage() {
                   // Card reuse #3 — check-in
                   <Card
                     key={ci.checkInId}
-                    title={`Check-In — ${ci.date}`}
-                    subtitle={ci.generalFeedback || 'No feedback recorded'}
+                    title={`Check-In — ${ci.checkInDate}`}
+                    subtitle={ci.feedback || 'No feedback recorded'}
                     accentColor="#e17055"
                     stats={[
-                      { label: 'Weight',    value: `${ci.currentWeight} kg` },
-                      { label: 'Energy',    value: ci.energyLevel },
-                      { label: 'Hunger',    value: ci.hungerLevel },
+                      { label: 'Weight',         value: `${ci.weight} kg` },
+                      { label: 'Workouts Done',  value: ci.workoutsCompleted },
                     ]}
                   />
                 ))}

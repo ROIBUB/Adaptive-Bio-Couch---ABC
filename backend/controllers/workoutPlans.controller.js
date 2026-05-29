@@ -3,7 +3,6 @@ const workoutPlans = require("../models/workoutPlans.model");
 const {
     sendSuccess,
     sendValidationError,
-    sendForbidden,
     sendNotFound,
     sendServerError
 } = require("../middleware/errorHandlers");
@@ -101,15 +100,10 @@ const getWorkoutPlanById = (req, res) => {
             userRole !== "admin" &&
             workoutPlan.userId !== requestUserId
         ) {
-            return sendForbidden(
+            return sendNotFound(
                 res,
-                "You are not allowed to access this workout plan",
-                {
-                    requiredOwnerUserId:
-                    workoutPlan.userId,
-                    requestUserId:
-                    requestUserId
-                }
+                "Workout plan not found",
+                { workoutPlanId: id }
             );
         }
 
@@ -128,8 +122,12 @@ const getWorkoutPlanById = (req, res) => {
 const createWorkoutPlan = (req, res) => {
     try {
 
+        const userId = parseInt(req.headers["userid"]);
+        if (!userId || isNaN(userId)) {
+            return sendValidationError(res, "Missing user id", { field: "userid header" });
+        }
+
         const {
-            userId,
             name,
             goal,
             isActive,
@@ -137,7 +135,6 @@ const createWorkoutPlan = (req, res) => {
         } = req.body;
 
         const requiredFields = [
-            "userId",
             "name",
             "goal",
             "isActive",
@@ -157,20 +154,6 @@ const createWorkoutPlan = (req, res) => {
                 {
                     missingFields:
                     missingFields
-                }
-            );
-        }
-
-        if (
-            typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
                 }
             );
         }
@@ -417,8 +400,14 @@ const updateWorkoutPlan = (req, res) => {
             );
         }
 
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["userid"]);
+
+        if (userRole !== "admin" && workoutPlans[workoutPlanIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Workout plan not found", { workoutPlanId: id });
+        }
+
         const {
-            userId,
             name,
             goal,
             isActive,
@@ -426,7 +415,6 @@ const updateWorkoutPlan = (req, res) => {
         } = req.body;
 
         const requiredFields = [
-            "userId",
             "name",
             "goal",
             "isActive",
@@ -446,20 +434,6 @@ const updateWorkoutPlan = (req, res) => {
                 {
                     missingFields:
                     missingFields
-                }
-            );
-        }
-
-        if (
-            typeof userId !== "number" ||
-            userId <= 0
-        ) {
-            return sendValidationError(
-                res,
-                "Invalid user id",
-                {
-                    field: "userId",
-                    value: userId
                 }
             );
         }
@@ -644,7 +618,7 @@ const updateWorkoutPlan = (req, res) => {
             workoutPlanIndex
             ] = {
             workoutPlanId: id,
-            userId,
+            userId: workoutPlans[workoutPlanIndex].userId,
             name,
             goal,
             isActive,
@@ -699,6 +673,13 @@ const deleteWorkoutPlan = (req, res) => {
                     workoutPlanId: id
                 }
             );
+        }
+
+        const userRole = req.headers["x-user-role"];
+        const requestUserId = parseInt(req.headers["userid"]);
+
+        if (userRole !== "admin" && workoutPlans[workoutPlanIndex].userId !== requestUserId) {
+            return sendNotFound(res, "Workout plan not found", { workoutPlanId: id });
         }
 
         const deletedWorkoutPlan =

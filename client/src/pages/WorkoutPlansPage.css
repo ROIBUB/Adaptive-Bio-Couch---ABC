@@ -1,0 +1,114 @@
+.workout-plans-page {
+  /* Layout.jsx already provides padding and max-width */
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.page-header p {
+  color: #636e72;
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.plan-section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #dfe6e9;
+}
+
+.plan-section:last-child {
+  border-bottom: none;
+}
+
+.plan-card-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Training days grid */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.day-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border-top: 3px solid #6c5ce7;
+}
+
+.day-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.8rem;
+}
+
+.day-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #6c5ce7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.day-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin-top: 0.2rem;
+}
+
+.exercise-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.exercise-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.exercise-item:last-child {
+  border-bottom: none;
+}
+
+.ex-name {
+  color: #2d3436;
+  font-weight: 500;
+}
+
+.ex-detail {
+  color: #636e72;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.plan-table {
+  margin-top: 1rem;
+}
+
+.table-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 0.75rem;
+}

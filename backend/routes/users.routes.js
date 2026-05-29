@@ -5,6 +5,7 @@ const authorize = require("../middleware/auth");
 const { getAllUsers, getUserById, getMe, createUser, updateUser, deleteUser} = require('../controllers/users.controller');
 
 // if u asked for GET /api/users
+// todo: should every user be able to see all users? 
 router.get('/', getAllUsers);
 // /me MUST come before /:id — otherwise "me" is captured as an id param
 router.get('/me', getMe);

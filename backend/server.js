@@ -11,6 +11,8 @@ const dailyMealPlansRoutes = require("./routes/dailyMealPlans.routes");
 const checkInsRoutes = require("./routes/checkIns.routes");
 const authRoutes = require("./routes/auth.routes");
 const settingsRoutes = require("./routes/settings.routes");
+const profilesRoutes = require("./routes/profiles.routes");
+const progressDataRoutes = require("./routes/progressData.routes");
 const app = express();
 
 // Allow the React frontend (localhost:3001) to call this API
@@ -52,6 +54,10 @@ app.use("/api/check-ins", checkInsRoutes);
 app.use("/api/auth", authRoutes);
 // every request to /api/settings is sent to settings.routes.js
 app.use("/api/settings", settingsRoutes);
+// every request to /api/profiles is sent to profiles.routes.js
+app.use("/api/profiles", profilesRoutes);
+// every request to /api/progress is sent to progressData.routes.js
+app.use("/api/progress", progressDataRoutes);
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
