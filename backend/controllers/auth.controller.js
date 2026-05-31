@@ -1,5 +1,6 @@
-const UsersModel = require('../models/users.model');
+const UsersModel    = require('../models/users.model');
 const ProfilesModel = require('../models/profiles.model');
+const SettingsModel = require('../models/settings.model');
 const { generatePlan } = require('../services/planGenerator');
 const { sendSuccess, sendValidationError, sendServerError } = require('../middleware/errorHandlers');
 
@@ -83,6 +84,14 @@ const register = (req, res) => {
             fitnessGoal, activityLevel,
             workoutsPerWeek, mealsPerDay,
             onboardingCompleted: true
+        });
+
+        SettingsModel.create({
+            userId:        newUser.userid,
+            displayName:   `${firstName} ${lastName}`,
+            email,
+            fitnessGoal,
+            activityLevel
         });
 
         const plan = generatePlan({...newProfile, userId: newUser.userid, firstName: newUser.firstName });

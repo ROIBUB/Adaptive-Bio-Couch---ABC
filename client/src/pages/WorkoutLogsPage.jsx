@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import { getWorkoutLogs } from '../services/workoutService';
 import './WorkoutLogsPage.css';
@@ -12,6 +12,11 @@ const SETS_COLUMNS = [
 
 function WorkoutLogsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const search   = new URLSearchParams(location.search);
+  const workoutDayId = search.get('workoutDayId') ? Number(search.get('workoutDayId')) : null;
+  const dayTitle     = search.get('dayTitle') || null;
+
   const [logs,       setLogs]       = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState('');
@@ -22,7 +27,7 @@ function WorkoutLogsPage() {
       setLoading(true);
       setError('');
       try {
-        const data = await getWorkoutLogs();
+        const data = await getWorkoutLogs({ workoutDayId });
         setLogs(data || []);
       } catch (err) {
         setError('Could not load workout logs. Make sure the backend is running on port 3000.');
@@ -31,16 +36,22 @@ function WorkoutLogsPage() {
       }
     };
     fetchLogs();
-  }, []);
+  }, [workoutDayId]);
 
   const toggleExpand = (logId) =>
     setExpandedId(prev => (prev === logId ? null : logId));
 
+  const pageTitle = dayTitle ? `${dayTitle} — Workout History` : 'Workout Logs';
+
   return (
     <div className="workout-logs-page">
       <div className="page-header">
-        <h1>Workout Logs</h1>
-        <p>Track your completed workouts</p>
+        <h1>{pageTitle}</h1>
+        <p>
+          {workoutDayId
+            ? <button className="back-to-plans-btn" onClick={() => navigate('/workout-plans')}>← Back to Plans</button>
+            : 'Track your completed workouts'}
+        </p>
       </div>
 
       {loading && <p className="loading">Loading workout logs…</p>}

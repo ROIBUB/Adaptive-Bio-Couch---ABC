@@ -99,12 +99,20 @@ function WorkoutPlansPage() {
                     ))}
                   </ul>
                 </div>
-                <button
-                  className="start-workout-btn"
-                  onClick={() => navigate(`/workout-logs/new?planId=${plan.workoutPlanId}&dayId=${day.workoutDayId}`)}
-                >
-                  Start Workout
-                </button>
+                <div className="day-card-actions">
+                  <button
+                    className="start-workout-btn"
+                    onClick={() => navigate(`/workout-logs/new?planId=${plan.workoutPlanId}&dayId=${day.workoutDayId}`)}
+                  >
+                    Start Workout
+                  </button>
+                  <button
+                    className="view-logs-btn"
+                    onClick={() => navigate(`/workout-logs?workoutDayId=${day.workoutDayId}&dayTitle=${encodeURIComponent(day.title)}`)}
+                  >
+                    View Logs
+                  </button>
+                </div>
               </div>
             ))}
           </div>

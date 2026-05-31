@@ -2,6 +2,40 @@
   /* Layout.jsx already provides padding and max-width */
 }
 
+/* ── Plan success banner ── */
+.plan-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f0fff4;
+  border: 1px solid #a9dfbf;
+  color: #27ae60;
+  border-radius: 10px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.plan-success-banner span:nth-child(2) {
+  flex: 1;
+}
+
+.plan-success-close {
+  background: none;
+  border: none;
+  color: #27ae60;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.plan-success-close:hover {
+  opacity: 1;
+}
+
 /* ── Welcome ── */
 .welcome-section { margin-bottom: 2rem; }
 .welcome-section h1 { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; }
@@ -19,10 +53,14 @@
 
 /* ── Quick Nav ── */
 .quick-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem; }
-.quick-nav-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; min-height: 100px; background: #f8f9fa; border: none; border-radius: 12px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-.quick-nav-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.quick-nav-emoji { font-size: 2rem; }
-.quick-nav-label { font-size: 0.9rem; font-weight: 500; color: #2d3436; }
+.quick-nav-tile { display: flex; flex-direction: column; align-items: center; gap: 0; background: white; border: none; border-radius: 14px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 0; }
+.quick-nav-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.13); }
+.quick-nav-img-wrap { position: relative; width: 100%; height: 110px; overflow: hidden; }
+.quick-nav-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+.quick-nav-tile:hover .quick-nav-img { transform: scale(1.05); }
+.quick-nav-overlay { position: absolute; inset: 0; opacity: 0.22; transition: opacity 0.2s; }
+.quick-nav-tile:hover .quick-nav-overlay { opacity: 0.35; }
+.quick-nav-label { font-size: 0.9rem; font-weight: 600; color: #2d3436; padding: 0.65rem 1rem; }
 
 /* ── Graph ── */
 .graph-section { background: white; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 2rem; }

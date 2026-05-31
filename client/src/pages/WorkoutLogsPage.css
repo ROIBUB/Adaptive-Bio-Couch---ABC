@@ -18,6 +18,20 @@
   font-size: 0.95rem;
 }
 
+.back-to-plans-btn {
+  background: none;
+  border: none;
+  color: #6c5ce7;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.back-to-plans-btn:hover {
+  text-decoration: underline;
+}
+
 .add-log-toggle {
   margin-bottom: 1rem;
 }

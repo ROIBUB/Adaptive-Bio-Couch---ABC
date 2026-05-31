@@ -1,4 +1,5 @@
 const CheckInsModel = require('../models/checkIns.model');
+const ProfilesModel = require('../models/profiles.model');
 
 const {
     sendSuccess,
@@ -81,6 +82,8 @@ const createCheckIn = (req, res) => {
         }
 
         const newCheckIn = CheckInsModel.create({ userId: requestUserId, weight, workoutsCompleted, feedback, checkInDate });
+        // Keep profile.currentWeight in sync so the dashboard reflects the latest weight
+        ProfilesModel.update(requestUserId, { currentWeight: weight });
         return sendSuccess(res, 201, newCheckIn);
     } catch (err) {
         return sendServerError(res);

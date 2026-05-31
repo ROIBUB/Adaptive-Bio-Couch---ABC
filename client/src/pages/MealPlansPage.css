@@ -96,11 +96,54 @@
 
 .food-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   font-size: 0.86rem;
   padding: 0.25rem 0;
   border-bottom: 1px solid #f0f0f0;
 }
+
+.food-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.food-item-row .food-name { flex: 1; }
+
+.alt-btn {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid #6c5ce7;
+  color: #6c5ce7;
+  background: white;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.alt-btn:hover { background: #6c5ce7; color: white; }
+
+.alt-panel {
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #6c5ce7;
+}
+
+.alt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+  font-size: 0.82rem;
+}
+
+.alt-name  { font-weight: 500; color: #2d3436; }
+.alt-detail { color: #636e72; font-size: 0.78rem; }
+.alt-loading, .alt-empty, .alt-error { font-size: 0.82rem; color: #636e72; }
+.alt-error { color: #e17055; }
 
 .food-item:last-child {
   border-bottom: none;

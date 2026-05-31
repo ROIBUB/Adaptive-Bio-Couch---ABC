@@ -9,16 +9,29 @@ const getAllWorkoutLogs = (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
+        const filterPlanId = req.query.workoutPlanId ? Number(req.query.workoutPlanId) : null;
+
+        const filterDayId  = req.query.workoutDayId  ? Number(req.query.workoutDayId)  : null;
+
+        let logs;
 
         if (userRole === 'admin') {
-            return sendSuccess(res, 200, WorkoutLogsModel.getAll());
+            logs = WorkoutLogsModel.getAll();
+        } else {
+            if (!validateId(requestUserId)) {
+                return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
+            }
+            logs = WorkoutLogsModel.getByUserId(requestUserId);
         }
 
-        if (!validateId(requestUserId)) {
-            return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
+        if (filterPlanId) {
+            logs = logs.filter(l => l.workoutPlanId === filterPlanId);
+        }
+        if (filterDayId) {
+            logs = logs.filter(l => l.workoutDayId === filterDayId);
         }
 
-        return sendSuccess(res, 200, WorkoutLogsModel.getByUserId(requestUserId));
+        return sendSuccess(res, 200, logs);
     } catch (err) {
         return sendServerError(res);
     }
@@ -60,7 +73,7 @@ const createWorkoutLog = (req, res) => {
             return sendValidationError(res, 'Missing user id', { field: 'userid header' });
         }
 
-        const { workoutPlanId, date, workoutTitle, exercises, durationMinutes, difficultyRating, notes } = req.body;
+        const { workoutPlanId, workoutDayId, date, workoutTitle, exercises, durationMinutes, difficultyRating, notes } = req.body;
 
         const missingFields = getMissingFields(req.body, ['workoutPlanId', 'date', 'workoutTitle', 'exercises', 'durationMinutes', 'difficultyRating']);
         if (missingFields.length > 0) {
@@ -121,7 +134,7 @@ const createWorkoutLog = (req, res) => {
             return sendValidationError(res, 'Invalid workout log sets', { invalidSets });
         }
 
-        const newLog = WorkoutLogsModel.create({ userId, workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
+        const newLog = WorkoutLogsModel.create({ userId, workoutPlanId, workoutDayId: workoutDayId || null, date, workoutTitle, durationMinutes, difficultyRating, notes });
 
         exercises.forEach(exercise => {
             const newExercise = WorkoutLogsModel.createLogExercise({

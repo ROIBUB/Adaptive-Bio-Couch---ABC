@@ -1,8 +1,8 @@
 // --- workout_logs ---
 let workoutLogs = [
-    { workoutLogId: 1, userId: 1, workoutPlanId: 1, date: "2026-05-06", workoutTitle: "Full Body A",         durationMinutes: 60, difficultyRating: 8, notes: "Good workout, leg press felt challenging." },
-    { workoutLogId: 2, userId: 1, workoutPlanId: 1, date: "2026-05-08", workoutTitle: "Upper Body Focus",    durationMinutes: 55, difficultyRating: 7, notes: "Shoulder press was difficult in the last set." },
-    { workoutLogId: 3, userId: 3, workoutPlanId: 2, date: "2026-05-07", workoutTitle: "Lower Body And Core", durationMinutes: 45, difficultyRating: 6, notes: "Completed all planned leg press sets." }
+    { workoutLogId: 1, userId: 1, workoutPlanId: 1, workoutDayId: 1, date: "2026-05-06", workoutTitle: "Full Body A",         durationMinutes: 60, difficultyRating: 8, notes: "Good workout, leg press felt challenging." },
+    { workoutLogId: 2, userId: 1, workoutPlanId: 1, workoutDayId: 2, date: "2026-05-08", workoutTitle: "Upper Body Focus",    durationMinutes: 55, difficultyRating: 7, notes: "Shoulder press was difficult in the last set." },
+    { workoutLogId: 3, userId: 3, workoutPlanId: 2, workoutDayId: 4, date: "2026-05-07", workoutTitle: "Lower Body And Core", durationMinutes: 45, difficultyRating: 6, notes: "Completed all planned leg press sets." }
 ];
 
 // --- workout_log_exercises ---
@@ -72,6 +72,7 @@ const create = (data) => {
         workoutLogId: workoutLogs.length > 0 ? workoutLogs[workoutLogs.length - 1].workoutLogId + 1 : 1,
         userId: data.userId,
         workoutPlanId: data.workoutPlanId,
+        workoutDayId: data.workoutDayId || null,
         date: data.date,
         workoutTitle: data.workoutTitle,
         durationMinutes: data.durationMinutes,

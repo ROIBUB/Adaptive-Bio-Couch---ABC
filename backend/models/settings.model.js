@@ -9,6 +9,19 @@ let settings = [
 
 const getByUserId = (userId) => settings.find(s => s.userId === userId) || null;
 
+const create = (data) => {
+    const newSettings = {
+        userId:        data.userId,
+        displayName:   data.displayName,
+        email:         data.email,
+        theme:         'light',
+        fitnessGoal:   data.fitnessGoal   || '',
+        activityLevel: data.activityLevel || ''
+    };
+    settings.push(newSettings);
+    return newSettings;
+};
+
 const update = (userId, data) => {
     const index = settings.findIndex(s => s.userId === userId);
     if (index === -1) return null;
@@ -16,4 +29,4 @@ const update = (userId, data) => {
     return settings[index];
 };
 
-module.exports = { getByUserId, update };
+module.exports = { getByUserId, create, update };

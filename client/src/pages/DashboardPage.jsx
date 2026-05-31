@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import { getProfile } from '../services/profileService';
 import { getWorkoutPlans, getWorkoutLogs } from '../services/workoutService';
@@ -25,7 +25,17 @@ const GM = { top: 15, right: 20, bottom: 35, left: 45 };
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  const [planSuccess, setPlanSuccess] = useState(!!location.state?.planCreated);
+
+  // Clear the navigation state so the banner doesn't reappear on refresh
+  useEffect(() => {
+    if (location.state?.planCreated) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [loading,        setLoading]        = useState(true);
   const [profile,        setProfile]        = useState(null);
@@ -143,13 +153,38 @@ function DashboardPage() {
 
       {!loading && (
         <>
+          {planSuccess && (
+            <div className="plan-success-banner">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+                <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+              </svg>
+              <span>Your new plan has been created successfully!</span>
+              <button className="plan-success-close" onClick={() => setPlanSuccess(false)}>✕</button>
+            </div>
+          )}
+
           {/* ── Welcome ── */}
           <div className="welcome-section">
             <h1>Welcome back, {user.firstName} 👋</h1>
             <div className="welcome-pills">
-              <span className="pill">🎯 {GOAL_LABELS[profile?.fitnessGoal] || '—'}</span>
-              <span className="pill">⚖️ {profile ? `${profile.currentWeight} kg` : '—'}</span>
-              <span className="pill">📅 {profile ? `${profile.workoutsPerWeek} workouts/week` : '—'}</span>
+              <span className="pill">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'middle',marginRight:'4px'}}>
+                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                </svg>
+                {GOAL_LABELS[profile?.fitnessGoal] || '—'}
+              </span>
+              <span className="pill">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'middle',marginRight:'4px'}}>
+                  <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                {profile ? `${profile.currentWeight} kg` : '—'}
+              </span>
+              <span className="pill">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'middle',marginRight:'4px'}}>
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                {profile ? `${profile.workoutsPerWeek} workouts/week` : '—'}
+              </span>
             </div>
           </div>
 
@@ -245,13 +280,16 @@ function DashboardPage() {
           {/* ── Quick Navigation ── */}
           <div className="quick-nav">
             {[
-              { emoji: '🏋️', label: 'Workout Plans', route: '/workout-plans' },
-              { emoji: '🥗', label: 'Meal Plans',    route: '/meal-plans'    },
-              { emoji: '📊', label: 'Check-Ins',     route: '/check-ins'     },
-              { emoji: '⚙️', label: 'Settings',      route: '/settings'      },
-            ].map(({ emoji, label, route }) => (
+              { img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80&auto=format&fit=crop', accent: '#6c5ce7', label: 'Workout Plans', route: '/workout-plans' },
+              { img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80&auto=format&fit=crop', accent: '#00b894', label: 'Meal Plans',    route: '/meal-plans'    },
+              { img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80&auto=format&fit=crop', accent: '#e17055', label: 'Check-Ins',   route: '/check-ins'     },
+              { img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80&auto=format&fit=crop', accent: '#0984e3', label: 'Settings',     route: '/settings'      },
+            ].map(({ img, accent, label, route }) => (
               <button key={route} className="quick-nav-tile" onClick={() => navigate(route)}>
-                <span className="quick-nav-emoji">{emoji}</span>
+                <div className="quick-nav-img-wrap">
+                  <img src={img} alt={label} className="quick-nav-img" />
+                  <div className="quick-nav-overlay" style={{ background: accent }} />
+                </div>
                 <span className="quick-nav-label">{label}</span>
               </button>
             ))}

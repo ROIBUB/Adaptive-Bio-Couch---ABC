@@ -116,6 +116,36 @@
   margin-bottom: 0.75rem;
 }
 
+.day-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.day-card-actions .start-workout-btn,
+.day-card-actions .view-logs-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+.view-logs-btn {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0;
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.view-logs-btn:hover {
+  background: #5a4bd1;
+}
+
 .start-workout-btn {
   display: block;
   width: 100%;

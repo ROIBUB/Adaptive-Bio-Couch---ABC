@@ -1,0 +1,93 @@
+.onboarding-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  padding: 2.5rem 1rem;
+}
+
+.onboarding-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  margin-bottom: 2.5rem;
+}
+
+.onboarding-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.onboarding-logo {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 0.4rem;
+}
+
+.onboarding-header p {
+  color: #636e72;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.onboarding-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 0.85rem;
+  background: #f5f7fa;
+  color: #636e72;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #dfe6e9;
+}
+
+.generate-btn {
+  flex: 2;
+  padding: 0.85rem;
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background: #5a4bd1;
+}
+
+.generate-btn:disabled {
+  background: #b2bec3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 580px) {
+  .onboarding-card {
+    padding: 1.75rem 1.25rem;
+  }
+}

@@ -17,11 +17,19 @@ const getAuthHeaders = () => {
   };
 };
 
+const clearSessionAndRedirect = () => {
+  localStorage.removeItem('user');
+  localStorage.removeItem('theme');
+  window.location.replace('/');
+};
+
 // Generic fetch wrapper.
 // - Merges auth headers into every request automatically.
+// - Handles 401 globally: clears the stored session and redirects to login.
 // - Reads the { success, data, error } envelope from the backend.
 // - Throws an error (with the server's message) if success is false.
-//   This lets every caller just do: const data = await apiFetch('/api/...')
+//   The thrown error has a `.status` property set to the HTTP status code
+//   so callers can distinguish 404 (not found) from other failures.
 const apiFetch = async (path, options = {}) => {
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
@@ -31,13 +39,20 @@ const apiFetch = async (path, options = {}) => {
     }
   });
 
+  if (response.status === 401) {
+    clearSessionAndRedirect();
+    return;
+  }
+
   const json = await response.json();
 
   if (!json.success) {
-    throw new Error(json.error?.message || 'Request failed');
+    const err = new Error(json.error?.message || 'Request failed');
+    err.status = response.status;
+    throw err;
   }
 
   return json.data;
 };
 
-export { BASE_URL, apiFetch };
+export { BASE_URL, apiFetch, clearSessionAndRedirect };

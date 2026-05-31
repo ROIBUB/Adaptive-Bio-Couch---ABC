@@ -16,7 +16,10 @@ const authorize = (allowedRoles) => {
             });
         }
 
-        if (!allowedRoles.includes(userRole)) {
+        // 'manager' has the same permissions as 'admin'
+        const effectiveRole = userRole === 'manager' ? 'admin' : userRole;
+
+        if (!allowedRoles.includes(effectiveRole)) {
             return res.status(403).json({
                 success: false,
                 data: null,

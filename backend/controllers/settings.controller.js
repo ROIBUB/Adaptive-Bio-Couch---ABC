@@ -19,7 +19,10 @@ const getSettings = (req, res) => {
         const settings = SettingsModel.getByUserId(userId);
 
         if (!settings) {
-            return sendNotFound(res, 'Settings not found for this user', {});
+            return sendSuccess(res, 200, {
+                displayName: '', email: '', theme: 'light',
+                fitnessGoal: '', activityLevel: ''
+            });
         }
 
         return sendSuccess(res, 200, settings);

@@ -115,4 +115,47 @@ const deleteFoodItem = (req, res) => {
     }
 };
 
-module.exports = { getAllFoodItems, getFoodItemById, createFoodItem, updateFoodItem, deleteFoodItem };
+// GET /api/food-items/alternatives/:foodItemId?grams=<number>
+const getAlternatives = (req, res) => {
+    try {
+        const foodItemId = Number(req.params.foodItemId);
+        const grams      = Number(req.query.grams);
+
+        if (!validateId(foodItemId)) {
+            return sendValidationError(res, 'Invalid food item id', { field: 'foodItemId', value: req.params.foodItemId });
+        }
+        if (!req.query.grams || isNaN(grams) || grams <= 0) {
+            return sendValidationError(res, 'grams must be a positive number', { field: 'grams', value: req.query.grams });
+        }
+
+        const original = FoodItemsModel.getById(foodItemId);
+        if (!original) {
+            return sendNotFound(res, 'Food item not found', { foodItemId });
+        }
+
+        const originalCalories = (original.caloriesPer100g / 100) * grams;
+
+        const alternatives = FoodItemsModel.getAll()
+            .filter(alt => alt.category === original.category && alt.foodItemId !== foodItemId)
+            .reduce((acc, alt) => {
+                const alternativeGrams = Math.round((originalCalories / alt.caloriesPer100g) * 100);
+                if (alternativeGrams >= 50 && alternativeGrams <= 500) {
+                    acc.push({
+                        foodItemId:       alt.foodItemId,
+                        name:             alt.name,
+                        category:         alt.category,
+                        grams:            alternativeGrams,
+                        calories:         Math.round(originalCalories),
+                        protein:          Math.round((alt.proteinPer100g / 100) * alternativeGrams)
+                    });
+                }
+                return acc;
+            }, []);
+
+        return sendSuccess(res, 200, alternatives);
+    } catch (err) {
+        return sendServerError(res);
+    }
+};
+
+module.exports = { getAllFoodItems, getFoodItemById, createFoodItem, updateFoodItem, deleteFoodItem, getAlternatives };

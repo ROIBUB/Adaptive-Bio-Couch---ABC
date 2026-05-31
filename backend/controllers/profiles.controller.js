@@ -1,4 +1,8 @@
-const ProfilesModel = require('../models/profiles.model');
+const ProfilesModel      = require('../models/profiles.model');
+const UsersModel         = require('../models/users.model');
+const WorkoutPlansModel  = require('../models/workoutPlans.model');
+const DailyMealPlansModel = require('../models/dailyMealPlans.model');
+const { generatePlan }   = require('../services/planGenerator');
 
 const {
     sendSuccess,
@@ -120,4 +124,53 @@ const updateProfile = (req, res) => {
     }
 };
 
-module.exports = { getProfileByUserId, createProfile, updateProfile };
+// POST /api/profiles/:userId/replan
+const replanProfile = (req, res) => {
+    try {
+        const userId = Number(req.params.userId);
+
+        if (!validateId(userId)) {
+            return sendValidationError(res, 'Invalid user id', { field: 'userId', value: req.params.userId });
+        }
+
+        const userRole = req.headers['x-user-role'];
+        const requestUserId = Number(req.headers.userid);
+
+        if (userRole !== 'admin' && requestUserId !== userId) {
+            return sendNotFound(res, 'Profile not found', { userId });
+        }
+
+        const profile = ProfilesModel.getByUserId(userId);
+        if (!profile) {
+            return sendNotFound(res, 'Profile not found', { userId });
+        }
+
+        const missing = getMissingFields(req.body, ['fitnessGoal', 'activityLevel', 'workoutsPerWeek', 'mealsPerDay']);
+        if (missing.length > 0) {
+            return sendValidationError(res, 'Missing required replan fields', { missingFields: missing });
+        }
+
+        const { height, currentWeight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay } = req.body;
+
+        const profileUpdates = { fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay };
+        if (height !== undefined)        profileUpdates.height = Number(height);
+        if (currentWeight !== undefined) profileUpdates.currentWeight = Number(currentWeight);
+
+        const updatedProfile = ProfilesModel.update(userId, profileUpdates);
+
+        const user = UsersModel.getById(userId);
+        const firstName = user ? user.firstName : 'User';
+
+        WorkoutPlansModel.deactivateByUserId(userId);
+        DailyMealPlansModel.deactivateByUserId(userId);
+
+        const plan = generatePlan({ ...updatedProfile, userId, firstName });
+        const finalProfile = ProfilesModel.update(userId, plan);
+
+        return sendSuccess(res, 200, finalProfile);
+    } catch (err) {
+        return sendServerError(res);
+    }
+};
+
+module.exports = { getProfileByUserId, createProfile, updateProfile, replanProfile };

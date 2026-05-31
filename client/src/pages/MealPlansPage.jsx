@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/Card';
-import { getDailyMealPlans } from '../services/mealService';
+import { getDailyMealPlans, getFoodAlternatives } from '../services/mealService';
 import { getProgressData, createProgress, updateProgress } from '../services/progressService';
 import './MealPlansPage.css';
 
@@ -13,6 +13,8 @@ function MealPlansPage() {
   const [consumedMealIds, setConsumedMealIds] = useState(new Set());
   const [todayProgress,   setTodayProgress]   = useState(null);
   const [markingMealId,   setMarkingMealId]   = useState(null);
+  const [altMap,          setAltMap]          = useState({});
+  // altMap key: foodItemId → { loading, data, error, open }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,6 +83,27 @@ function MealPlansPage() {
     }
   };
 
+  const handleShowAlternatives = async (fi) => {
+    const current = altMap[fi.foodItemId];
+
+    if (current?.open) {
+      setAltMap(prev => ({ ...prev, [fi.foodItemId]: { ...prev[fi.foodItemId], open: false } }));
+      return;
+    }
+    if (current?.data || current?.error) {
+      setAltMap(prev => ({ ...prev, [fi.foodItemId]: { ...prev[fi.foodItemId], open: true } }));
+      return;
+    }
+
+    setAltMap(prev => ({ ...prev, [fi.foodItemId]: { loading: true, data: null, error: null, open: true } }));
+    try {
+      const data = await getFoodAlternatives(fi.foodItemId, fi.quantityGrams);
+      setAltMap(prev => ({ ...prev, [fi.foodItemId]: { loading: false, data, error: null, open: true } }));
+    } catch {
+      setAltMap(prev => ({ ...prev, [fi.foodItemId]: { loading: false, data: null, error: 'Failed to load', open: true } }));
+    }
+  };
+
   // Sort meals by the defined order; unknown types go to the end
   const sortedMeals = (meals) =>
     [...(meals || [])].sort(
@@ -146,8 +169,35 @@ function MealPlansPage() {
                   <ul className="food-list">
                     {(meal.foodItems || []).map((fi, j) => (
                       <li key={j} className="food-item">
-                        <span className="food-name">{fi.foodName}</span>
-                        <span className="food-qty">{fi.quantityGrams} g</span>
+                        <div className="food-item-row">
+                          <span className="food-name">{fi.foodName}</span>
+                          <span className="food-qty">{fi.quantityGrams} g</span>
+                          <button
+                            className="alt-btn"
+                            onClick={() => handleShowAlternatives(fi)}
+                          >
+                            {altMap[fi.foodItemId]?.open ? 'Hide' : 'Alternatives'}
+                          </button>
+                        </div>
+                        {altMap[fi.foodItemId]?.open && (
+                          <div className="alt-panel">
+                            {altMap[fi.foodItemId]?.loading && (
+                              <span className="alt-loading">Loading…</span>
+                            )}
+                            {altMap[fi.foodItemId]?.error && (
+                              <span className="alt-error">{altMap[fi.foodItemId].error}</span>
+                            )}
+                            {altMap[fi.foodItemId]?.data?.length === 0 && (
+                              <span className="alt-empty">No alternatives found</span>
+                            )}
+                            {altMap[fi.foodItemId]?.data?.map((alt, k) => (
+                              <div key={k} className="alt-item">
+                                <span className="alt-name">{alt.name}</span>
+                                <span className="alt-detail">{alt.grams}g · {alt.calories} kcal · {alt.protein}g protein</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>

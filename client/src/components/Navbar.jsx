@@ -22,26 +22,54 @@ function Navbar() {
     navigate('/');
   };
 
+  const ic = (size, children) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      style={{ verticalAlign: 'middle', marginRight: '6px' }}>
+      {children}
+    </svg>
+  );
+
   return (
     <nav className="navbar">
       {/* Brand / logo */}
       <div className="navbar-brand">
-        <Link to="/dashboard">🏋️ Adaptive Bio-Coach</Link>
+        <Link to="/dashboard">
+          {ic(20, <path d="M6 4v16M18 4v16M4 9h4M4 15h4M16 9h4M16 15h4M8 12h8"/>)}
+          Adaptive Bio-Coach
+        </Link>
       </div>
 
-      {/* Navigation links — pages not yet built will redirect to / via the catch-all route */}
+      {/* Navigation links */}
       <ul className="navbar-links">
-        <li><Link to="/dashboard">Dashboard</Link></li>
-        <li><Link to="/workout-plans">Workout Plans</Link></li>
-        <li><Link to="/workout-logs">Workout Logs</Link></li>
-        <li><Link to="/meal-plans">Meal Plans</Link></li>
-        <li><Link to="/check-ins">Check-ins</Link></li>
-        <li><Link to="/settings">Settings</Link></li>
+        <li><Link to="/dashboard">
+          {ic(14, <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>)}
+          Dashboard
+        </Link></li>
+        <li><Link to="/workout-plans">
+          {ic(14, <path d="M6 4v16M18 4v16M4 9h4M4 15h4M16 9h4M16 15h4M8 12h8"/>)}
+          Workout Plans
+        </Link></li>
+        <li><Link to="/meal-plans">
+          {ic(14, <><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></>)}
+          Meal Plans
+        </Link></li>
+        <li><Link to="/check-ins">
+          {ic(14, <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>)}
+          Check-ins
+        </Link></li>
+        <li><Link to="/settings">
+          {ic(14, <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></>)}
+          Settings
+        </Link></li>
       </ul>
 
       {/* User info and logout */}
       <div className="navbar-user">
-        <span className="navbar-username">👤 {fullName}</span>
+        <span className="navbar-username">
+          {ic(16, <><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></>)}
+          {fullName}
+        </span>
         <button className="navbar-logout-btn" onClick={handleLogout}>
           Logout
         </button>

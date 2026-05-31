@@ -101,3 +101,139 @@ body {
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+body.dark-mode {
+  background-color: #12121e;
+  color: #e0e0e0;
+}
+
+body.dark-mode .navbar {
+  background-color: #1e1e30;
+  border-bottom-color: #2e2e45;
+}
+
+body.dark-mode .navbar a,
+body.dark-mode .navbar-username {
+  color: #e0e0e0;
+}
+
+body.dark-mode .navbar-logout-btn {
+  background: #2e2e45;
+  color: #e0e0e0;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select {
+  background: #1e1e30;
+  border-color: #3a3a55;
+  color: #e0e0e0;
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus {
+  border-color: #9b8af4;
+}
+
+body.dark-mode .form-group label {
+  color: #a0a0c0;
+}
+
+body.dark-mode .settings-form,
+body.dark-mode .settings-header h1 {
+  background: #1e1e30;
+  color: #e0e0e0;
+}
+
+body.dark-mode .settings-header p {
+  color: #a0a0c0;
+}
+
+body.dark-mode .summary-card,
+body.dark-mode .day-card,
+body.dark-mode .logs-table-wrapper,
+body.dark-mode .expand-panel {
+  background: #1e1e30;
+  color: #e0e0e0;
+}
+
+body.dark-mode .summary-card-title {
+  color: #a0a0c0;
+}
+
+body.dark-mode .page-header h1,
+body.dark-mode .section-title,
+body.dark-mode .table-heading,
+body.dark-mode .day-title {
+  color: #e0e0e0;
+}
+
+body.dark-mode .page-header p,
+body.dark-mode .summary-card-subtitle {
+  color: #a0a0c0;
+}
+
+body.dark-mode table,
+body.dark-mode .logs-table {
+  background: #1e1e30;
+  color: #e0e0e0;
+}
+
+body.dark-mode th {
+  background: #16162a;
+  color: #a0a0c0;
+}
+
+body.dark-mode td,
+body.dark-mode tr {
+  border-color: #2e2e45;
+  color: #e0e0e0;
+}
+
+body.dark-mode tr:nth-child(even) {
+  background: #1a1a2e;
+}
+
+body.dark-mode .error-banner {
+  background: #2a1a1a;
+  border-color: #6b2a2a;
+}
+
+body.dark-mode .success-msg {
+  background: #1a2a1a;
+  border-color: #2a5a2a;
+}
+
+body.dark-mode .api-error {
+  background: #2a1a1a;
+  border-color: #6b2a2a;
+  color: #f08080;
+}
+
+body.dark-mode .quick-nav-tile {
+  background: #1e1e30;
+  color: #e0e0e0;
+}
+
+body.dark-mode .quick-nav-tile:hover {
+  background: #2a2a42;
+}
+
+body.dark-mode .input-readonly {
+  background-color: #16162a !important;
+  color: #6b6b90 !important;
+}
+
+body.dark-mode .card {
+  background: #1e1e30;
+  color: #e0e0e0;
+}
+
+body.dark-mode .card-title {
+  color: #e0e0e0;
+}
+
+body.dark-mode .card-subtitle,
+body.dark-mode .card-stat-label {
+  color: #a0a0c0;
+}

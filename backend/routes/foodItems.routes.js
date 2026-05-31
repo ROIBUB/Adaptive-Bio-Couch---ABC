@@ -8,11 +8,16 @@ const {
     getFoodItemById,
     createFoodItem,
     updateFoodItem,
-    deleteFoodItem
+    deleteFoodItem,
+    getAlternatives
 } = require("../controllers/foodItems.controller");
 
 // GET /api/food-items
 router.get("/", getAllFoodItems);
+
+// GET /api/food-items/alternatives/:foodItemId?grams=<number>
+// Must be declared before /:id so the literal segment wins
+router.get("/alternatives/:foodItemId", getAlternatives);
 
 // GET /api/food-items/:id
 router.get("/:id", getFoodItemById);

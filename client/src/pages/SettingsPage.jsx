@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getSettings, updateSettings } from '../services/settingsService';
 import './SettingsPage.css';
 
 function SettingsPage() {
-  // Single state object for all form fields.
-  // Each input's `name` attribute matches a key here.
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
-    displayName:   '',
-    email:         '',
-    theme:         'light',
-    fitnessGoal:   '',
-    activityLevel: 1,
+    displayName: '',
+    email:       '',
+    theme:       'light',
   });
 
   const [formErrors, setFormErrors] = useState({});  // field-level errors
@@ -25,13 +24,13 @@ function SettingsPage() {
       setLoading(true);
       try {
         const data = await getSettings();
+        const theme = data.theme || 'light';
         setForm({
-          displayName:   data.displayName   || '',
-          email:         data.email         || '',
-          theme:         data.theme         || 'light',
-          fitnessGoal:   data.fitnessGoal   || '',
-          activityLevel: data.activityLevel ?? 1,
+          displayName: data.displayName || '',
+          email:       data.email       || '',
+          theme,
         });
+        document.body.classList.toggle('dark-mode', theme === 'dark');
       } catch (err) {
         setApiError('Could not load settings. Make sure the backend is running on port 3000.');
       } finally {
@@ -45,21 +44,18 @@ function SettingsPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-    setSuccess(''); // clear the success message when the user starts editing again
+    setSuccess('');
+    // Immediately preview dark/light mode when theme changes
+    if (name === 'theme') {
+      document.body.classList.toggle('dark-mode', value === 'dark');
+    }
   };
 
-  // Client-side validation for the three required fields
+  // Client-side validation for required fields
   const validate = () => {
     const errs = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!form.displayName.trim()) {
       errs.displayName = 'Display name is required';
-    }
-    if (!form.email.trim()) {
-      errs.email = 'Email is required';
-    } else if (!emailRegex.test(form.email)) {
-      errs.email = 'Enter a valid email address';
     }
     if (!form.theme) {
       errs.theme = 'Theme is required';
@@ -82,6 +78,7 @@ function SettingsPage() {
     setSaving(true);
     try {
       await updateSettings(form);
+      localStorage.setItem('theme', form.theme);
       setSuccess('Settings saved successfully!');
     } catch (err) {
       setApiError(err.message || 'Failed to save settings. Please try again.');
@@ -101,6 +98,7 @@ function SettingsPage() {
       {loading && <p className="loading">Loading settings…</p>}
 
       {!loading && (
+        <>
         <form className="settings-form" onSubmit={handleSubmit} noValidate>
 
           {/* ── Required field 1: Display Name ── */}
@@ -120,7 +118,7 @@ function SettingsPage() {
             )}
           </div>
 
-          {/* ── Required field 2: Email ── */}
+          {/* ── Display-only: Email ── */}
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
@@ -128,13 +126,9 @@ function SettingsPage() {
               name="email"
               type="email"
               value={form.email}
-              onChange={handleChange}
-              placeholder="your@email.com"
-              className={formErrors.email ? 'input-error' : ''}
+              readOnly
+              className="input-readonly"
             />
-            {formErrors.email && (
-              <span className="error-msg">{formErrors.email}</span>
-            )}
           </div>
 
           {/* ── Required field 3: Theme preference ── */}
@@ -155,33 +149,6 @@ function SettingsPage() {
             )}
           </div>
 
-          {/* ── Optional field: Fitness Goal ── */}
-          <div className="form-group">
-            <label htmlFor="fitnessGoal">Fitness Goal</label>
-            <input
-              id="fitnessGoal"
-              name="fitnessGoal"
-              type="text"
-              value={form.fitnessGoal}
-              onChange={handleChange}
-              placeholder="e.g. muscle gain, fat loss, maintenance"
-            />
-          </div>
-
-          {/* ── Optional field: Activity Level ── */}
-          <div className="form-group">
-            <label htmlFor="activityLevel">Activity Level (1 = low, 5 = very active)</label>
-            <input
-              id="activityLevel"
-              name="activityLevel"
-              type="number"
-              min="1"
-              max="5"
-              value={form.activityLevel}
-              onChange={handleChange}
-            />
-          </div>
-
           {/* Server error */}
           {apiError && <div className="api-error">{apiError}</div>}
 
@@ -192,6 +159,22 @@ function SettingsPage() {
             {saving ? 'Saving…' : 'Save Settings'}
           </button>
         </form>
+
+        {/* ── Fitness Plan ── */}
+        <div className="replan-section">
+          <h2 className="replan-title">Fitness Plan</h2>
+          <p className="replan-desc">
+            Want to switch goals or adjust your training intensity? Generate a fresh
+            workout and meal plan based on updated preferences.
+          </p>
+          <button
+            className="replan-btn"
+            onClick={() => navigate('/onboarding?mode=replan')}
+          >
+            Create New Plan
+          </button>
+        </div>
+      </>
       )}
     </div>
   );

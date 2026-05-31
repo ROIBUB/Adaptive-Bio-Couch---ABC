@@ -26,6 +26,51 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
+.replan-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border-left: 4px solid #6c5ce7;
+}
+
+.replan-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.4rem;
+}
+
+.replan-desc {
+  font-size: 0.9rem;
+  color: #636e72;
+  margin-bottom: 1.1rem;
+  line-height: 1.5;
+}
+
+.replan-btn {
+  padding: 0.7rem 1.4rem;
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.replan-btn:hover {
+  background: #5a4bd1;
+}
+
+.input-readonly {
+  background-color: #f5f7fa !important;
+  color: #636e72 !important;
+  cursor: default;
+}
+
 .save-btn {
   width: 100%;
   padding: 0.85rem;

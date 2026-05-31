@@ -123,8 +123,9 @@ function WorkoutLoggerPage() {
     const payload = {
       userId:           user.userId,
       workoutPlanId:    Number(planId),
+      workoutDayId:     Number(dayId),
       date:             form.date,
-      workoutTitle:     `${day.title} – ${form.date}`,
+      workoutTitle:     day.title,
       durationMinutes:  Number(form.durationMinutes),
       difficultyRating: Number(form.difficultyRating),
       notes:            form.notes || '',

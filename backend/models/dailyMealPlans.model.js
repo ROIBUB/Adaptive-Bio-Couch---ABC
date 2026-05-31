@@ -124,7 +124,13 @@ const getById = (id) => {
 };
 
 const getByUserId = (userId) =>
-    dailyMealPlans.filter(p => p.userId === userId).map(assemblePlan);
+    dailyMealPlans.filter(p => p.userId === userId && p.isActive === true).map(assemblePlan);
+
+const deactivateByUserId = (userId) => {
+    dailyMealPlans
+        .filter(p => p.userId === userId)
+        .forEach(p => { p.isActive = false; });
+};
 
 const create = (data) => {
     const newPlan = {
@@ -227,7 +233,7 @@ const removeMealFoodItem = (id) => {
 };
 
 module.exports = {
-    getAll, getById, getByUserId, create, update, remove,
+    getAll, getById, getByUserId, deactivateByUserId, create, update, remove,
     getMeals, getMealById, createMeal, updateMeal, removeMeal,
     getMealFoodItems, getMealFoodItemById, createMealFoodItem, updateMealFoodItem, removeMealFoodItem
 };
