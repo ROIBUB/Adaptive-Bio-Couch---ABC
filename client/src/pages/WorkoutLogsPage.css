@@ -9,11 +9,11 @@
 .page-header h1 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--text);
 }
 
 .page-header p {
-  color: #636e72;
+  color: var(--text-secondary);
   margin-top: 0.3rem;
   font-size: 0.95rem;
 }
@@ -21,7 +21,7 @@
 .back-to-plans-btn {
   background: none;
   border: none;
-  color: #6c5ce7;
+  color: var(--purple);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -37,10 +37,10 @@
 }
 
 .new-workout-btn {
-  background: #6c5ce7;
+  background: var(--purple);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 0.65rem 1.4rem;
   font-size: 0.9rem;
   font-weight: 600;
@@ -49,14 +49,14 @@
 }
 
 .new-workout-btn:hover {
-  background: #5a4bd1;
+  background: var(--purple-hover);
 }
 
 .log-form {
-  background: white;
-  border-radius: 12px;
+  background: var(--card);
+  border-radius: var(--radius);
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--shadow-md);
   margin-bottom: 1.5rem;
   max-width: 480px;
 }
@@ -64,10 +64,10 @@
 .submit-btn {
   width: 100%;
   padding: 0.8rem;
-  background-color: #00b894;
+  background-color: #059669;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -76,11 +76,11 @@
 }
 
 .submit-btn:hover:not(:disabled) {
-  background-color: #00a381;
+  background-color: #047857;
 }
 
 .submit-btn:disabled {
-  background-color: #b2bec3;
+  background-color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -108,16 +108,17 @@
   text-align: left;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #636e72;
+  color: var(--purple);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 2px solid #dfe6e9;
+  background: var(--purple-bg);
+  border-bottom: 2px solid var(--purple-border);
 }
 
 .logs-table td {
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid #f0f4f8;
-  color: #2d3436;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
 
 .logs-table tbody tr:last-child td {
@@ -125,11 +126,11 @@
 }
 
 .logs-table tbody tr:hover {
-  background: #fafbfc;
+  background: var(--purple-bg);
 }
 
 .row-expanded {
-  background: #f5f3ff !important;
+  background: var(--purple-bg) !important;
 }
 
 .notes-cell {
@@ -143,9 +144,9 @@
 
 .details-btn {
   background: none;
-  border: 1px solid #6c5ce7;
-  color: #6c5ce7;
-  border-radius: 6px;
+  border: 1px solid var(--purple);
+  color: var(--purple);
+  border-radius: var(--radius-sm);
   padding: 0.3rem 0.75rem;
   font-size: 0.82rem;
   font-weight: 600;
@@ -155,13 +156,13 @@
 }
 
 .details-btn:hover {
-  background: #6c5ce7;
+  background: var(--purple);
   color: white;
 }
 
 /* Expanded exercise panel */
 .expand-row td {
-  background: #faf9ff;
+  background: var(--purple-bg);
   padding: 1rem 1.5rem 1.5rem;
 }
 

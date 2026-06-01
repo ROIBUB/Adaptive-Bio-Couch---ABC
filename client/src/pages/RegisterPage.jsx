@@ -64,32 +64,32 @@ function RegisterPage() {
 
     if (!form.age) {
       newErrors.age = 'Age is required';
-    } else if (Number(form.age) < 13 || Number(form.age) > 100) {
-      newErrors.age = 'Age must be between 13 and 100';
+    } else if (!Number.isInteger(Number(form.age)) || Number(form.age) < 13 || Number(form.age) > 120) {
+      newErrors.age = 'Age must be a whole number between 13 and 120';
     }
     if (!form.gender) newErrors.gender = 'Gender is required';
     if (!form.height) {
       newErrors.height = 'Height is required';
-    } else if (Number(form.height) <= 0) {
-      newErrors.height = 'Height must be a positive number';
+    } else if (Number.isNaN(Number(form.height)) || Number(form.height) < 100 || Number(form.height) > 250) {
+      newErrors.height = 'Height must be between 100 and 250 cm';
     }
     if (!form.weight) {
       newErrors.weight = 'Weight is required';
-    } else if (Number(form.weight) <= 0) {
-      newErrors.weight = 'Weight must be a positive number';
+    } else if (Number.isNaN(Number(form.weight)) || Number(form.weight) < 30 || Number(form.weight) > 300) {
+      newErrors.weight = 'Weight must be between 30 and 300 kg';
     }
 
     if (!form.fitnessGoal) newErrors.fitnessGoal = 'Please select a fitness goal';
     if (!form.activityLevel) newErrors.activityLevel = 'Please select an activity level';
     if (!form.workoutsPerWeek) {
       newErrors.workoutsPerWeek = 'Workouts per week is required';
-    } else if (Number(form.workoutsPerWeek) < 1 || Number(form.workoutsPerWeek) > 7) {
-      newErrors.workoutsPerWeek = 'Must be between 1 and 7';
+    } else if (!Number.isInteger(Number(form.workoutsPerWeek)) || Number(form.workoutsPerWeek) < 1 || Number(form.workoutsPerWeek) > 7) {
+      newErrors.workoutsPerWeek = 'Must be a whole number between 1 and 7';
     }
     if (!form.mealsPerDay) {
       newErrors.mealsPerDay = 'Meals per day is required';
-    } else if (Number(form.mealsPerDay) < 1 || Number(form.mealsPerDay) > 6) {
-      newErrors.mealsPerDay = 'Must be between 1 and 6';
+    } else if (!Number.isInteger(Number(form.mealsPerDay)) || Number(form.mealsPerDay) < 1 || Number(form.mealsPerDay) > 8) {
+      newErrors.mealsPerDay = 'Must be a whole number between 1 and 8';
     }
 
     return newErrors;
@@ -240,7 +240,7 @@ function RegisterPage() {
                   onChange={handleChange}
                   placeholder="e.g. 25"
                   min="13"
-                  max="100"
+                  max="120"
                   className={errors.age ? 'input-error' : ''}
                 />
                 {errors.age && <span className="error-msg">{errors.age}</span>}
@@ -272,7 +272,8 @@ function RegisterPage() {
                   value={form.height}
                   onChange={handleChange}
                   placeholder="e.g. 170"
-                  min="1"
+                  min="100"
+                  max="250"
                   className={errors.height ? 'input-error' : ''}
                 />
                 {errors.height && <span className="error-msg">{errors.height}</span>}
@@ -287,7 +288,8 @@ function RegisterPage() {
                   value={form.weight}
                   onChange={handleChange}
                   placeholder="e.g. 70"
-                  min="1"
+                  min="30"
+                  max="300"
                   className={errors.weight ? 'input-error' : ''}
                 />
                 {errors.weight && <span className="error-msg">{errors.weight}</span>}
@@ -357,9 +359,9 @@ function RegisterPage() {
                   type="number"
                   value={form.mealsPerDay}
                   onChange={handleChange}
-                  placeholder="1 – 6"
+                  placeholder="1 – 8"
                   min="1"
-                  max="6"
+                  max="8"
                   className={errors.mealsPerDay ? 'input-error' : ''}
                 />
                 {errors.mealsPerDay && <span className="error-msg">{errors.mealsPerDay}</span>}

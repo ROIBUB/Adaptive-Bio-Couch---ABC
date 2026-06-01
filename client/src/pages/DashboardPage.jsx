@@ -5,6 +5,7 @@ import { getProfile } from '../services/profileService';
 import { getWorkoutPlans, getWorkoutLogs } from '../services/workoutService';
 import { getCheckIns } from '../services/checkInService';
 import { getProgressData } from '../services/progressService';
+import { getDailyMealPlans } from '../services/mealService';
 import './DashboardPage.css';
 
 const GOAL_LABELS = {
@@ -40,6 +41,7 @@ function DashboardPage() {
   const [loading,        setLoading]        = useState(true);
   const [profile,        setProfile]        = useState(null);
   const [profileFailed,  setProfileFailed]  = useState(false);
+  const [assignedMealPlan, setAssignedMealPlan] = useState(null);
   const [workoutLogs,    setWorkoutLogs]    = useState([]);
   const [logsFailed,     setLogsFailed]     = useState(false);
   const [checkIns,       setCheckIns]       = useState([]);
@@ -58,8 +60,21 @@ function DashboardPage() {
         getProgressData(),
       ]);
 
-      if (profileRes.status  === 'fulfilled') setProfile(profileRes.value);
-      else                                    setProfileFailed(true);
+      if (profileRes.status  === 'fulfilled') {
+        setProfile(profileRes.value);
+        // Fetch the assigned meal plan so the calories target matches the meal plan page
+        try {
+          const mealPlans = await getDailyMealPlans();
+          const assigned = (mealPlans || []).find(
+            p => p.dailyMealPlanId === profileRes.value.assignedMealPlanId
+          );
+          setAssignedMealPlan(assigned || null);
+        } catch {
+          // Could not load the meal plan — fall back to profile.caloricTarget
+        }
+      } else {
+        setProfileFailed(true);
+      }
 
       if (logsRes.status     === 'fulfilled') setWorkoutLogs(logsRes.value    || []);
       else                                    setLogsFailed(true);
@@ -80,7 +95,7 @@ function DashboardPage() {
   const today = new Date().toISOString().split('T')[0];
   const todayRecord      = progressData.find(p => p.date === today);
   const caloriesConsumed = todayRecord ? todayRecord.caloriesConsumed : 0;
-  const caloriesTarget   = profile?.caloricTarget ?? 0;
+  const caloriesTarget   = assignedMealPlan?.targetCalories ?? profile?.caloricTarget ?? 0;
 
   const now = new Date();
   const dayOfWeek = now.getDay();
@@ -280,15 +295,14 @@ function DashboardPage() {
           {/* ── Quick Navigation ── */}
           <div className="quick-nav">
             {[
-              { img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80&auto=format&fit=crop', accent: '#6c5ce7', label: 'Workout Plans', route: '/workout-plans' },
-              { img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80&auto=format&fit=crop', accent: '#00b894', label: 'Meal Plans',    route: '/meal-plans'    },
-              { img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80&auto=format&fit=crop', accent: '#e17055', label: 'Check-Ins',   route: '/check-ins'     },
-              { img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80&auto=format&fit=crop', accent: '#0984e3', label: 'Settings',     route: '/settings'      },
-            ].map(({ img, accent, label, route }) => (
+              { emoji: '🏋️', accent: 'linear-gradient(135deg,#7c3aed,#a78bfa)', label: 'Workout Plans', route: '/workout-plans' },
+              { emoji: '🥗', accent: 'linear-gradient(135deg,#059669,#34d399)', label: 'Meal Plans',    route: '/meal-plans'    },
+              { emoji: '📊', accent: 'linear-gradient(135deg,#dc6b19,#fb923c)', label: 'Check-Ins',     route: '/check-ins'     },
+              { emoji: '⚙️', accent: 'linear-gradient(135deg,#0369a1,#38bdf8)', label: 'Settings',      route: '/settings'      },
+            ].map(({ emoji, accent, label, route }) => (
               <button key={route} className="quick-nav-tile" onClick={() => navigate(route)}>
-                <div className="quick-nav-img-wrap">
-                  <img src={img} alt={label} className="quick-nav-img" />
-                  <div className="quick-nav-overlay" style={{ background: accent }} />
+                <div className="quick-nav-emoji-wrap" style={{ background: accent }}>
+                  <span className="quick-nav-emoji">{emoji}</span>
                 </div>
                 <span className="quick-nav-label">{label}</span>
               </button>

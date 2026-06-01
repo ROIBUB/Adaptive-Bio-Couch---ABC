@@ -47,15 +47,36 @@ function CheckInsPage() {
 
   const validate = () => {
     const errs = {};
-    if (!form.weight || isNaN(Number(form.weight)) || Number(form.weight) <= 0) {
-      errs.weight = 'Weight must be a positive number';
+
+    const weight = Number(form.weight);
+    if (form.weight === '' || isNaN(weight) || weight < 30 || weight > 300) {
+      errs.weight = 'Weight must be a number between 30 and 300 kg';
     }
-    if (form.workoutsCompleted === '' || isNaN(Number(form.workoutsCompleted)) || Number(form.workoutsCompleted) < 0) {
-      errs.workoutsCompleted = 'Workouts completed must be 0 or more';
+
+    const workouts = Number(form.workoutsCompleted);
+    if (form.workoutsCompleted === '' || !Number.isInteger(workouts) || workouts < 0 || workouts > 7) {
+      errs.workoutsCompleted = 'Workouts completed must be a whole number between 0 and 7';
     }
+
     if (!form.checkInDate) {
       errs.checkInDate = 'Date is required';
+    } else {
+      const todayStr = new Date().toISOString().split('T')[0];
+      if (form.checkInDate < '2000-01-01') {
+        errs.checkInDate = 'Date must not be before 2000-01-01';
+      } else if (form.checkInDate > todayStr) {
+        errs.checkInDate = 'Date must not be in the future';
+      }
     }
+
+    if (form.feedback) {
+      if (form.feedback.length > 500) {
+        errs.feedback = 'Feedback must be 500 characters or fewer';
+      } else if (form.feedback.trim() !== '' && !isNaN(Number(form.feedback))) {
+        errs.feedback = 'Feedback must not be only numbers';
+      }
+    }
+
     return errs;
   };
 
@@ -158,7 +179,9 @@ function CheckInsPage() {
                   id="feedback" name="feedback" type="text"
                   value={form.feedback} onChange={handleChange}
                   placeholder="How did your week go?"
+                  className={formErrors.feedback ? 'input-error' : ''}
                 />
+                {formErrors.feedback && <span className="error-msg">{formErrors.feedback}</span>}
               </div>
 
               {submitError && <div className="api-error">{submitError}</div>}

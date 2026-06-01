@@ -4,18 +4,18 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  background: linear-gradient(135deg, #1e0050 0%, #4c1d95 50%, #6d28d9 100%);
   padding: 2.5rem 1rem;
 }
 
 /* Card — wider than login to fit two-column form */
 .register-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 2.5rem;
   width: 100%;
   max-width: 680px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
   margin-bottom: 2.5rem;
 }
 
@@ -34,7 +34,7 @@
 .register-header h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--text);
   margin-bottom: 0.4rem;
 }
 
@@ -60,11 +60,11 @@
 .section-title {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #6c5ce7;
+  color: var(--purple);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   padding-left: 0.75rem;
-  border-left: 3px solid #6c5ce7;
+  border-left: 3px solid var(--purple);
   margin-bottom: 1.25rem;
   line-height: 1.4;
 }
@@ -90,10 +90,10 @@
 .register-btn {
   width: 100%;
   padding: 0.9rem;
-  background-color: #6c5ce7;
+  background-color: var(--purple);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -102,7 +102,7 @@
 }
 
 .register-btn:hover:not(:disabled) {
-  background-color: #5a4bd1;
+  background-color: var(--purple-hover);
 }
 
 .register-btn:active:not(:disabled) {
@@ -110,7 +110,7 @@
 }
 
 .register-btn:disabled {
-  background-color: #b2bec3;
+  background-color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -133,7 +133,7 @@
 }
 
 .register-nav-link a {
-  color: #6c5ce7;
+  color: var(--purple);
   font-weight: 600;
   text-decoration: none;
 }

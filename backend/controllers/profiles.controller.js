@@ -2,6 +2,7 @@ const ProfilesModel      = require('../models/profiles.model');
 const UsersModel         = require('../models/users.model');
 const WorkoutPlansModel  = require('../models/workoutPlans.model');
 const DailyMealPlansModel = require('../models/dailyMealPlans.model');
+const ProgressDataModel  = require('../models/progressData.model');
 const { generatePlan }   = require('../services/planGenerator');
 
 const {
@@ -166,6 +167,16 @@ const replanProfile = (req, res) => {
 
         const plan = generatePlan({ ...updatedProfile, userId, firstName });
         const finalProfile = ProfilesModel.update(userId, plan);
+
+        // Reset today's consumed calories so the old plan's eaten meals don't carry over
+        const today = new Date().toISOString().split('T')[0];
+        const todayRecord = ProgressDataModel.getByUserAndDate(userId, today);
+        if (todayRecord) {
+            ProgressDataModel.update(todayRecord.progressId, {
+                ...todayRecord,
+                caloriesConsumed: 0
+            });
+        }
 
         return sendSuccess(res, 200, finalProfile);
     } catch (err) {

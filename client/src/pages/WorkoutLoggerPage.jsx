@@ -92,17 +92,33 @@ function WorkoutLoggerPage() {
 
   const validate = () => {
     if (!form.date) return 'Date is required.';
-    if (!form.durationMinutes || Number(form.durationMinutes) <= 0)
-      return 'Duration must be a positive number.';
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (Number.isNaN(new Date(form.date).getTime()))
+      return 'Please enter a valid date.';
+    if (form.date < '2000-01-01')
+      return 'Date must not be before 2000-01-01.';
+    if (form.date > todayStr)
+      return 'Date must not be in the future.';
+
+    const duration = Number(form.durationMinutes);
+    if (!form.durationMinutes || Number.isNaN(duration) || duration < 1 || duration > 600)
+      return 'Duration must be a number between 1 and 600 minutes.';
+
     const diff = Number(form.difficultyRating);
     if (!form.difficultyRating || diff < 1 || diff > 10)
       return 'Difficulty rating must be between 1 and 10.';
+
     for (let i = 0; i < exerciseSets.length; i++) {
       if (exerciseSets[i].length === 0)
         return `${day.exercises[i].exerciseName} must have at least one set.`;
       for (const s of exerciseSets[i]) {
-        if (Number(s.reps) < 0 || Number(s.weight) < 0)
-          return 'Reps and weight must be 0 or greater.';
+        const reps   = Number(s.reps);
+        const weight = Number(s.weight);
+        if (s.reps === '' || s.weight === '' ||
+            Number.isNaN(reps) || Number.isNaN(weight) ||
+            reps < 0 || reps > 200 ||
+            weight < 0 || weight > 1000)
+          return 'Please enter valid reps and weight for all sets.';
       }
     }
     return null;

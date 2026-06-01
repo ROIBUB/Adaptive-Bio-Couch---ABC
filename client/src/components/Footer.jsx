@@ -9,7 +9,7 @@ function Footer() {
         {' '}|{' '}
         {new Date().getFullYear()}
         {' '}|{' '}
-        <em>Personalized fitness and nutrition coaching, built around your progress.</em>
+        <em>Smart plans for the body you scan.</em>
       </p>
     </footer>
   );

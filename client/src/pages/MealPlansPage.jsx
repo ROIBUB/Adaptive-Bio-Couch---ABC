@@ -6,7 +6,31 @@ import './MealPlansPage.css';
 
 const MEAL_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
+// "Eaten" marks are persisted per user + day so the button state survives
+// navigation. The date in the key means a new day automatically starts fresh.
+const eatenStorageKey = (userId, date) => `fitwise_eaten_${userId}_${date}`;
+
+const readEatenIds = (key) => {
+  try {
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeEatenIds = (key, idSet) => {
+  try {
+    localStorage.setItem(key, JSON.stringify([...idSet]));
+  } catch {
+    /* localStorage unavailable — ignore */
+  }
+};
+
 function MealPlansPage() {
+  const user   = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.userId;
+
   const [plans,           setPlans]           = useState([]);
   const [loading,         setLoading]         = useState(true);
   const [error,           setError]           = useState('');
@@ -29,6 +53,24 @@ function MealPlansPage() {
         const today = new Date().toISOString().split('T')[0];
         const todayRecord = allProgress.find(p => p.date === today) || null;
         setTodayProgress(todayRecord);
+
+        // Restore which meals were marked "eaten" today from localStorage so the
+        // button state survives navigation. The stored ids are reconciled against
+        // the current plan and the backend's calorie total, so a replan (which
+        // generates new meal ids and resets caloriesConsumed to 0) starts fresh.
+        const key = eatenStorageKey(userId, today);
+        const validMealIds = new Set(
+          (data || []).flatMap(p => (p.meals || []).map(m => m.mealId))
+        );
+        let restoredIds = readEatenIds(key).filter(id => validMealIds.has(id));
+        if (!todayRecord || !todayRecord.caloriesConsumed) {
+          // Backend shows nothing consumed today (e.g. after a replan reset) —
+          // discard any stale eaten marks.
+          restoredIds = [];
+        }
+        const restored = new Set(restoredIds);
+        writeEatenIds(key, restored); // self-heal: drop stale ids from the stored key
+        setConsumedMealIds(restored);
       } catch (err) {
         setError('Could not load meal plans. Make sure the backend is running on port 3000.');
       } finally {
@@ -61,7 +103,11 @@ function MealPlansPage() {
           });
           setTodayProgress(created);
         }
-        setConsumedMealIds(prev => new Set([...prev, meal.mealId]));
+        setConsumedMealIds(prev => {
+          const next = new Set([...prev, meal.mealId]);
+          writeEatenIds(eatenStorageKey(userId, today), next);
+          return next;
+        });
       } else {
         const updated = await updateProgress(todayProgress.progressId, {
           date: todayProgress.date,
@@ -73,6 +119,7 @@ function MealPlansPage() {
         setConsumedMealIds(prev => {
           const next = new Set(prev);
           next.delete(meal.mealId);
+          writeEatenIds(eatenStorageKey(userId, today), next);
           return next;
         });
       }

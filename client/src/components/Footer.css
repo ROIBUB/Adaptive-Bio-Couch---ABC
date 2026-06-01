@@ -1,6 +1,7 @@
 .footer {
-  background-color: #1a1a2e;
-  color: #b2bec3;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
   text-align: center;
   padding: 1rem 2rem;
   font-size: 0.85rem;
@@ -8,10 +9,10 @@
 }
 
 .footer strong {
-  color: white;
+  color: var(--text);
 }
 
 .footer em {
-  color: #74b9ff;
+  color: var(--purple);
   font-style: normal;
 }

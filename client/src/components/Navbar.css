@@ -2,11 +2,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #1a1a2e;
-  color: white;
+  background: var(--card);
+  color: var(--text);
   padding: 0 2rem;
-  height: 62px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  height: 64px;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -15,10 +16,10 @@
 
 /* Brand / logo */
 .navbar-brand a {
-  color: white;
+  color: var(--text);
   text-decoration: none;
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 
@@ -32,18 +33,18 @@
 }
 
 .navbar-links a {
-  color: #b2bec3;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0.4rem 0.75rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: color 0.2s, background-color 0.2s;
 }
 
 .navbar-links a:hover {
-  color: white;
-  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--purple);
+  background-color: var(--purple-bg);
 }
 
 /* Right side — user name + logout */
@@ -55,17 +56,17 @@
 }
 
 .navbar-username {
-  color: #dfe6e9;
+  color: var(--text-secondary);
   font-size: 0.88rem;
   white-space: nowrap;
 }
 
 .navbar-logout-btn {
-  background-color: #e74c3c;
+  background-color: var(--purple);
   color: white;
   border: none;
   padding: 0.4rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
@@ -74,5 +75,5 @@
 }
 
 .navbar-logout-btn:hover {
-  background-color: #c0392b;
+  background-color: var(--purple-hover);
 }

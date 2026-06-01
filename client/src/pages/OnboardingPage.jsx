@@ -63,18 +63,26 @@ function OnboardingPage() {
     const errs = {};
     if (!form.fitnessGoal)   errs.fitnessGoal   = 'Please select a fitness goal';
     if (!form.activityLevel) errs.activityLevel = 'Please select an activity level';
+    if (!form.height) {
+      errs.height = 'Height is required';
+    } else if (Number.isNaN(Number(form.height)) || Number(form.height) < 100 || Number(form.height) > 250) {
+      errs.height = 'Height must be between 100 and 250 cm';
+    }
+    if (!form.currentWeight) {
+      errs.currentWeight = 'Current weight is required';
+    } else if (Number.isNaN(Number(form.currentWeight)) || Number(form.currentWeight) < 30 || Number(form.currentWeight) > 300) {
+      errs.currentWeight = 'Weight must be between 30 and 300 kg';
+    }
     if (!form.workoutsPerWeek) {
       errs.workoutsPerWeek = 'Workouts per week is required';
-    } else if (Number(form.workoutsPerWeek) < 1 || Number(form.workoutsPerWeek) > 7) {
-      errs.workoutsPerWeek = 'Must be between 1 and 7';
+    } else if (!Number.isInteger(Number(form.workoutsPerWeek)) || Number(form.workoutsPerWeek) < 1 || Number(form.workoutsPerWeek) > 7) {
+      errs.workoutsPerWeek = 'Must be a whole number between 1 and 7';
     }
     if (!form.mealsPerDay) {
       errs.mealsPerDay = 'Meals per day is required';
-    } else if (Number(form.mealsPerDay) < 1 || Number(form.mealsPerDay) > 6) {
-      errs.mealsPerDay = 'Must be between 1 and 6';
+    } else if (!Number.isInteger(Number(form.mealsPerDay)) || Number(form.mealsPerDay) < 1 || Number(form.mealsPerDay) > 8) {
+      errs.mealsPerDay = 'Must be a whole number between 1 and 8';
     }
-    if (form.height && Number(form.height) <= 0)       errs.height        = 'Height must be positive';
-    if (form.currentWeight && Number(form.currentWeight) <= 0) errs.currentWeight = 'Weight must be positive';
     return errs;
   };
 
@@ -133,7 +141,7 @@ function OnboardingPage() {
                   <input
                     id="height" name="height" type="number"
                     value={form.height} onChange={handleChange}
-                    placeholder="e.g. 175" min="1"
+                    placeholder="e.g. 175" min="100" max="250"
                     className={errors.height ? 'input-error' : ''}
                   />
                   {errors.height && <span className="error-msg">{errors.height}</span>}
@@ -144,7 +152,7 @@ function OnboardingPage() {
                   <input
                     id="currentWeight" name="currentWeight" type="number"
                     value={form.currentWeight} onChange={handleChange}
-                    placeholder="e.g. 75" min="1"
+                    placeholder="e.g. 75" min="30" max="300"
                     className={errors.currentWeight ? 'input-error' : ''}
                   />
                   {errors.currentWeight && <span className="error-msg">{errors.currentWeight}</span>}
@@ -202,7 +210,7 @@ function OnboardingPage() {
                   <input
                     id="mealsPerDay" name="mealsPerDay" type="number"
                     value={form.mealsPerDay} onChange={handleChange}
-                    placeholder="1 – 6" min="1" max="6"
+                    placeholder="1 – 8" min="1" max="8"
                     className={errors.mealsPerDay ? 'input-error' : ''}
                   />
                   {errors.mealsPerDay && <span className="error-msg">{errors.mealsPerDay}</span>}
