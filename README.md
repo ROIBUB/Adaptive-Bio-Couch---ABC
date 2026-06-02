@@ -1,1331 +1,1576 @@
-# Adaptive Bio-Coach (ABC) — FitWise
+# FitWise — Adaptive Bio-Coach
 
-A fullstack fitness and nutrition coaching web application.
-
-```
-FitWise/
-├── backend/    ← Node.js + Express API (Assignment 2)
-├── client/     ← React frontend (Assignment 3)
-└── README.md
-```
+A full-stack fitness and nutrition coaching web application. Users log in, receive AI-generated workout and meal plans tailored to their goals, log workouts, track meals, submit weekly check-ins, and monitor progress over time. Admins can manage users, exercises, and food items.
 
 ---
 
-## How to Run
+## Table of Contents
 
-Both servers must run at the same time in **two separate terminals**.
+- [Project Overview](#project-overview)
+- [Getting Started](#getting-started)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+- [Authentication Model](#authentication-model)
+- [Demo Accounts](#demo-accounts)
+- [Response Envelope](#response-envelope)
+- [API Reference](#api-reference)
+  - [Auth](#auth)
+  - [Users](#users)
+  - [Exercises](#exercises)
+  - [Food Items](#food-items)
+  - [Workout Plans](#workout-plans)
+  - [Workout Logs](#workout-logs)
+  - [Daily Meal Plans](#daily-meal-plans)
+  - [Check-Ins](#check-ins)
+  - [Profiles](#profiles)
+  - [Progress Data](#progress-data)
+  - [Settings](#settings)
 
-### Terminal 1 — Backend
+---
+
+## Project Overview
+
+FitWise is a two-tier web app:
+
+| Layer | Tech | Port |
+|---|---|---|
+| Backend API | Node.js + Express 5 | 3000 |
+| Frontend SPA | React 18 + React Router v6 | 5173 |
+
+**Key features:**
+- Registration with automatic plan generation (BMR-based caloric target, template workout & meal plans)
+- Role-based access control (user / admin / manager)
+- Workout plan browsing and workout session logging
+- Daily meal plan browsing with food alternatives
+- Weekly check-ins that update weight trend
+- Progress tracking dashboard with SVG weight graph
+
+> **Data persistence:** all data lives in-memory. The server ships with seed data for six demo users. Restarting the server resets everything to defaults.
+
+---
+
+## Getting Started
+
+### Backend
 
 ```bash
-cd backend
+# From the project root
 npm install
-node server.js
+npm start          # or: node server.js
 ```
 
-Runs at: `http://localhost:3000`
+The server starts on **http://localhost:3000**.  
+All API routes are prefixed with `/api` (except the admin-only root `GET /`).
 
-### Terminal 2 — Frontend
+### Frontend
 
 ```bash
+# From the client/ directory
 cd client
 npm install
-npm start
+npm run dev        # Vite dev server
 ```
 
-Runs at: `http://localhost:3001`
+Open **http://localhost:5173** in your browser.
+
+> The frontend expects the backend to be running on `http://localhost:3000`. This is hardcoded in `client/src/services/api.js`.
 
 ---
 
-## Demo Accounts (Login Page)
+## Authentication Model
 
-| Email | Password | Role |
+This project uses **simulated header-based authentication** — there is no JWT or session cookie. After logging in, the frontend stores the user object in `localStorage` and attaches these headers to every subsequent API request:
+
+| Header | Value | Purpose |
 |---|---|---|
-| john@fitwize.com | password123 | user |
-| noam@fitwize.com | password123 | admin |
-| dana@fitwize.com | password123 | user |
+| `x-user-role` | `admin` \| `manager` \| `user` | Role for authorization checks |
+| `x-user-id` | numeric user ID | Used by `/api/settings` |
+| `userid` | numeric user ID | Used by most other protected routes |
+
+`manager` is treated identically to `admin` throughout the codebase.
+
+To test the API with a tool like Postman or curl, manually supply these headers.
 
 ---
 
-## Technologies
+## Demo Accounts
 
-**Backend**
-- Node.js
-- Express.js
-- Mock data (in-memory arrays)
-- Postman for API testing
+All passwords are `password123`.
 
-**Frontend**
-- React 18
-- React Router v6
-- Fetch API
-
----
-
-## Project Structure
-
-```text
-FitWise/
-│
-├── README.md
-├── server.js
-├── package.json
-├── package-lock.json
-│
-├── routes/
-│   ├── users.routes.js
-│   ├── exercises.routes.js
-│   ├── foodItems.routes.js
-│   ├── workoutPlans.routes.js
-│   ├── workoutLogs.routes.js
-│   ├── dailyMealPlans.routes.js
-│   └── checkIns.routes.js
-│
-├── controllers/
-│   ├── users.controller.js
-│   ├── exercises.controller.js
-│   ├── foodItems.controller.js
-│   ├── workoutPlans.controller.js
-│   ├── workoutLogs.controller.js
-│   ├── dailyMealPlans.controller.js
-│   └── checkIns.controller.js
-│
-├── models/
-│   ├── users.model.js
-│   ├── exercises.model.js
-│   ├── foodItems.model.js
-│   ├── workoutPlans.model.js
-│   ├── workoutLogs.model.js
-│   ├── dailyMealPlans.model.js
-│   └── checkIns.model.js
-│
-├── middleware/
-│   ├── logger.js
-│   └── auth.js
-```
+| Email | Role | Notes |
+|---|---|---|
+| `john@fitwize.com` | user | Has workout logs and check-ins |
+| `noam@fitwize.com` | admin | Full admin access |
+| `dana@fitwize.com` | user | Basic user |
+| `yossi@fitwize.com` | manager | Treated as admin |
+| `maya@fitwize.com` | user | Basic user |
+| `eitan@fitwize.com` | user | Basic user |
 
 ---
 
-## Installation Instructions
+## Response Envelope
 
-To install the project dependencies, run the following command from the project root directory:
-
-```bash
-npm install
-```
-
----
-
-## Running the Server
-
-To start the server, run:
-
-```bash
-node server.js
-```
-
-The server runs locally on port:
-
-```text
-3000
-```
-
----
-
-## Base URL
-
-```text
-http://localhost:3000
-```
-
-The API is mounted from the root path:
-
-```text
-/
-```
-
-The implemented API routes use the following prefix:
-
-```text
-/api
-```
-
-Example full endpoint:
-
-```text
-http://localhost:3000/api/exercises
-```
-
----
-
-## Current API Base Paths
-
-```text
-/api/users
-/api/exercises
-/api/food-items
-/api/workout-plans
-/api/workout-logs
-/api/daily-meal-plans
-/api/check-ins
-```
-
----
-
-## General Assumptions
-
-- The project uses mock data only.
-- Data is stored in memory and resets when the server restarts.
-- IDs are generated based on the existing items in the relevant mock data array.
-- Usually, a new ID is generated by incrementing the highest existing ID in that resource.
-- Request and response bodies are in JSON format.
-- Authentication is not implemented in this stage.
-- Authorization is simulated using the `x-user-role` request header.
-- The API is tested using Postman.
-
-Example authorization header:
-
-```http
-x-user-role: admin
-```
-
-Supported example roles:
-
-```text
-admin
-user
-```
-
----
-
-## Required Request Format
-
-For requests that include a body, such as `POST` and `PUT`, the request body must be sent as JSON.
-
-In Postman:
-
-```text
-Body -> raw -> JSON
-```
-
-The following header should be included:
-
-```http
-Content-Type: application/json
-```
-
-For protected routes, include an authorization role header:
-
-```http
-x-user-role: admin
-```
-
-or:
-
-```http
-x-user-role: user
-```
-
-depending on the route permissions.
-
----
-
-## Response Format
-
-All API responses follow a consistent JSON structure.
-
-### Success Response Format
+Every response follows this consistent shape:
 
 ```json
-{
-  "success": true,
-  "data": {},
-  "error": null
-}
+{ "success": true, "data": { ... } }
 ```
-
-### Error Response Format
-
 ```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human readable error message",
-    "details": {}
-  }
-}
+{ "success": false, "error": { "message": "...", "details": "..." } }
 ```
 
----
+Standard HTTP status codes used:
 
-## HTTP Status Codes
-
-The API uses the following HTTP status codes:
-
-| Status Code | Meaning |
+| Code | Meaning |
 |---|---|
-| 200 OK | Successful GET, PUT, or DELETE request |
-| 201 Created | Successful POST request |
-| 400 Bad Request | Validation error or invalid input |
-| 403 Forbidden | User does not have permission |
-| 404 Not Found | Requested item does not exist |
-| 500 Internal Server Error | Unexpected server error |
+| 200 | OK (GET / PUT / DELETE success) |
+| 201 | Created (POST success) |
+| 400 | Validation error |
+| 403 | Forbidden (wrong role or not your resource) |
+| 404 | Not found |
+| 500 | Internal server error |
 
 ---
 
-# API Reference
-
-All resources follow the same basic CRUD structure:
-
-| Method | Path | Description |
-|---|---|---|
-| GET | /api/resource-name | Get all items |
-| GET | /api/resource-name/:id | Get item by ID |
-| POST | /api/resource-name | Create a new item |
-| PUT | /api/resource-name/:id | Update item by ID |
-| DELETE | /api/resource-name/:id | Delete item by ID |
-
-Unless stated otherwise:
-
-- Query parameters: none
-- GET and DELETE requests do not require a request body
-- POST and PUT requests require a JSON request body
-- `:id` is a path parameter and should be replaced with the relevant resource ID
+## API Reference
 
 ---
 
-# Users API
+### Auth
 
-Base path:
+#### POST /api/auth/login
 
-```text
-/api/users
-```
+Validates credentials and returns the authenticated user.
 
-The Users API manages user records and fitness profile information.
-
-A user object includes the following fields:
-
+**Request body:**
 ```json
 {
-  "userid": 1,
-  "firstName": "John",
-  "lastName": "Doe",
-  "createDate": "DATE-FORMAT",
-  "updateDate": "DATE-FORMAT",
-  "userRole": "user",
-  "age": 25,
-  "gender": "male",
-  "height": 175,
-  "weight": 75,
-  "activityLevel": 1,
-  "fitnessGoal": "muscle gain",
-  "preferences": 5
+  "email": "john@fitwize.com",
+  "password": "password123"
 }
 ```
 
-## Endpoints
-
-```http
-GET    /api/users
-GET    /api/users/:id
-POST   /api/users
-PUT    /api/users/:id
-DELETE /api/users/:id
-```
-
-## Example POST / PUT Request Body
-
-```json
-{
-  "firstName": "Dana",
-  "lastName": "Cohen",
-  "userRole": "user",
-  "age": 24,
-  "gender": "female",
-  "height": 165,
-  "weight": 60,
-  "activityLevel": 3,
-  "fitnessGoal": "muscle gain",
-  "preferences": 5
-}
-```
-
-## Example Success Response
-
+**Success response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "userid": 3,
-    "firstName": "Dana",
-    "lastName": "Cohen",
-    "createDate": "DATE-FORMAT",
-    "updateDate": "DATE-FORMAT",
-    "userRole": "user",
-    "age": 24,
-    "gender": "female",
-    "height": 165,
-    "weight": 60,
-    "activityLevel": 3,
-    "fitnessGoal": "muscle gain",
-    "preferences": 5
-  },
-  "error": null
+    "userId": 1,
+    "email": "john@fitwize.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "user"
+  }
 }
 ```
 
-## Example Error Response
+**Error responses:**
 
+`400` — missing fields:
+```json
+{ "success": false, "error": { "message": "Email and password are required." } }
+```
+
+`403` — wrong credentials:
+```json
+{ "success": false, "error": { "message": "Invalid email or password." } }
+```
+
+---
+
+#### POST /api/auth/logout
+
+No-op endpoint. The frontend clears `localStorage` client-side; no server state exists to clear.
+
+**Request body:** none required.
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Logged out successfully." } }
+```
+
+---
+
+#### POST /api/auth/register
+
+Creates a new user account, profile, and settings. Automatically generates a personalized workout plan and meal plan based on the supplied fitness profile.
+
+**Request body:**
 ```json
 {
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "User not found",
-    "details": {}
+  "firstName": "Alice",
+  "lastName": "Smith",
+  "email": "alice@example.com",
+  "password": "securepass1",
+  "age": 28,
+  "gender": "female",
+  "height": 165,
+  "weight": 62,
+  "fitnessGoal": "weight_loss",
+  "activityLevel": "intermediate",
+  "workoutsPerWeek": 4,
+  "mealsPerDay": 3
+}
+```
+
+| Field | Type | Required | Constraints |
+|---|---|---|---|
+| `firstName` | string | yes | |
+| `lastName` | string | yes | |
+| `email` | string | yes | must be unique |
+| `password` | string | yes | |
+| `age` | number | yes | 13–120 |
+| `gender` | string | yes | `male` \| `female` |
+| `height` | number | yes | cm, 100–250 |
+| `weight` | number | yes | kg, 30–300 |
+| `fitnessGoal` | string | yes | `weight_loss` \| `muscle_gain` \| `maintenance` |
+| `activityLevel` | string | yes | `beginner` \| `intermediate` \| `advanced` |
+| `workoutsPerWeek` | number | yes | |
+| `mealsPerDay` | number | yes | |
+
+**Success response (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 7,
+    "email": "alice@example.com",
+    "firstName": "Alice",
+    "lastName": "Smith",
+    "role": "user",
+    "caloricTarget": 1642
   }
+}
+```
+
+**Error responses:**
+
+`400` — email taken:
+```json
+{ "success": false, "error": { "message": "Email already in use." } }
+```
+
+`400` — missing fields:
+```json
+{ "success": false, "error": { "message": "Missing required fields.", "details": ["age", "fitnessGoal"] } }
+```
+
+---
+
+### Users
+
+> Requires headers: `x-user-role`, `userid`
+
+#### GET /api/users
+
+Returns all users. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "userId": 1, "firstName": "John", "lastName": "Doe", "email": "john@fitwize.com", "role": "user" },
+    { "userId": 2, "firstName": "Noam", "lastName": "Admin", "email": "noam@fitwize.com", "role": "admin" }
+  ]
+}
+```
+
+`403` — not admin:
+```json
+{ "success": false, "error": { "message": "Access denied." } }
+```
+
+---
+
+#### GET /api/users/me
+
+Returns the currently authenticated user's data. Identified by the `userid` header.
+
+**Headers required:** `userid: 1`
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": { "userId": 1, "firstName": "John", "lastName": "Doe", "email": "john@fitwize.com", "role": "user" }
+}
+```
+
+`404`:
+```json
+{ "success": false, "error": { "message": "User not found." } }
+```
+
+---
+
+#### GET /api/users/:id
+
+Returns a single user. Users may only access their own record; admins may access any.
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": { "userId": 1, "firstName": "John", "lastName": "Doe", "email": "john@fitwize.com", "role": "user" }
+}
+```
+
+`403` — accessing another user's record as non-admin:
+```json
+{ "success": false, "error": { "message": "Access denied." } }
+```
+
+---
+
+#### POST /api/users
+
+Creates a user. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Request body:**
+```json
+{
+  "firstName": "Bob",
+  "lastName": "Jones",
+  "email": "bob@example.com",
+  "password": "pass123",
+  "role": "user"
+}
+```
+
+**Success response (201):**
+```json
+{
+  "success": true,
+  "data": { "userId": 8, "firstName": "Bob", "lastName": "Jones", "email": "bob@example.com", "role": "user" }
 }
 ```
 
 ---
 
-# Exercises API
+#### PUT /api/users/:id
 
-Base path:
+Updates a user's fields. **Admin only.**
 
-```text
-/api/exercises
-```
+**Headers required:** `x-user-role: admin`
 
-The Exercises API manages exercise records.
-
-An exercise object includes the following fields:
-
+**Request body** (any subset of updatable fields):
 ```json
 {
-  "exerciseId": 1,
-  "name": "Leg Press",
-  "muscleGroup": "Legs",
-  "difficultyLevel": "Beginner",
-  "equipment": "Machine",
-  "description": "A lower-body exercise that mainly targets the quadriceps, glutes, and hamstrings."
+  "firstName": "Bobby",
+  "role": "manager"
 }
 ```
 
-## Endpoints
-
-```http
-GET    /api/exercises
-GET    /api/exercises/:id
-POST   /api/exercises
-PUT    /api/exercises/:id
-DELETE /api/exercises/:id
-```
-
-## Example POST / PUT Request Body
-
+**Success response (200):**
 ```json
 {
-  "name": "Cable Row",
-  "muscleGroup": "Back",
-  "difficultyLevel": "Beginner",
-  "equipment": "Cable Machine",
-  "description": "An upper-body pulling exercise that targets the back muscles."
+  "success": true,
+  "data": { "userId": 8, "firstName": "Bobby", "lastName": "Jones", "email": "bob@example.com", "role": "manager" }
 }
 ```
 
-## Example Success Response
+---
 
+#### DELETE /api/users/:id
+
+Deletes a user. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "User deleted successfully." } }
+```
+
+`404`:
+```json
+{ "success": false, "error": { "message": "User not found." } }
+```
+
+---
+
+### Exercises
+
+> Read endpoints are public. Write endpoints require `x-user-role: admin`.
+
+#### GET /api/exercises
+
+Returns all exercises.
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "exerciseId": 1,
+      "name": "Leg Press",
+      "muscleGroup": "Legs",
+      "difficultyLevel": "beginner",
+      "equipment": "Machine",
+      "description": "Push the platform away using your legs."
+    }
+  ]
+}
+```
+
+---
+
+#### GET /api/exercises/:id
+
+Returns a single exercise.
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "exerciseId": 3,
+    "name": "Lat Pulldown",
+    "muscleGroup": "Back",
+    "difficultyLevel": "intermediate",
+    "equipment": "Cable Machine",
+    "description": "Pull the bar down to your chest level."
+  }
+}
+```
+
+`404`:
+```json
+{ "success": false, "error": { "message": "Exercise not found." } }
+```
+
+---
+
+#### POST /api/exercises
+
+Creates a new exercise. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Request body:**
+```json
+{
+  "name": "Romanian Deadlift",
+  "muscleGroup": "Hamstrings",
+  "difficultyLevel": "intermediate",
+  "equipment": "Barbell",
+  "description": "Hinge at the hips keeping a neutral spine."
+}
+```
+
+| Field | Type | Required |
+|---|---|---|
+| `name` | string | yes |
+| `muscleGroup` | string | yes |
+| `difficultyLevel` | string | yes |
+| `equipment` | string | yes |
+| `description` | string | no |
+
+**Success response (201):**
 ```json
 {
   "success": true,
   "data": {
     "exerciseId": 8,
-    "name": "Cable Row",
-    "muscleGroup": "Back",
-    "difficultyLevel": "Beginner",
-    "equipment": "Cable Machine",
-    "description": "An upper-body pulling exercise that targets the back muscles."
-  },
-  "error": null
-}
-```
-
-## Example Error Response
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Exercise not found",
-    "details": {
-      "exerciseId": 999
-    }
+    "name": "Romanian Deadlift",
+    "muscleGroup": "Hamstrings",
+    "difficultyLevel": "intermediate",
+    "equipment": "Barbell",
+    "description": "Hinge at the hips keeping a neutral spine."
   }
 }
 ```
 
 ---
 
-# Food Items API
+#### PUT /api/exercises/:id
 
-Base path:
+Updates an exercise. **Admin only.**
 
-```text
-/api/food-items
+**Headers required:** `x-user-role: admin`
+
+**Request body** (any subset):
+```json
+{ "difficultyLevel": "advanced" }
 ```
 
-The Food Items API manages food records and their nutritional values per 100 grams.
-
-A food item object includes the following fields:
-
+**Success response (200):**
 ```json
 {
-  "foodItemId": 1,
-  "name": "Chicken Breast",
-  "category": "protein",
-  "caloriesPer100g": 165,
-  "proteinPer100g": 31,
-  "carbsPer100g": 0,
-  "fatPer100g": 3.6
+  "success": true,
+  "data": {
+    "exerciseId": 8,
+    "name": "Romanian Deadlift",
+    "muscleGroup": "Hamstrings",
+    "difficultyLevel": "advanced",
+    "equipment": "Barbell",
+    "description": "Hinge at the hips keeping a neutral spine."
+  }
 }
 ```
 
-## Endpoints
+---
 
-```http
-GET    /api/food-items
-GET    /api/food-items/:id
-POST   /api/food-items
-PUT    /api/food-items/:id
-DELETE /api/food-items/:id
+#### DELETE /api/exercises/:id
+
+Deletes an exercise. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Exercise deleted successfully." } }
 ```
 
-## Example POST / PUT Request Body
+---
 
+### Food Items
+
+> Read endpoints are public. Write endpoints require `x-user-role: admin`.
+
+#### GET /api/food-items
+
+Returns all food items with per-100g macros.
+
+**Success response (200):**
 ```json
 {
-  "name": "Tuna",
-  "category": "protein",
-  "caloriesPer100g": 132,
-  "proteinPer100g": 28,
-  "carbsPer100g": 0,
-  "fatPer100g": 1
+  "success": true,
+  "data": [
+    {
+      "foodItemId": 1,
+      "name": "Chicken Breast",
+      "caloriesPer100g": 165,
+      "proteinPer100g": 31,
+      "carbsPer100g": 0,
+      "fatPer100g": 3.6
+    }
+  ]
 }
 ```
 
-## Example Success Response
+---
 
+#### GET /api/food-items/:id
+
+Returns a single food item.
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "foodItemId": 4,
+    "name": "Salmon",
+    "caloriesPer100g": 208,
+    "proteinPer100g": 20,
+    "carbsPer100g": 0,
+    "fatPer100g": 13
+  }
+}
+```
+
+---
+
+#### GET /api/food-items/alternatives/:foodItemId
+
+Returns other food items with a similar caloric value (per serving), useful for meal substitutions.
+
+**Query parameters:**
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `grams` | number | no | Serving size in grams used for calorie comparison (defaults to 100) |
+
+**Example:** `GET /api/food-items/alternatives/1?grams=150`
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "foodItemId": 4,
+      "name": "Salmon",
+      "caloriesPer100g": 208,
+      "proteinPer100g": 20,
+      "carbsPer100g": 0,
+      "fatPer100g": 13
+    },
+    {
+      "foodItemId": 9,
+      "name": "Cottage Cheese",
+      "caloriesPer100g": 98,
+      "proteinPer100g": 11,
+      "carbsPer100g": 3.4,
+      "fatPer100g": 4.3
+    }
+  ]
+}
+```
+
+---
+
+#### POST /api/food-items
+
+Creates a food item. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Request body:**
+```json
+{
+  "name": "Brown Rice",
+  "caloriesPer100g": 216,
+  "proteinPer100g": 4.5,
+  "carbsPer100g": 45,
+  "fatPer100g": 1.8
+}
+```
+
+**Success response (201):**
 ```json
 {
   "success": true,
   "data": {
     "foodItemId": 11,
-    "name": "Tuna",
-    "category": "protein",
-    "caloriesPer100g": 132,
-    "proteinPer100g": 28,
-    "carbsPer100g": 0,
-    "fatPer100g": 1
-  },
-  "error": null
-}
-```
-
-## Example Error Response
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Food item not found",
-    "details": {
-      "foodItemId": 999
-    }
+    "name": "Brown Rice",
+    "caloriesPer100g": 216,
+    "proteinPer100g": 4.5,
+    "carbsPer100g": 45,
+    "fatPer100g": 1.8
   }
 }
 ```
 
 ---
 
-# Workout Plans API
+#### PUT /api/food-items/:id
 
-Base path:
+Updates a food item. **Admin only.**
 
-```text
-/api/workout-plans
-```
+**Headers required:** `x-user-role: admin`
 
-The Workout Plans API manages planned workout programs for users.
-
-A workout plan object includes the following fields:
-
+**Request body** (any subset):
 ```json
-{
-  "workoutPlanId": 1,
-  "userId": 1,
-  "name": "John Doe - 3 Day Muscle Gain Plan",
-  "goal": "muscle gain",
-  "isActive": true,
-  "days": [
-    {
-      "day": "Sunday",
-      "title": "Full Body A",
-      "exercises": [
-        {
-          "exerciseId": 1,
-          "exerciseName": "Leg Press",
-          "targetSets": 3,
-          "targetReps": 10,
-          "targetWeight": 80
-        }
-      ]
-    }
-  ],
-  "createdAt": "2026-05-05"
-}
+{ "caloriesPer100g": 220 }
 ```
 
-## Endpoints
-
-```http
-GET    /api/workout-plans
-GET    /api/workout-plans/:id
-POST   /api/workout-plans
-PUT    /api/workout-plans/:id
-DELETE /api/workout-plans/:id
-```
-
-## Example POST / PUT Request Body
-
-```json
-{
-  "userId": 1,
-  "name": "John Doe - 3 Day Muscle Gain Plan",
-  "goal": "muscle gain",
-  "isActive": true,
-  "days": [
-    {
-      "day": "Sunday",
-      "title": "Full Body A",
-      "exercises": [
-        {
-          "exerciseId": 1,
-          "exerciseName": "Leg Press",
-          "targetSets": 3,
-          "targetReps": 10,
-          "targetWeight": 80
-        },
-        {
-          "exerciseId": 2,
-          "exerciseName": "Chest Press",
-          "targetSets": 3,
-          "targetReps": 10,
-          "targetWeight": 35
-        },
-        {
-          "exerciseId": 3,
-          "exerciseName": "Lat Pulldown",
-          "targetSets": 3,
-          "targetReps": 10,
-          "targetWeight": 40
-        }
-      ]
-    }
-  ],
-  "createdAt": "2026-05-05"
-}
-```
-
-## Example Success Response
-
+**Success response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "workoutPlanId": 3,
-    "userId": 1,
-    "name": "John Doe - 3 Day Muscle Gain Plan",
-    "goal": "muscle gain",
-    "isActive": true,
-    "days": [
-      {
-        "day": "Sunday",
-        "title": "Full Body A",
-        "exercises": [
-          {
-            "exerciseId": 1,
-            "exerciseName": "Leg Press",
-            "targetSets": 3,
-            "targetReps": 10,
-            "targetWeight": 80
-          }
-        ]
-      }
-    ],
-    "createdAt": "2026-05-05"
-  },
-  "error": null
-}
-```
-
-## Example Error Response
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Workout plan not found",
-    "details": {
-      "workoutPlanId": 999
-    }
+    "foodItemId": 11,
+    "name": "Brown Rice",
+    "caloriesPer100g": 220,
+    "proteinPer100g": 4.5,
+    "carbsPer100g": 45,
+    "fatPer100g": 1.8
   }
 }
 ```
 
 ---
 
-# Workout Logs API
+#### DELETE /api/food-items/:id
 
-Base path:
+Deletes a food item. **Admin only.**
 
-```text
-/api/workout-logs
+**Headers required:** `x-user-role: admin`
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Food item deleted successfully." } }
 ```
 
-The Workout Logs API manages completed workout records.
+---
 
-A workout log object includes the following fields:
+### Workout Plans
 
+> Requires headers: `x-user-role`, `userid`
+
+Plans have a three-level nested structure: **Plan → Days → Day Exercises**.
+
+#### GET /api/workout-plans
+
+Returns plans. Admins see all plans; regular users see only their own.
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Success response (200):**
 ```json
 {
-  "workoutLogId": 1,
-  "userId": 1,
-  "workoutPlanId": 1,
-  "date": "2026-05-06",
-  "workoutTitle": "Full Body A",
-  "exercises": [
+  "success": true,
+  "data": [
     {
-      "exerciseId": 1,
-      "exerciseName": "Leg Press",
-      "sets": [
+      "workoutPlanId": 1,
+      "userId": 1,
+      "planName": "Weight Loss – 3 Days/Week",
+      "fitnessGoal": "weight_loss",
+      "isActive": true,
+      "createdAt": "2026-05-01",
+      "days": [
         {
-          "setNumber": 1,
-          "reps": 10,
-          "weight": 80
+          "dayId": 1,
+          "workoutPlanId": 1,
+          "dayNumber": 1,
+          "workoutTitle": "Full Body A",
+          "exercises": [
+            {
+              "dayExerciseId": 1,
+              "exerciseId": 1,
+              "exerciseName": "Leg Press",
+              "targetSets": 3,
+              "targetReps": 12,
+              "targetWeight": 50
+            }
+          ]
         }
       ]
     }
-  ],
-  "durationMinutes": 60,
-  "difficultyRating": 8,
-  "notes": "Good workout, leg press felt challenging."
+  ]
 }
 ```
 
-## Endpoints
+---
 
-```http
-GET    /api/workout-logs
-GET    /api/workout-logs/:id
-POST   /api/workout-logs
-PUT    /api/workout-logs/:id
-DELETE /api/workout-logs/:id
+#### GET /api/workout-plans/:id
+
+Returns a single plan with full nested structure. Users may only access their own plans; admins may access any.
+
+**Success response (200):** same structure as a single item from the list above.
+
+`403`:
+```json
+{ "success": false, "error": { "message": "Access denied." } }
 ```
 
-## Example POST / PUT Request Body
+`404`:
+```json
+{ "success": false, "error": { "message": "Workout plan not found." } }
+```
 
+---
+
+#### POST /api/workout-plans
+
+Creates a workout plan with nested days and exercises. **Admin only.**
+
+**Headers required:** `x-user-role: admin`, `userid: <target-user-id>`
+
+**Request body:**
 ```json
 {
-  "userId": 1,
-  "workoutPlanId": 1,
-  "date": "2026-05-06",
-  "workoutTitle": "Full Body A",
-  "exercises": [
+  "userId": 3,
+  "planName": "Custom Strength Plan",
+  "fitnessGoal": "muscle_gain",
+  "isActive": true,
+  "days": [
     {
-      "exerciseId": 1,
-      "exerciseName": "Leg Press",
-      "sets": [
+      "dayNumber": 1,
+      "workoutTitle": "Push Day",
+      "exercises": [
+        { "exerciseId": 2, "targetSets": 4, "targetReps": 8, "targetWeight": 60 },
+        { "exerciseId": 4, "targetSets": 3, "targetReps": 10, "targetWeight": 40 }
+      ]
+    }
+  ]
+}
+```
+
+**Success response (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "workoutPlanId": 7,
+    "userId": 3,
+    "planName": "Custom Strength Plan",
+    "fitnessGoal": "muscle_gain",
+    "isActive": true,
+    "days": [
+      {
+        "dayId": 22,
+        "dayNumber": 1,
+        "workoutTitle": "Push Day",
+        "exercises": [
+          { "dayExerciseId": 64, "exerciseId": 2, "exerciseName": "Chest Press", "targetSets": 4, "targetReps": 8, "targetWeight": 60 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+#### PUT /api/workout-plans/:id
+
+Updates a workout plan. Admin can update any plan; users can update their own.
+
+**Request body** (any subset of plan-level fields; `days` array replaces existing days if provided):
+```json
+{
+  "planName": "Renamed Plan",
+  "isActive": false
+}
+```
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": { "workoutPlanId": 7, "planName": "Renamed Plan", "isActive": false }
+}
+```
+
+---
+
+#### DELETE /api/workout-plans/:id
+
+Deletes a workout plan and all its days/exercises. Admin or owner.
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Workout plan deleted successfully." } }
+```
+
+---
+
+### Workout Logs
+
+> Requires headers: `x-user-role`, `userid`
+
+Logs have a three-level nested structure: **Log → Log Exercises → Sets**.
+
+#### GET /api/workout-logs
+
+Returns completed workout sessions. Admins see all; users see their own.
+
+**Query parameters:**
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `workoutDayId` | number | no | Filter logs by the source workout day |
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "workoutLogId": 1,
+      "userId": 1,
+      "workoutDayId": 1,
+      "workoutTitle": "Full Body A",
+      "date": "2026-05-20",
+      "durationMinutes": 55,
+      "difficultyRating": 7,
+      "notes": "Felt strong today.",
+      "exercises": [
         {
-          "setNumber": 1,
-          "reps": 10,
-          "weight": 80
-        },
-        {
-          "setNumber": 2,
-          "reps": 10,
-          "weight": 80
-        },
-        {
-          "setNumber": 3,
-          "reps": 9,
-          "weight": 80
+          "logExerciseId": 1,
+          "exerciseId": 1,
+          "exerciseName": "Leg Press",
+          "sets": [
+            { "logSetId": 1, "setNumber": 1, "reps": 12, "weight": 50 }
+          ]
         }
       ]
     }
-  ],
-  "durationMinutes": 60,
-  "difficultyRating": 8,
-  "notes": "Good workout, leg press felt challenging."
+  ]
 }
 ```
 
-## Example Success Response
+---
 
+#### GET /api/workout-logs/:id
+
+Returns a single log with full nested structure.
+
+**Success response (200):** same structure as a single item from the list above.
+
+---
+
+#### POST /api/workout-logs
+
+Creates a workout log session with nested exercises and sets.
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Request body:**
+```json
+{
+  "userId": 1,
+  "workoutDayId": 1,
+  "workoutTitle": "Full Body A",
+  "date": "2026-06-02",
+  "durationMinutes": 60,
+  "difficultyRating": 6,
+  "notes": "Good session.",
+  "exercises": [
+    {
+      "exerciseId": 1,
+      "sets": [
+        { "setNumber": 1, "reps": 12, "weight": 50 },
+        { "setNumber": 2, "reps": 10, "weight": 55 }
+      ]
+    }
+  ]
+}
+```
+
+| Field | Type | Required | Constraints |
+|---|---|---|---|
+| `userId` | number | yes | |
+| `workoutDayId` | number | yes | |
+| `workoutTitle` | string | yes | |
+| `date` | string | yes | YYYY-MM-DD |
+| `durationMinutes` | number | yes | positive |
+| `difficultyRating` | number | yes | 1–10 |
+| `notes` | string | no | |
+| `exercises` | array | yes | |
+| `exercises[].exerciseId` | number | yes | |
+| `exercises[].sets` | array | yes | |
+| `exercises[].sets[].setNumber` | number | yes | |
+| `exercises[].sets[].reps` | number | yes | positive |
+| `exercises[].sets[].weight` | number | yes | positive |
+
+**Success response (201):**
 ```json
 {
   "success": true,
   "data": {
     "workoutLogId": 4,
     "userId": 1,
-    "workoutPlanId": 1,
-    "date": "2026-05-06",
+    "workoutDayId": 1,
     "workoutTitle": "Full Body A",
-    "exercises": [
-      {
-        "exerciseId": 1,
-        "exerciseName": "Leg Press",
-        "sets": [
-          {
-            "setNumber": 1,
-            "reps": 10,
-            "weight": 80
-          }
-        ]
-      }
-    ],
+    "date": "2026-06-02",
     "durationMinutes": 60,
-    "difficultyRating": 8,
-    "notes": "Good workout, leg press felt challenging."
-  },
-  "error": null
-}
-```
-
-## Example Error Response
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Workout log not found",
-    "details": {
-      "workoutLogId": 999
-    }
+    "difficultyRating": 6,
+    "notes": "Good session.",
+    "exercises": [ { "...": "..." } ]
   }
 }
 ```
 
 ---
 
-# Daily Meal Plans API
+#### PUT /api/workout-logs/:id
 
-Base path:
+Updates a workout log. Admin or owner.
 
-```text
-/api/daily-meal-plans
-```
-
-The Daily Meal Plans API manages daily nutrition plans for users.
-
-A daily meal plan object includes the following fields:
-
+**Request body** (any subset):
 ```json
 {
-  "dailyMealPlanId": 1,
-  "userId": 1,
-  "name": "John Doe - Muscle Gain Daily Meal Plan",
-  "goal": "muscle gain",
-  "targetCalories": 2800,
-  "targetProtein": 150,
+  "durationMinutes": 65,
+  "notes": "Updated note."
+}
+```
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": { "workoutLogId": 4, "durationMinutes": 65, "notes": "Updated note." }
+}
+```
+
+---
+
+#### DELETE /api/workout-logs/:id
+
+Deletes a workout log. Admin or owner.
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Workout log deleted successfully." } }
+```
+
+---
+
+### Daily Meal Plans
+
+> Requires headers: `x-user-role`, `userid`
+
+Plans have a three-level nested structure: **Plan → Meals → Meal Food Items**.
+
+#### GET /api/daily-meal-plans
+
+Returns meal plans. Admins see all; users see their own.
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "mealPlanId": 1,
+      "userId": 1,
+      "planName": "Weight Loss – 3 Meals/Day",
+      "targetCalories": 1600,
+      "targetProtein": 130,
+      "isActive": true,
+      "meals": [
+        {
+          "mealId": 1,
+          "mealType": "Breakfast",
+          "mealName": "Morning Protein Bowl",
+          "foodItems": [
+            {
+              "mealFoodItemId": 1,
+              "foodItemId": 2,
+              "foodItemName": "Greek Yogurt",
+              "grams": 200,
+              "calories": 118,
+              "protein": 20
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+#### GET /api/daily-meal-plans/:id
+
+Returns a single meal plan with full nested structure.
+
+**Success response (200):** same structure as a single item from the list above.
+
+---
+
+#### POST /api/daily-meal-plans
+
+Creates a meal plan with nested meals and food items. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Request body:**
+```json
+{
+  "userId": 3,
+  "planName": "Custom High Protein Plan",
+  "targetCalories": 2200,
+  "targetProtein": 180,
   "isActive": true,
   "meals": [
     {
       "mealType": "Breakfast",
-      "title": "Greek Yogurt With Oats",
-      "estimatedCalories": 550,
-      "estimatedProtein": 35,
+      "mealName": "Egg and Oats",
       "foodItems": [
-        {
-          "foodItemId": 2,
-          "foodName": "Greek Yogurt",
-          "quantityGrams": 250
-        }
+        { "foodItemId": 5, "grams": 150 },
+        { "foodItemId": 6, "grams": 80 }
       ]
     }
-  ],
-  "createdAt": "2026-05-05"
+  ]
 }
 ```
 
-## Endpoints
-
-```http
-GET    /api/daily-meal-plans
-GET    /api/daily-meal-plans/:id
-POST   /api/daily-meal-plans
-PUT    /api/daily-meal-plans/:id
-DELETE /api/daily-meal-plans/:id
-```
-
-## Example POST / PUT Request Body
-
-```json
-{
-  "userId": 1,
-  "name": "John Doe - Muscle Gain Daily Meal Plan",
-  "goal": "muscle gain",
-  "targetCalories": 2800,
-  "targetProtein": 150,
-  "isActive": true,
-  "meals": [
-    {
-      "mealType": "Breakfast",
-      "title": "Greek Yogurt With Oats",
-      "estimatedCalories": 550,
-      "estimatedProtein": 35,
-      "foodItems": [
-        {
-          "foodItemId": 2,
-          "foodName": "Greek Yogurt",
-          "quantityGrams": 250
-        },
-        {
-          "foodItemId": 6,
-          "foodName": "Oats",
-          "quantityGrams": 60
-        }
-      ]
-    }
-  ],
-  "createdAt": "2026-05-05"
-}
-```
-
-## Example Success Response
-
+**Success response (201):**
 ```json
 {
   "success": true,
   "data": {
-    "dailyMealPlanId": 3,
-    "userId": 1,
-    "name": "John Doe - Muscle Gain Daily Meal Plan",
-    "goal": "muscle gain",
-    "targetCalories": 2800,
-    "targetProtein": 150,
+    "mealPlanId": 7,
+    "userId": 3,
+    "planName": "Custom High Protein Plan",
+    "targetCalories": 2200,
+    "targetProtein": 180,
     "isActive": true,
-    "meals": [
-      {
-        "mealType": "Breakfast",
-        "title": "Greek Yogurt With Oats",
-        "estimatedCalories": 550,
-        "estimatedProtein": 35,
-        "foodItems": [
-          {
-            "foodItemId": 2,
-            "foodName": "Greek Yogurt",
-            "quantityGrams": 250
-          }
-        ]
-      }
-    ],
-    "createdAt": "2026-05-05"
-  },
-  "error": null
-}
-```
-
-## Example Error Response
-
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Daily meal plan not found",
-    "details": {
-      "dailyMealPlanId": 999
-    }
+    "meals": [ { "...": "..." } ]
   }
 }
 ```
 
 ---
 
-# Check-Ins API
+#### PUT /api/daily-meal-plans/:id
 
-Base path:
+Full update of a meal plan. **Admin only.**
 
-```text
-/api/check-ins
-```
+**Headers required:** `x-user-role: admin`
 
-The Check-Ins API manages weekly progress updates and recommendation summaries.
+**Request body:** same structure as POST.
 
-A check-in object includes the following fields:
-
+**Success response (200):**
 ```json
 {
-  "checkInId": 1,
-  "userId": 1,
-  "date": "2026-05-12",
-  "currentWeight": 75.5,
-  "nutritionDeviation": "small",
-  "deviationFrequency": 2,
-  "hungerLevel": "medium",
-  "energyLevel": "high",
-  "generalFeedback": "Workouts went well. Had two small nutrition deviations during the weekend.",
-  "recommendationSummary": "Keep the daily meal plan unchanged and slightly increase workout weights next week."
+  "success": true,
+  "data": { "mealPlanId": 7, "planName": "Custom High Protein Plan Updated" }
 }
 ```
 
-## Endpoints
+---
 
-```http
-GET    /api/check-ins
-GET    /api/check-ins/:id
-POST   /api/check-ins
-PUT    /api/check-ins/:id
-DELETE /api/check-ins/:id
+#### DELETE /api/daily-meal-plans/:id
+
+Deletes a meal plan. **Admin only.**
+
+**Headers required:** `x-user-role: admin`
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Meal plan deleted successfully." } }
 ```
 
-## Example POST / PUT Request Body
+---
 
+### Check-Ins
+
+> Requires headers: `x-user-role`, `userid`
+
+Weekly progress check-ins. Creating a check-in also updates `currentWeight` on the user's profile.
+
+#### GET /api/check-ins
+
+Returns check-ins. Admins see all; users see their own.
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Success response (200):**
 ```json
 {
-  "userId": 1,
-  "date": "2026-05-12",
-  "currentWeight": 75.5,
-  "nutritionDeviation": "small",
-  "deviationFrequency": 2,
-  "hungerLevel": "medium",
-  "energyLevel": "high",
-  "generalFeedback": "Workouts went well. Had two small nutrition deviations during the weekend.",
-  "recommendationSummary": "Keep the daily meal plan unchanged and slightly increase workout weights next week."
+  "success": true,
+  "data": [
+    {
+      "checkInId": 1,
+      "userId": 1,
+      "weight": 82.5,
+      "workoutsCompleted": 3,
+      "checkInDate": "2026-05-20",
+      "feedback": "Feeling good, energy is up."
+    }
+  ]
 }
 ```
 
-## Example Success Response
+---
 
+#### GET /api/check-ins/:id
+
+Returns a single check-in. Users may access their own; admins may access any.
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "checkInId": 1,
+    "userId": 1,
+    "weight": 82.5,
+    "workoutsCompleted": 3,
+    "checkInDate": "2026-05-20",
+    "feedback": "Feeling good, energy is up."
+  }
+}
+```
+
+---
+
+#### POST /api/check-ins
+
+Creates a weekly check-in and syncs `currentWeight` on the user's profile.
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Request body:**
+```json
+{
+  "userId": 1,
+  "weight": 81.0,
+  "workoutsCompleted": 4,
+  "checkInDate": "2026-06-02",
+  "feedback": "Best week so far."
+}
+```
+
+| Field | Type | Required | Constraints |
+|---|---|---|---|
+| `userId` | number | yes | |
+| `weight` | number | yes | 30–300 kg |
+| `workoutsCompleted` | number | yes | 0–7 |
+| `checkInDate` | string | yes | YYYY-MM-DD, year ≥ 2000 |
+| `feedback` | string | no | |
+
+**Success response (201):**
 ```json
 {
   "success": true,
   "data": {
     "checkInId": 4,
     "userId": 1,
-    "date": "2026-05-12",
-    "currentWeight": 75.5,
-    "nutritionDeviation": "small",
-    "deviationFrequency": 2,
-    "hungerLevel": "medium",
-    "energyLevel": "high",
-    "generalFeedback": "Workouts went well. Had two small nutrition deviations during the weekend.",
-    "recommendationSummary": "Keep the daily meal plan unchanged and slightly increase workout weights next week."
-  },
-  "error": null
+    "weight": 81.0,
+    "workoutsCompleted": 4,
+    "checkInDate": "2026-06-02",
+    "feedback": "Best week so far."
+  }
 }
 ```
 
-## Example Error Response
+---
 
+#### PUT /api/check-ins/:id
+
+Updates a check-in. Admin or owner.
+
+**Request body** (any subset):
+```json
+{ "feedback": "Updated note." }
+```
+
+**Success response (200):**
 ```json
 {
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Check-in not found",
-    "details": {
-      "checkInId": 999
+  "success": true,
+  "data": { "checkInId": 4, "feedback": "Updated note." }
+}
+```
+
+---
+
+#### DELETE /api/check-ins/:id
+
+Deletes a check-in. Admin or owner.
+
+**Success response (200):**
+```json
+{ "success": true, "data": { "message": "Check-in deleted successfully." } }
+```
+
+---
+
+### Profiles
+
+> Requires headers: `x-user-role`, `userid`
+
+Each user has exactly one profile containing fitness stats and assigned plan IDs.
+
+#### GET /api/profiles/:userId
+
+Returns the profile for a given user. Users may access their own; admins may access any.
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "profileId": 1,
+    "userId": 1,
+    "age": 30,
+    "gender": "male",
+    "height": 178,
+    "currentWeight": 83,
+    "targetWeight": 76,
+    "fitnessGoal": "weight_loss",
+    "activityLevel": "intermediate",
+    "workoutsPerWeek": 3,
+    "mealsPerDay": 3,
+    "assignedWorkoutPlanId": 1,
+    "assignedMealPlanId": 1,
+    "caloricTarget": 1742,
+    "onboardingCompleted": true
+  }
+}
+```
+
+---
+
+#### POST /api/profiles
+
+Creates a profile for a user.
+
+**Request body:**
+```json
+{
+  "userId": 7,
+  "age": 25,
+  "gender": "female",
+  "height": 162,
+  "currentWeight": 58,
+  "targetWeight": 55,
+  "fitnessGoal": "maintenance",
+  "activityLevel": "beginner",
+  "workoutsPerWeek": 3,
+  "mealsPerDay": 3
+}
+```
+
+**Success response (201):**
+```json
+{
+  "success": true,
+  "data": { "profileId": 7, "userId": 7, "age": 25, "gender": "female" }
+}
+```
+
+---
+
+#### PUT /api/profiles/:userId
+
+Updates a profile. Users may update their own; admins may update any.
+
+**Request body** (any subset):
+```json
+{
+  "currentWeight": 57,
+  "fitnessGoal": "weight_loss",
+  "activityLevel": "intermediate"
+}
+```
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": { "profileId": 7, "userId": 7, "currentWeight": 57, "fitnessGoal": "weight_loss" }
+}
+```
+
+---
+
+#### POST /api/profiles/:userId/replan
+
+Regenerates workout and meal plans for a user based on their current profile. Deactivates all existing plans, creates new ones from templates, and resets today's `caloriesConsumed` to 0.
+
+**Caloric target formula (Mifflin-St Jeor):**
+
+| Goal | Adjustment |
+|---|---|
+| `weight_loss` | BMR × activity multiplier − 500 kcal |
+| `muscle_gain` | BMR × activity multiplier + 300 kcal |
+| `maintenance` | BMR × activity multiplier |
+
+Activity multipliers: `beginner` = 1.375, `intermediate` = 1.55, `advanced` = 1.725
+
+**Request body** (optional overrides; if omitted, uses the stored profile):
+```json
+{
+  "fitnessGoal": "muscle_gain",
+  "activityLevel": "advanced",
+  "workoutsPerWeek": 5
+}
+```
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "caloricTarget": 2840,
+    "assignedWorkoutPlanId": 4,
+    "assignedMealPlanId": 4
+  }
+}
+```
+
+---
+
+### Progress Data
+
+> Requires headers: `x-user-role`, `userid`
+
+Daily progress records tracking calories consumed, workouts completed, and active minutes.
+
+#### GET /api/progress
+
+Returns progress records. Admins see all; users see their own.
+
+**Headers required:** `x-user-role: user`, `userid: 1`
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "progressId": 1,
+      "userId": 1,
+      "date": "2026-05-20",
+      "caloriesConsumed": 1580,
+      "workoutsCompleted": 1,
+      "activeMinutes": 55
     }
-  }
+  ]
 }
 ```
 
 ---
 
-# Endpoint Summary
+#### GET /api/progress/:date
 
-| Resource | Method | Path | Description |
-|---|---|---|---|
-| Users | GET | /api/users | Get all users |
-| Users | GET | /api/users/:id | Get user by ID |
-| Users | POST | /api/users | Create a new user |
-| Users | PUT | /api/users/:id | Update user by ID |
-| Users | DELETE | /api/users/:id | Delete user by ID |
-| Exercises | GET | /api/exercises | Get all exercises |
-| Exercises | GET | /api/exercises/:id | Get exercise by ID |
-| Exercises | POST | /api/exercises | Create a new exercise |
-| Exercises | PUT | /api/exercises/:id | Update exercise by ID |
-| Exercises | DELETE | /api/exercises/:id | Delete exercise by ID |
-| Food Items | GET | /api/food-items | Get all food items |
-| Food Items | GET | /api/food-items/:id | Get food item by ID |
-| Food Items | POST | /api/food-items | Create a new food item |
-| Food Items | PUT | /api/food-items/:id | Update food item by ID |
-| Food Items | DELETE | /api/food-items/:id | Delete food item by ID |
-| Workout Plans | GET | /api/workout-plans | Get all workout plans |
-| Workout Plans | GET | /api/workout-plans/:id | Get workout plan by ID |
-| Workout Plans | POST | /api/workout-plans | Create a new workout plan |
-| Workout Plans | PUT | /api/workout-plans/:id | Update workout plan by ID |
-| Workout Plans | DELETE | /api/workout-plans/:id | Delete workout plan by ID |
-| Workout Logs | GET | /api/workout-logs | Get all workout logs |
-| Workout Logs | GET | /api/workout-logs/:id | Get workout log by ID |
-| Workout Logs | POST | /api/workout-logs | Create a new workout log |
-| Workout Logs | PUT | /api/workout-logs/:id | Update workout log by ID |
-| Workout Logs | DELETE | /api/workout-logs/:id | Delete workout log by ID |
-| Daily Meal Plans | GET | /api/daily-meal-plans | Get all daily meal plans |
-| Daily Meal Plans | GET | /api/daily-meal-plans/:id | Get daily meal plan by ID |
-| Daily Meal Plans | POST | /api/daily-meal-plans | Create a new daily meal plan |
-| Daily Meal Plans | PUT | /api/daily-meal-plans/:id | Update daily meal plan by ID |
-| Daily Meal Plans | DELETE | /api/daily-meal-plans/:id | Delete daily meal plan by ID |
-| Check-Ins | GET | /api/check-ins | Get all check-ins |
-| Check-Ins | GET | /api/check-ins/:id | Get check-in by ID |
-| Check-Ins | POST | /api/check-ins | Create a new check-in |
-| Check-Ins | PUT | /api/check-ins/:id | Update check-in by ID |
-| Check-Ins | DELETE | /api/check-ins/:id | Delete check-in by ID |
+Returns the progress record for a specific date (`YYYY-MM-DD`). If no record exists for that date, a zeroed record is created automatically.
 
----
+**Example:** `GET /api/progress/2026-06-02`
 
-# Middleware
-
-## Logger Middleware
-
-The logger middleware records basic information about incoming requests and prints it to the server console.
-
-It should run globally for all routes.
-
-The logger may include:
-
-```text
-HTTP method
-Requested URL
-Date and time of the request
-Response status code
-```
-
-Example console output:
-
-```text
-[2026-05-03T12:00:00.000Z] GET /api/exercises - 200
-```
-
----
-
-## Authorization Middleware
-
-Authorization is simulated using the request header:
-
-```http
-x-user-role
-```
-
-Example:
-
-```http
-x-user-role: admin
-```
-
-If a route is protected, the middleware checks whether the provided user role is allowed to perform the requested action.
-
-If authorization fails, the API returns:
-
-```http
-403 Forbidden
-```
-
-Example authorization error response:
-
+**Success response (200):**
 ```json
 {
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "FORBIDDEN",
-    "message": "You do not have permission to perform this action.",
-    "details": {}
+  "success": true,
+  "data": {
+    "progressId": 6,
+    "userId": 1,
+    "date": "2026-06-02",
+    "caloriesConsumed": 0,
+    "workoutsCompleted": 0,
+    "activeMinutes": 0
   }
 }
 ```
 
-If no role is provided, the API may return:
+---
 
+#### POST /api/progress
+
+Creates a new progress record for a given date.
+
+**Request body:**
 ```json
 {
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "FORBIDDEN",
-    "message": "No role provided",
-    "details": {}
-  }
+  "userId": 1,
+  "date": "2026-06-03",
+  "caloriesConsumed": 1700,
+  "workoutsCompleted": 1,
+  "activeMinutes": 50
 }
 ```
 
----
-
-# Validation Rules
-
-The exact required fields depend on the resource.
-
-In general:
-
-- `POST` requests require the fields needed to create the resource.
-- `PUT` requests require the fields needed to update the resource.
-- `GET /:id`, `PUT /:id`, and `DELETE /:id` require a valid numeric ID.
-- If a required field is missing, the API returns `400 Bad Request`.
-- If an item does not exist, the API returns `404 Not Found`.
-- If the user role is not authorized, the API returns `403 Forbidden`.
-
-Example validation error:
-
+**Success response (201):**
 ```json
 {
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Missing required fields",
-    "details": {
-      "required": [
-        "fieldName"
-      ]
-    }
+  "success": true,
+  "data": {
+    "progressId": 7,
+    "userId": 1,
+    "date": "2026-06-03",
+    "caloriesConsumed": 1700,
+    "workoutsCompleted": 1,
+    "activeMinutes": 50
   }
 }
 ```
 
-Example not found error:
+---
 
+#### PUT /api/progress/:id
+
+Updates a progress record by its numeric ID.
+
+**Request body** (any subset):
 ```json
 {
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Resource not found",
-    "details": {}
+  "caloriesConsumed": 1820,
+  "activeMinutes": 65
+}
+```
+
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "progressId": 7,
+    "caloriesConsumed": 1820,
+    "activeMinutes": 65
   }
 }
 ```
 
 ---
 
-# Postman Testing Instructions
+### Settings
 
-The submitted Postman collection should include all implemented endpoints.
+> Requires header: `x-user-id` (note: this endpoint uses `x-user-id`, not `userid`)
 
-## Users Requests
+User display preferences. One settings record exists per user.
 
-```text
-GET    http://localhost:3000/api/users
-GET    http://localhost:3000/api/users/1
-POST   http://localhost:3000/api/users
-PUT    http://localhost:3000/api/users/1
-DELETE http://localhost:3000/api/users/1
-```
+#### GET /api/settings
 
-## Exercises Requests
+Returns settings for the authenticated user.
 
-```text
-GET    http://localhost:3000/api/exercises
-GET    http://localhost:3000/api/exercises/1
-POST   http://localhost:3000/api/exercises
-PUT    http://localhost:3000/api/exercises/1
-DELETE http://localhost:3000/api/exercises/1
-```
+**Headers required:** `x-user-id: 1`
 
-## Food Items Requests
-
-```text
-GET    http://localhost:3000/api/food-items
-GET    http://localhost:3000/api/food-items/1
-POST   http://localhost:3000/api/food-items
-PUT    http://localhost:3000/api/food-items/1
-DELETE http://localhost:3000/api/food-items/1
-```
-
-## Workout Plans Requests
-
-```text
-GET    http://localhost:3000/api/workout-plans
-GET    http://localhost:3000/api/workout-plans/1
-POST   http://localhost:3000/api/workout-plans
-PUT    http://localhost:3000/api/workout-plans/1
-DELETE http://localhost:3000/api/workout-plans/1
-```
-
-## Workout Logs Requests
-
-```text
-GET    http://localhost:3000/api/workout-logs
-GET    http://localhost:3000/api/workout-logs/1
-POST   http://localhost:3000/api/workout-logs
-PUT    http://localhost:3000/api/workout-logs/1
-DELETE http://localhost:3000/api/workout-logs/1
-```
-
-## Daily Meal Plans Requests
-
-```text
-GET    http://localhost:3000/api/daily-meal-plans
-GET    http://localhost:3000/api/daily-meal-plans/1
-POST   http://localhost:3000/api/daily-meal-plans
-PUT    http://localhost:3000/api/daily-meal-plans/1
-DELETE http://localhost:3000/api/daily-meal-plans/1
-```
-
-## Check-Ins Requests
-
-```text
-GET    http://localhost:3000/api/check-ins
-GET    http://localhost:3000/api/check-ins/1
-POST   http://localhost:3000/api/check-ins
-PUT    http://localhost:3000/api/check-ins/1
-DELETE http://localhost:3000/api/check-ins/1
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "settingsId": 1,
+    "userId": 1,
+    "displayName": "John Doe",
+    "email": "john@fitwize.com",
+    "theme": "light",
+    "fitnessGoal": "weight_loss",
+    "activityLevel": "intermediate"
+  }
+}
 ```
 
 ---
 
-## Postman Setup for POST and PUT Requests
+#### PUT /api/settings
 
-For every `POST` or `PUT` request:
+Updates settings for the authenticated user.
 
-1. Go to the `Body` tab.
-2. Select `raw`.
-3. Select `JSON`.
-4. Add the relevant JSON body.
-5. Add the following header:
+**Headers required:** `x-user-id: 1`
 
-```http
-Content-Type: application/json
+**Request body** (any subset of updatable fields):
+```json
+{
+  "displayName": "Johnny",
+  "theme": "dark"
+}
 ```
 
-6. If the route is protected, add:
+| Field | Type | Allowed values |
+|---|---|---|
+| `displayName` | string | any |
+| `theme` | string | `light` \| `dark` |
+| `fitnessGoal` | string | `weight_loss` \| `muscle_gain` \| `maintenance` |
+| `activityLevel` | string | `beginner` \| `intermediate` \| `advanced` |
 
-```http
-x-user-role: admin
+**Success response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "settingsId": 1,
+    "userId": 1,
+    "displayName": "Johnny",
+    "theme": "dark",
+    "fitnessGoal": "weight_loss",
+    "activityLevel": "intermediate"
+  }
+}
 ```
 
-or another allowed role.
+`404` — no settings found for this user:
+```json
+{ "success": false, "error": { "message": "Settings not found." } }
+```
 
 ---
 
-# Notes
+## Assumptions & Notes
 
-This backend is an initial API skeleton for the FitWise final project.
-
-In the next development stages, the mock data can be replaced with a real database while keeping the same API structure.
+- **IDs** are auto-incremented integers starting from the last seed value. There is no UUID scheme.
+- **No password hashing** — passwords are stored as plain strings in memory. This is a university project; do not use real credentials.
+- **No real authentication** — the `x-user-role` / `userid` headers are set by the client without server-side verification. Any client can claim any role.
+- **Data resets on restart** — there is no database. All in-memory data returns to seed state when the Node.js process restarts.
+- **CORS** is configured to allow only `http://localhost:5173`. API calls from other origins will be blocked by the browser (direct curl/Postman calls bypass CORS and work fine).
+- **`manager` = `admin`** throughout the codebase — the `yossi` account demonstrates this.
+- The `GET /` root endpoint is admin-only and returns a server status message. It is not part of the `/api` prefix.

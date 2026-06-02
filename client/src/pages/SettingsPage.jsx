@@ -24,7 +24,8 @@ function SettingsPage() {
       setLoading(true);
       try {
         const data = await getSettings();
-        const theme = data.theme || 'light';
+        const savedTheme = localStorage.getItem('theme'); // check localStorage first
+        const theme = savedTheme || data.theme || 'light';
         setForm({
           displayName: data.displayName || '',
           email:       data.email       || '',
