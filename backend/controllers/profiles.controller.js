@@ -14,6 +14,8 @@ const {
 
 const { validateId, getMissingFields } = require('../middleware/validation');
 
+const { isAdminRole } = require('../middleware/roleUtils');
+
 // GET /api/profiles/:userId
 const getProfileByUserId = (req, res) => {
     try {
@@ -26,7 +28,7 @@ const getProfileByUserId = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== 'admin' && requestUserId !== userId) {
+        if (!isAdminRole(userRole) && requestUserId !== userId) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
@@ -93,7 +95,7 @@ const updateProfile = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== 'admin' && requestUserId !== userId) {
+        if (!isAdminRole(userRole) && requestUserId !== userId) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
@@ -137,7 +139,7 @@ const replanProfile = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== 'admin' && requestUserId !== userId) {
+        if (!isAdminRole(userRole) && requestUserId !== userId) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 

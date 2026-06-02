@@ -4,6 +4,8 @@ const { sendSuccess, sendValidationError, sendNotFound, sendServerError } = requ
 
 const { validateId, getMissingFields } = require('../middleware/validation');
 
+const { isAdminRole } = require('../middleware/roleUtils');
+
 // GET /api/workout-logs
 const getAllWorkoutLogs = (req, res) => {
     try {
@@ -15,7 +17,7 @@ const getAllWorkoutLogs = (req, res) => {
 
         let logs;
 
-        if (userRole === 'admin') {
+        if (isAdminRole(userRole)) {
             logs = WorkoutLogsModel.getAll();
         } else {
             if (!validateId(requestUserId)) {
@@ -55,7 +57,7 @@ const getWorkoutLogById = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== 'admin' && log.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && log.userId !== requestUserId) {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
@@ -176,7 +178,7 @@ const updateWorkoutLog = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== 'admin' && log.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && log.userId !== requestUserId) {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
@@ -285,7 +287,7 @@ const deleteWorkoutLog = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== 'admin' && log.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && log.userId !== requestUserId) {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 

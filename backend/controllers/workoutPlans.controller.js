@@ -9,13 +9,15 @@ const {
 
 const { validateId, getMissingFields } = require('../middleware/validation');
 
+const { isAdminRole } = require('../middleware/roleUtils');
+
 // GET /api/workout-plans
 const getAllWorkoutPlans = (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole === 'admin') {
+        if (isAdminRole(userRole)) {
             return sendSuccess(res, 200, WorkoutPlansModel.getAll());
         }
 
@@ -47,7 +49,7 @@ const getWorkoutPlanById = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== 'admin' && plan.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && plan.userId !== requestUserId) {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
         }
 
@@ -101,7 +103,7 @@ const updateWorkoutPlan = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== 'admin' && plan.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && plan.userId !== requestUserId) {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
         }
 
@@ -141,7 +143,7 @@ const deleteWorkoutPlan = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== 'admin' && plan.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && plan.userId !== requestUserId) {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
         }
 

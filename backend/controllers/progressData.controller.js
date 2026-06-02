@@ -9,13 +9,15 @@ const {
 
 const { validateId, getMissingFields } = require('../middleware/validation');
 
+const { isAdminRole } = require('../middleware/roleUtils');
+
 // GET /api/progress
 const getAllProgress = (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole === 'admin') {
+        if (isAdminRole(userRole)) {
             return sendSuccess(res, 200, ProgressDataModel.getAll());
         }
 
@@ -106,7 +108,7 @@ const updateProgress = (req, res) => {
         }
 
         const userRole = req.headers['x-user-role'];
-        if (userRole !== 'admin' && record.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && record.userId !== requestUserId) {
             return sendNotFound(res, 'Progress record not found', { progressId: id });
         }
 

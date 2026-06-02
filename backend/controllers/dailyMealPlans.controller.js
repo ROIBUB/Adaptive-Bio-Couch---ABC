@@ -4,13 +4,15 @@ const { sendSuccess, sendValidationError, sendNotFound, sendServerError } = requ
 
 const { validateId, getMissingFields } = require('../middleware/validation');
 
+const { isAdminRole } = require('../middleware/roleUtils');
+
 // GET /api/daily-meal-plans
 const getAllDailyMealPlans = (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole === 'admin') {
+        if (isAdminRole(userRole)) {
             return sendSuccess(res, 200, DailyMealPlansModel.getAll());
         }
 
@@ -42,7 +44,7 @@ const getDailyMealPlanById = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
-        if (userRole !== 'admin' && plan.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && plan.userId !== requestUserId) {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
         }
 
@@ -167,7 +169,7 @@ const updateDailyMealPlan = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== 'admin' && plan.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && plan.userId !== requestUserId) {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
         }
 
@@ -280,7 +282,7 @@ const deleteDailyMealPlan = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['userid']);
 
-        if (userRole !== 'admin' && plan.userId !== requestUserId) {
+        if (!isAdminRole(userRole) && plan.userId !== requestUserId) {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
         }
 

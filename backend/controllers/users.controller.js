@@ -14,6 +14,8 @@ const {
     validatePositiveNumericFields
 } = require('../middleware/validation');
 
+const { isAdminRole } = require('../middleware/roleUtils');
+
 // GET /api/users
 const getAllUsers = (req, res) => {
     try {
@@ -41,7 +43,7 @@ const getUserById = (req, res) => {
         const userRole = req.headers['x-user-role'];
         const requestUserId = parseInt(req.headers['x-user-id']);
 
-        if (userRole !== 'admin' && requestUserId !== id) {
+        if (!isAdminRole(userRole) && requestUserId !== id) {
             return sendNotFound(res, 'User not found', {});
         }
 
