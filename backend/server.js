@@ -15,9 +15,9 @@ const profilesRoutes = require("./routes/profiles.routes");
 const progressDataRoutes = require("./routes/progressData.routes");
 const app = express();
 
-// Allow the React frontend (localhost:3001) to call this API
+// Allow the React frontend (localhost:5173) to call this API
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, x-user-role, x-user-id, userid');
     if (req.method === 'OPTIONS') return res.sendStatus(200);
