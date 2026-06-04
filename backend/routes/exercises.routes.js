@@ -18,10 +18,10 @@ router.get('/', getAllExercises);
 router.get('/:id', getExerciseById);
 
 // POST /api/exercises
-router.post('/', authorize(['admin']), createExercise);
+router.post('/', authorize(['admin', 'manager']), createExercise);
 
 // PUT /api/exercises/:id
-router.put('/:id', authorize(['admin']), updateExercise);
+router.put('/:id', authorize(['admin', 'manager']), updateExercise);
 
 // DELETE /api/exercises/:id
 router.delete('/:id', authorize(['admin']), deleteExercise);

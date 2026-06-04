@@ -6,15 +6,15 @@ const { getAllUsers, getUserById, getMe, createUser, updateUser, deleteUser} = r
 
 // if u asked for GET /api/users
 // todo: should every user be able to see all users? 
-router.get('/', authorize(['admin']), getAllUsers);
+router.get('/', authorize(['admin', 'manager']), getAllUsers);
 // /me MUST come before /:id — otherwise "me" is captured as an id param
 router.get('/me', getMe);
 // if u asked for GET /api/users/:id
 router.get('/:id', getUserById);
 // if u asked for POST /api/users only for admin
-router.post('/' , authorize(['admin']), createUser);
+router.post('/' , authorize(['admin', 'manager']), createUser);
 // if u asked for PUT /api/users/:id only for admin
-router.put('/:id' , authorize(['admin']), updateUser);
+router.put('/:id' , authorize(['admin', 'manager']), updateUser);
 // if u asked for DELETE /api/users/:id only for admin
 router.delete('/:id' , authorize(['admin']), deleteUser);
 module.exports = router;

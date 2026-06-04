@@ -23,10 +23,10 @@ router.get("/alternatives/:foodItemId", getAlternatives);
 router.get("/:id", getFoodItemById);
 
 // POST /api/food-items
-router.post("/", authorize(["admin"]), createFoodItem);
+router.post("/", authorize(["admin", "manager"]), createFoodItem);
 
 // PUT /api/food-items/:id
-router.put("/:id", authorize(["admin"]), updateFoodItem);
+router.put("/:id", authorize(["admin", "manager"]), updateFoodItem);
 
 // DELETE /api/food-items/:id
 router.delete("/:id", authorize(["admin"]), deleteFoodItem);

@@ -14,22 +14,22 @@ const {
 // GET /api/workout-plans
 router.get(
     "/",
-    authorize(["user", "admin"]),
+    authorize(["user", "admin", "manager"]),
     getAllWorkoutPlans
 );
 
 // GET /api/workout-plans/:id
 router.get(
     "/:id",
-    authorize(["user", "admin"]),
+    authorize(["user", "admin", "manager"]),
     getWorkoutPlanById
 );
 
 // POST /api/workout-plans
-router.post("/", authorize(["admin"]), createWorkoutPlan);
+router.post("/", authorize(["admin", "manager"]), createWorkoutPlan);
 
 // PUT /api/workout-plans/:id
-router.put("/:id", authorize(["admin"]), updateWorkoutPlan);
+router.put("/:id", authorize(["admin", "manager"]), updateWorkoutPlan);
 
 // DELETE /api/workout-plans/:id
 router.delete("/:id", authorize(["admin"]), deleteWorkoutPlan);

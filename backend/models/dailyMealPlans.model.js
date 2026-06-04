@@ -2,7 +2,7 @@
 let dailyMealPlans = [
     { dailyMealPlanId: 1, userId: 1, name: "John Doe - Muscle Gain Daily Meal Plan",  goal: "muscle gain", targetCalories: 2800, targetProtein: 150, isActive: true, createdAt: "2026-05-05" },
     { dailyMealPlanId: 2, userId: 3, name: "Dana Cohen - Muscle Gain Daily Meal Plan",          goal: "muscle gain", targetCalories: 2300, targetProtein: 120, isActive: true, createdAt: "2026-05-05" },
-    { dailyMealPlanId: 3, userId: 4, name: "Yossi Mizrahi - Weight Loss Daily Meal Plan",       goal: "weight_loss", targetCalories: 1800, targetProtein: 130, isActive: true, createdAt: "2026-05-05" },
+    { dailyMealPlanId: 3, userId: 4, name: "Roi Bublil - Weight Loss Daily Meal Plan",       goal: "weight_loss", targetCalories: 1800, targetProtein: 130, isActive: true, createdAt: "2026-05-05" },
     { dailyMealPlanId: 4, userId: 2, name: "Noam Levi - Weight Loss Daily Meal Plan",           goal: "weight_loss", targetCalories: 1600, targetProtein: 110, isActive: true, createdAt: "2026-05-05" },
     { dailyMealPlanId: 5, userId: 5, name: "Maya Ben-David - Maintenance Daily Meal Plan",      goal: "maintenance", targetCalories: 2200, targetProtein: 130, isActive: true, createdAt: "2026-05-05" },
     { dailyMealPlanId: 6, userId: 5, name: "Maya Ben-David - Active Maintenance Daily Meal Plan",goal: "maintenance", targetCalories: 2500, targetProtein: 150, isActive: true, createdAt: "2026-05-05" }

@@ -12,16 +12,16 @@ const {
 } = require("../controllers/dailyMealPlans.controller");
 
 // GET /api/daily-meal-plans
-router.get("/", authorize(["user", "admin"]), getAllDailyMealPlans);
+router.get("/", authorize(["user", "admin", "manager"]), getAllDailyMealPlans);
 
 // GET /api/daily-meal-plans/:id
-router.get("/:id", authorize(["user", "admin"]), getDailyMealPlanById);
+router.get("/:id", authorize(["user", "admin", "manager"]), getDailyMealPlanById);
 
 // POST /api/daily-meal-plans
-router.post("/", authorize(["admin"]), createDailyMealPlan);
+router.post("/", authorize(["admin", "manager"]), createDailyMealPlan);
 
 // PUT /api/daily-meal-plans/:id
-router.put("/:id", authorize(["admin"]), updateDailyMealPlan);
+router.put("/:id", authorize(["admin", "manager"]), updateDailyMealPlan);
 
 // DELETE /api/daily-meal-plans/:id
 router.delete("/:id", authorize(["admin"]), deleteDailyMealPlan);

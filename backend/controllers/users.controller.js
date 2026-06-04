@@ -86,17 +86,25 @@ const createUser = (req, res) => {
             return sendValidationError(res, 'Missing required user fields', { missingFields });
         }
 
-        const invalidNumericFields = validatePositiveNumericFields(req.body, ['age', 'height', 'weight', 'activityLevel']);
+        const invalidNumericFields = validatePositiveNumericFields(req.body, ['age', 'height', 'weight']);
         if (invalidNumericFields.length > 0) {
             return sendValidationError(res, 'Invalid numeric fields', { invalidFields: invalidNumericFields });
+        }
+
+        if (!['beginner', 'intermediate', 'advanced'].includes(activityLevel)) {
+            return sendValidationError(res, 'Invalid activity level', {
+                field: 'activityLevel',
+                allowedValues: ['beginner', 'intermediate', 'advanced'],
+                value: activityLevel
+            });
         }
 
         if (!['male', 'female'].includes(gender)) {
             return sendValidationError(res, 'Invalid gender', { field: 'gender', allowedValues: ['male', 'female'], value: gender });
         }
 
-        if (!['user', 'admin'].includes(userRole)) {
-            return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin'], value: userRole });
+        if (!['user', 'admin', 'manager'].includes(userRole)) {
+            return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
         const newUser = UsersModel.create({ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
@@ -126,17 +134,25 @@ const updateUser = (req, res) => {
             return sendValidationError(res, 'Missing required user fields', { missingFields });
         }
 
-        const invalidNumericFields = validatePositiveNumericFields(req.body, ['age', 'height', 'weight', 'activityLevel']);
+        const invalidNumericFields = validatePositiveNumericFields(req.body, ['age', 'height', 'weight']);
         if (invalidNumericFields.length > 0) {
             return sendValidationError(res, 'Invalid numeric fields', { invalidFields: invalidNumericFields });
+        }
+
+        if (!['beginner', 'intermediate', 'advanced'].includes(activityLevel)) {
+            return sendValidationError(res, 'Invalid activity level', {
+                field: 'activityLevel',
+                allowedValues: ['beginner', 'intermediate', 'advanced'],
+                value: activityLevel
+            });
         }
 
         if (!['male', 'female'].includes(gender)) {
             return sendValidationError(res, 'Invalid gender', { field: 'gender', allowedValues: ['male', 'female'], value: gender });
         }
 
-        if (!['user', 'admin'].includes(userRole)) {
-            return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin'], value: userRole });
+        if (!['user', 'admin', 'manager'].includes(userRole)) {
+            return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
         const updated = UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });

@@ -13,6 +13,7 @@ import WorkoutLogsPage    from './pages/WorkoutLogsPage';
 import WorkoutLoggerPage  from './pages/WorkoutLoggerPage';
 import MealPlansPage    from './pages/MealPlansPage';
 import CheckInsPage     from './pages/CheckInsPage';
+import AdminPage        from './pages/AdminPage';
 
 const isLoggedIn = () => !!localStorage.getItem('user');
 
@@ -86,6 +87,10 @@ function App() {
         <Route
           path="/check-ins"
           element={<ProtectedRoute><CheckInsPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/admin"
+          element={<ProtectedRoute><AdminPage /></ProtectedRoute>}
         />
 
         {/* Any unknown URL → login */}

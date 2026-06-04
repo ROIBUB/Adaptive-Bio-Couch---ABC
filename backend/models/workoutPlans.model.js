@@ -2,7 +2,7 @@
 let workoutPlans = [
     { workoutPlanId: 1, userId: 1, name: "John Doe - 3 Day Muscle Gain Plan",  goal: "muscle gain", isActive: true, createdAt: "2026-05-05" },
     { workoutPlanId: 2, userId: 3, name: "Dana Cohen - 3 Day Muscle Gain Plan",    goal: "muscle gain", isActive: true, createdAt: "2026-05-05" },
-    { workoutPlanId: 3, userId: 4, name: "Yossi Mizrahi - 3 Day Weight Loss Plan", goal: "weight_loss", isActive: true, createdAt: "2026-05-05" },
+    { workoutPlanId: 3, userId: 4, name: "Roi Bublil - 3 Day Weight Loss Plan", goal: "weight_loss", isActive: true, createdAt: "2026-05-05" },
     { workoutPlanId: 4, userId: 2, name: "Noam Levi - 4 Day Weight Loss Plan",     goal: "weight_loss", isActive: true, createdAt: "2026-05-05" },
     { workoutPlanId: 5, userId: 5, name: "Maya Ben-David - 3 Day Maintenance Plan",goal: "maintenance", isActive: true, createdAt: "2026-05-05" },
     { workoutPlanId: 6, userId: 5, name: "Maya Ben-David - 5 Day Maintenance Plan",goal: "maintenance", isActive: true, createdAt: "2026-05-05" }

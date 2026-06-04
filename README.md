@@ -44,6 +44,7 @@ FitWise is a two-tier web app:
 - Daily meal plan browsing with food alternatives
 - Weekly check-ins that update weight trend
 - Progress tracking dashboard with SVG weight graph
+- Admin/Manager panel for managing users, workout plans, and meal plans
 
 > **Data persistence:** all data lives in-memory. The server ships with seed data for six demo users. Restarting the server resets everything to defaults.
 
@@ -68,12 +69,31 @@ All API routes are prefixed with `/api` (except the admin-only root `GET /`).
 # From the client/ directory
 cd client
 npm install
-npm run dev        # Vite dev server
+npm start
 ```
 
 Open **http://localhost:5173** in your browser.
 
-> The frontend expects the backend to be running on `http://localhost:3000`. This is hardcoded in `client/src/services/api.js`.
+> The frontend connects to the backend API at **http://localhost:3000**.
+> This is hardcoded in `client/src/services/api.js`.
+
+---
+
+## Roles & Admin Panel
+
+The application supports three roles:
+
+| Role | Permissions |
+|---|---|
+| `user` | Access and manage own data only |
+| `manager` | View and edit all users, workout plans, and meal plans. Cannot delete. |
+| `admin` | Full access including delete on all resources |
+
+Admin and manager users see an **Admin** link in the navbar after login.
+The Admin panel (`/admin`) has three tabs:
+- **Users** — view all users, edit name/role, delete (admin only)
+- **Workout Plans** — view all plans, delete (admin only)
+- **Meal Plans** — view all plans, delete (admin only)
 
 ---
 
@@ -87,7 +107,7 @@ This project uses **simulated header-based authentication** — there is no JWT 
 | `x-user-id` | numeric user ID | Used by `/api/settings` |
 | `userid` | numeric user ID | Used by most other protected routes |
 
-`manager` is treated identically to `admin` throughout the codebase.
+`manager` has the same read and write permissions as `admin`, but cannot delete resources.
 
 To test the API with a tool like Postman or curl, manually supply these headers.
 
@@ -102,7 +122,7 @@ All passwords are `password123`.
 | `john@fitwize.com` | user | Has workout logs and check-ins |
 | `noam@fitwize.com` | admin | Full admin access |
 | `dana@fitwize.com` | user | Basic user |
-| `yossi@fitwize.com` | manager | Treated as admin |
+| `roi@fitwize.com` | manager | Treated as admin |
 | `maya@fitwize.com` | user | Basic user |
 | `eitan@fitwize.com` | user | Basic user |
 
@@ -1572,5 +1592,5 @@ Updates settings for the authenticated user.
 - **No real authentication** — the `x-user-role` / `userid` headers are set by the client without server-side verification. Any client can claim any role.
 - **Data resets on restart** — there is no database. All in-memory data returns to seed state when the Node.js process restarts.
 - **CORS** is configured to allow only `http://localhost:5173`. API calls from other origins will be blocked by the browser (direct curl/Postman calls bypass CORS and work fine).
-- **`manager` = `admin`** throughout the codebase — the `yossi` account demonstrates this.
+- **`manager` role** has the same read and write permissions as `admin` but cannot delete resources. Use `roi@fitwize.com` to test manager access.
 - The `GET /` root endpoint is admin-only and returns a server status message. It is not part of the `/api` prefix.

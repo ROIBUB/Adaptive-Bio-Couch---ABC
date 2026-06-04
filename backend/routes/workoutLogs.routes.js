@@ -12,16 +12,16 @@ const {
 } = require("../controllers/workoutLogs.controller");
 
 // GET /api/workout-logs
-router.get("/", authorize(["user", "admin"]), getAllWorkoutLogs);
+router.get("/", authorize(["user", "admin", "manager"]), getAllWorkoutLogs);
 
 // GET /api/workout-logs/:id
-router.get("/:id", authorize(["user", "admin"]), getWorkoutLogById);
+router.get("/:id", authorize(["user", "admin", "manager"]), getWorkoutLogById);
 
 // POST /api/workout-logs
-router.post("/", authorize(["user", "admin"]), createWorkoutLog);
+router.post("/", authorize(["user", "admin", "manager"]), createWorkoutLog);
 
 // PUT /api/workout-logs/:id
-router.put("/:id", authorize(["user", "admin"]), updateWorkoutLog);
+router.put("/:id", authorize(["user", "admin", "manager"]), updateWorkoutLog);
 
 // DELETE /api/workout-logs/:id
 router.delete("/:id", authorize(["user", "admin"]), deleteWorkoutLog);

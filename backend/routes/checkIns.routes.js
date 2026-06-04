@@ -12,16 +12,16 @@ const {
 } = require("../controllers/checkIns.controller");
 
 // GET /api/check-ins
-router.get("/", authorize(["user", "admin"]), getAllCheckIns);
+router.get("/", authorize(["user", "admin", "manager"]), getAllCheckIns);
 
 // GET /api/check-ins/:id
-router.get("/:id", authorize(["user", "admin"]), getCheckInById);
+router.get("/:id", authorize(["user", "admin", "manager"]), getCheckInById);
 
 // POST /api/check-ins
-router.post("/", authorize(["user", "admin"]), createCheckIn);
+router.post("/", authorize(["user", "admin", "manager"]), createCheckIn);
 
 // PUT /api/check-ins/:id
-router.put("/:id", authorize(["user", "admin"]), updateCheckIn);
+router.put("/:id", authorize(["user", "admin", "manager"]), updateCheckIn);
 
 // DELETE /api/check-ins/:id
 router.delete("/:id", authorize(["user", "admin"]), deleteCheckIn);

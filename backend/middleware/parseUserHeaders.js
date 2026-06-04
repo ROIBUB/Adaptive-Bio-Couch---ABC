@@ -4,10 +4,8 @@ const parseUserHeaders = (req, res, next) => {
     req.userId = Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 
     const rawRole = req.headers["x-user-role"] || null;
-    // 'manager' has the same permissions as 'admin' throughout the system
-    const effectiveRole = rawRole === 'manager' ? 'admin' : rawRole;
-    req.userRole = effectiveRole;
-    req.headers["x-user-role"] = effectiveRole;
+    req.userRole = rawRole;
+    req.headers["x-user-role"] = rawRole;
     next();
 };
 
