@@ -283,9 +283,9 @@ Creates a new user account, profile, and settings. Automatically generates a per
 
 #### GET /api/users
 
-Returns all users. **Admin only.**
+Returns all users. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Success response (200):**
 ```json
@@ -298,7 +298,7 @@ Returns all users. **Admin only.**
 }
 ```
 
-`403` — not admin:
+`403` — not admin or manager:
 ```json
 { "success": false, "error": { "message": "Access denied." } }
 ```
@@ -328,7 +328,7 @@ Returns the currently authenticated user's data. Identified by the `userid` head
 
 #### GET /api/users/:id
 
-Returns a single user. Users may only access their own record; admins may access any.
+Returns a single user. Users may only access their own record; admins and managers may access any.
 
 **Success response (200):**
 ```json
@@ -338,7 +338,7 @@ Returns a single user. Users may only access their own record; admins may access
 }
 ```
 
-`403` — accessing another user's record as non-admin:
+`403` — accessing another user's record as a regular user:
 ```json
 { "success": false, "error": { "message": "Access denied." } }
 ```
@@ -347,9 +347,9 @@ Returns a single user. Users may only access their own record; admins may access
 
 #### POST /api/users
 
-Creates a user. **Admin only.**
+Creates a user. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body:**
 ```json
@@ -374,9 +374,9 @@ Creates a user. **Admin only.**
 
 #### PUT /api/users/:id
 
-Updates a user's fields. **Admin only.**
+Updates a user's fields. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body** (any subset of updatable fields):
 ```json
@@ -416,7 +416,7 @@ Deletes a user. **Admin only.**
 
 ### Exercises
 
-> Read endpoints are public. Write endpoints require `x-user-role: admin`.
+> Read endpoints are public. POST/PUT require `x-user-role: admin | manager`; DELETE requires `x-user-role: admin`.
 
 #### GET /api/exercises
 
@@ -469,9 +469,9 @@ Returns a single exercise.
 
 #### POST /api/exercises
 
-Creates a new exercise. **Admin only.**
+Creates a new exercise. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body:**
 ```json
@@ -511,9 +511,9 @@ Creates a new exercise. **Admin only.**
 
 #### PUT /api/exercises/:id
 
-Updates an exercise. **Admin only.**
+Updates an exercise. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body** (any subset):
 ```json
@@ -552,7 +552,7 @@ Deletes an exercise. **Admin only.**
 
 ### Food Items
 
-> Read endpoints are public. Write endpoints require `x-user-role: admin`.
+> Read endpoints are public. POST/PUT require `x-user-role: admin | manager`; DELETE requires `x-user-role: admin`.
 
 #### GET /api/food-items
 
@@ -639,9 +639,9 @@ Returns other food items with a similar caloric value (per serving), useful for 
 
 #### POST /api/food-items
 
-Creates a food item. **Admin only.**
+Creates a food item. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body:**
 ```json
@@ -673,9 +673,9 @@ Creates a food item. **Admin only.**
 
 #### PUT /api/food-items/:id
 
-Updates a food item. **Admin only.**
+Updates a food item. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body** (any subset):
 ```json
@@ -720,7 +720,7 @@ Plans have a three-level nested structure: **Plan → Days → Day Exercises**.
 
 #### GET /api/workout-plans
 
-Returns plans. Admins see all plans; regular users see only their own.
+Returns plans. Admins and managers see all plans; regular users see only their own.
 
 **Headers required:** `x-user-role: user`, `userid: 1`
 
@@ -763,7 +763,7 @@ Returns plans. Admins see all plans; regular users see only their own.
 
 #### GET /api/workout-plans/:id
 
-Returns a single plan with full nested structure. Users may only access their own plans; admins may access any.
+Returns a single plan with full nested structure. Users may only access their own plans; admins and managers may access any.
 
 **Success response (200):** same structure as a single item from the list above.
 
@@ -781,9 +781,9 @@ Returns a single plan with full nested structure. Users may only access their ow
 
 #### POST /api/workout-plans
 
-Creates a workout plan with nested days and exercises. **Admin only.**
+Creates a workout plan with nested days and exercises. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`, `userid: <target-user-id>`
+**Headers required:** `x-user-role: admin | manager`, `userid: <target-user-id>`
 
 **Request body:**
 ```json
@@ -833,7 +833,7 @@ Creates a workout plan with nested days and exercises. **Admin only.**
 
 #### PUT /api/workout-plans/:id
 
-Updates a workout plan. Admin can update any plan; users can update their own.
+Updates a workout plan. Admin or manager only; either may update any plan.
 
 **Request body** (any subset of plan-level fields; `days` array replaces existing days if provided):
 ```json
@@ -855,7 +855,7 @@ Updates a workout plan. Admin can update any plan; users can update their own.
 
 #### DELETE /api/workout-plans/:id
 
-Deletes a workout plan and all its days/exercises. Admin or owner.
+Deletes a workout plan and all its days/exercises. Admin only.
 
 **Success response (200):**
 ```json
@@ -872,7 +872,7 @@ Logs have a three-level nested structure: **Log → Log Exercises → Sets**.
 
 #### GET /api/workout-logs
 
-Returns completed workout sessions. Admins see all; users see their own.
+Returns completed workout sessions. Admins and managers see all; users see their own.
 
 **Query parameters:**
 
@@ -987,7 +987,7 @@ Creates a workout log session with nested exercises and sets.
 
 #### PUT /api/workout-logs/:id
 
-Updates a workout log. Admin or owner.
+Updates a workout log. Admin, manager, or owner.
 
 **Request body** (any subset):
 ```json
@@ -1026,7 +1026,7 @@ Plans have a three-level nested structure: **Plan → Meals → Meal Food Items*
 
 #### GET /api/daily-meal-plans
 
-Returns meal plans. Admins see all; users see their own.
+Returns meal plans. Admins and managers see all; users see their own.
 
 **Headers required:** `x-user-role: user`, `userid: 1`
 
@@ -1076,9 +1076,9 @@ Returns a single meal plan with full nested structure.
 
 #### POST /api/daily-meal-plans
 
-Creates a meal plan with nested meals and food items. **Admin only.**
+Creates a meal plan with nested meals and food items. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body:**
 ```json
@@ -1121,9 +1121,9 @@ Creates a meal plan with nested meals and food items. **Admin only.**
 
 #### PUT /api/daily-meal-plans/:id
 
-Full update of a meal plan. **Admin only.**
+Full update of a meal plan. **Admin or Manager.**
 
-**Headers required:** `x-user-role: admin`
+**Headers required:** `x-user-role: admin | manager`
 
 **Request body:** same structure as POST.
 
@@ -1158,7 +1158,7 @@ Weekly progress check-ins. Creating a check-in also updates `currentWeight` on t
 
 #### GET /api/check-ins
 
-Returns check-ins. Admins see all; users see their own.
+Returns check-ins. Admins and managers see all; users see their own.
 
 **Headers required:** `x-user-role: user`, `userid: 1`
 
@@ -1183,7 +1183,7 @@ Returns check-ins. Admins see all; users see their own.
 
 #### GET /api/check-ins/:id
 
-Returns a single check-in. Users may access their own; admins may access any.
+Returns a single check-in. Users may access their own; admins and managers may access any.
 
 **Success response (200):**
 ```json
@@ -1246,7 +1246,7 @@ Creates a weekly check-in and syncs `currentWeight` on the user's profile.
 
 #### PUT /api/check-ins/:id
 
-Updates a check-in. Admin or owner.
+Updates a check-in. Admin, manager, or owner.
 
 **Request body** (any subset):
 ```json
@@ -1282,7 +1282,7 @@ Each user has exactly one profile containing fitness stats and assigned plan IDs
 
 #### GET /api/profiles/:userId
 
-Returns the profile for a given user. Users may access their own; admins may access any.
+Returns the profile for a given user. Users may access their own; admins and managers may access any.
 
 **Success response (200):**
 ```json
@@ -1342,7 +1342,7 @@ Creates a profile for a user.
 
 #### PUT /api/profiles/:userId
 
-Updates a profile. Users may update their own; admins may update any.
+Updates a profile. Users may update their own; admins and managers may update any.
 
 **Request body** (any subset):
 ```json
@@ -1408,7 +1408,7 @@ Daily progress records tracking calories consumed, workouts completed, and activ
 
 #### GET /api/progress
 
-Returns progress records. Admins see all; users see their own.
+Returns progress records. Admins and managers see all; users see their own.
 
 **Headers required:** `x-user-role: user`, `userid: 1`
 
