@@ -1,4 +1,4 @@
-import { apiFetch } from './api';
+import { apiFetch, BASE_URL } from './api';
 
 // Users
 const getAllUsers   = ()           => apiFetch('/api/users');
@@ -13,4 +13,20 @@ const deleteWorkoutPlan  = (id)     => apiFetch(`/api/workout-plans/${id}`, { me
 const getAllMealPlans     = ()       => apiFetch('/api/daily-meal-plans');
 const deleteMealPlan     = (id)     => apiFetch(`/api/daily-meal-plans/${id}`, { method: 'DELETE' });
 
-export { getAllUsers, deleteUser, updateUser, getAllWorkoutPlans, deleteWorkoutPlan, getAllMealPlans, deleteMealPlan };
+const createUserFull = async (formData) => {
+  // Use auth/register so profile + plans are auto-generated
+  const response = await fetch(`${BASE_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+  });
+  const json = await response.json();
+  if (!json.success) {
+    const err = new Error(json.error?.message || 'Registration failed');
+    err.status = response.status;
+    throw err;
+  }
+  return json.data;
+};
+
+export { getAllUsers, deleteUser, updateUser, getAllWorkoutPlans, deleteWorkoutPlan, getAllMealPlans, deleteMealPlan, createUserFull };

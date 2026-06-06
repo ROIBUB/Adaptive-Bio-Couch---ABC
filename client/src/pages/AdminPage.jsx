@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import {
   getAllUsers, deleteUser, updateUser,
   getAllWorkoutPlans, deleteWorkoutPlan,
-  getAllMealPlans, deleteMealPlan
+  getAllMealPlans, deleteMealPlan, createUserFull
 } from '../services/adminService';
 import './AdminPage.css';
 
@@ -36,6 +36,17 @@ function AdminPage() {
   const [editingUserId, setEditingUserId] = useState(null);
   const [editForm,      setEditForm]      = useState({ firstName: '', lastName: '', userRole: '' });
   const [savingEdit,    setSavingEdit]    = useState(false);
+
+  // Add-user form
+  const [showAddUser,   setShowAddUser]   = useState(false);
+  const [addUserForm,   setAddUserForm]   = useState({
+    firstName: '', lastName: '', email: '', password: '',
+    age: '', gender: '', height: '', weight: '',
+    fitnessGoal: '', activityLevel: '', workoutsPerWeek: '', mealsPerDay: ''
+  });
+  const [addUserErrors,  setAddUserErrors]  = useState({});
+  const [addUserApiError, setAddUserApiError] = useState('');
+  const [addUserSaving,  setAddUserSaving]  = useState(false);
 
   const fetchActiveTab = useCallback(async () => {
     setLoading(true);
@@ -121,6 +132,73 @@ function AdminPage() {
     }
   };
 
+  const validateAddUser = () => {
+    const f = addUserForm;
+    const errs = {};
+    if (!f.firstName.trim())  errs.firstName  = 'First name is required';
+    if (!f.lastName.trim())   errs.lastName   = 'Last name is required';
+    if (!f.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email))
+      errs.email = 'Valid email is required';
+    if (!f.password || f.password.length < 6)
+      errs.password = 'Password must be at least 6 characters';
+    const age = Number(f.age);
+    if (!f.age || isNaN(age) || age < 13 || age > 120)
+      errs.age = 'Age must be between 13 and 120';
+    if (!f.gender) errs.gender = 'Gender is required';
+    const height = Number(f.height);
+    if (!f.height || isNaN(height) || height < 100 || height > 250)
+      errs.height = 'Height must be between 100 and 250 cm';
+    const weight = Number(f.weight);
+    if (!f.weight || isNaN(weight) || weight < 30 || weight > 300)
+      errs.weight = 'Weight must be between 30 and 300 kg';
+    if (!f.fitnessGoal)    errs.fitnessGoal    = 'Fitness goal is required';
+    if (!f.activityLevel)  errs.activityLevel  = 'Activity level is required';
+    const wpw = Number(f.workoutsPerWeek);
+    if (!f.workoutsPerWeek || !Number.isInteger(wpw) || wpw < 1 || wpw > 7)
+      errs.workoutsPerWeek = 'Must be a whole number between 1 and 7';
+    const mpd = Number(f.mealsPerDay);
+    if (!f.mealsPerDay || !Number.isInteger(mpd) || mpd < 1 || mpd > 8)
+      errs.mealsPerDay = 'Must be a whole number between 1 and 8';
+    return errs;
+  };
+
+  const handleAddUserSubmit = async () => {
+    const errs = validateAddUser();
+    setAddUserErrors(errs);
+    setAddUserApiError('');
+    if (Object.keys(errs).length > 0) return;
+
+    setAddUserSaving(true);
+    try {
+      await createUserFull({
+        ...addUserForm,
+        age:             Number(addUserForm.age),
+        height:          Number(addUserForm.height),
+        weight:          Number(addUserForm.weight),
+        workoutsPerWeek: Number(addUserForm.workoutsPerWeek),
+        mealsPerDay:     Number(addUserForm.mealsPerDay),
+      });
+      // reset and close form, then refresh list
+      setAddUserForm({
+        firstName: '', lastName: '', email: '', password: '',
+        age: '', gender: '', height: '', weight: '',
+        fitnessGoal: '', activityLevel: '', workoutsPerWeek: '', mealsPerDay: ''
+      });
+      setAddUserErrors({});
+      setShowAddUser(false);
+      fetchActiveTab();
+    } catch (err) {
+      setAddUserApiError(err.message || 'Failed to create user.');
+    } finally {
+      setAddUserSaving(false);
+    }
+  };
+
+  const handleAddUserChange = (e) => {
+    const { name, value } = e.target;
+    setAddUserForm(prev => ({ ...prev, [name]: value }));
+  };
+
   // ── Plan deletes ────────────────────────────────────────────────────────────
   const handleDeleteWorkoutPlan = async (p) => {
     if (!window.confirm(`Delete workout plan "${p.name}" (ID ${p.workoutPlanId})? This cannot be undone.`)) return;
@@ -146,7 +224,134 @@ function AdminPage() {
 
   // ── Renderers ───────────────────────────────────────────────────────────────
   const renderUsers = () => (
-    <div className="table-wrapper">
+    <>
+      {!showAddUser && (
+        <button
+          className="action-btn save"
+          style={{ marginBottom: '1.25rem' }}
+          onClick={() => { setShowAddUser(true); setAddUserApiError(''); }}
+        >
+          + Add User
+        </button>
+      )}
+
+      {showAddUser && (
+        <div className="add-user-form">
+          <h3 className="add-user-title">New User</h3>
+
+          <div className="add-user-grid">
+            <div className="form-group">
+              <label>First Name</label>
+              <input name="firstName" value={addUserForm.firstName}
+                onChange={handleAddUserChange}
+                className={addUserErrors.firstName ? 'input-error' : ''} />
+              {addUserErrors.firstName && <span className="error-msg">{addUserErrors.firstName}</span>}
+            </div>
+            <div className="form-group">
+              <label>Last Name</label>
+              <input name="lastName" value={addUserForm.lastName}
+                onChange={handleAddUserChange}
+                className={addUserErrors.lastName ? 'input-error' : ''} />
+              {addUserErrors.lastName && <span className="error-msg">{addUserErrors.lastName}</span>}
+            </div>
+            <div className="form-group form-group--full">
+              <label>Email</label>
+              <input name="email" type="email" value={addUserForm.email}
+                onChange={handleAddUserChange}
+                className={addUserErrors.email ? 'input-error' : ''} />
+              {addUserErrors.email && <span className="error-msg">{addUserErrors.email}</span>}
+            </div>
+            <div className="form-group form-group--full">
+              <label>Password</label>
+              <input name="password" type="password" value={addUserForm.password}
+                onChange={handleAddUserChange}
+                className={addUserErrors.password ? 'input-error' : ''} />
+              {addUserErrors.password && <span className="error-msg">{addUserErrors.password}</span>}
+            </div>
+            <div className="form-group">
+              <label>Age</label>
+              <input name="age" type="number" value={addUserForm.age}
+                onChange={handleAddUserChange}
+                className={addUserErrors.age ? 'input-error' : ''} />
+              {addUserErrors.age && <span className="error-msg">{addUserErrors.age}</span>}
+            </div>
+            <div className="form-group">
+              <label>Gender</label>
+              <select name="gender" value={addUserForm.gender} onChange={handleAddUserChange}
+                className={addUserErrors.gender ? 'input-error' : ''}>
+                <option value="">Select…</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+              {addUserErrors.gender && <span className="error-msg">{addUserErrors.gender}</span>}
+            </div>
+            <div className="form-group">
+              <label>Height (cm)</label>
+              <input name="height" type="number" value={addUserForm.height}
+                onChange={handleAddUserChange}
+                className={addUserErrors.height ? 'input-error' : ''} />
+              {addUserErrors.height && <span className="error-msg">{addUserErrors.height}</span>}
+            </div>
+            <div className="form-group">
+              <label>Weight (kg)</label>
+              <input name="weight" type="number" value={addUserForm.weight}
+                onChange={handleAddUserChange}
+                className={addUserErrors.weight ? 'input-error' : ''} />
+              {addUserErrors.weight && <span className="error-msg">{addUserErrors.weight}</span>}
+            </div>
+            <div className="form-group">
+              <label>Fitness Goal</label>
+              <select name="fitnessGoal" value={addUserForm.fitnessGoal} onChange={handleAddUserChange}
+                className={addUserErrors.fitnessGoal ? 'input-error' : ''}>
+                <option value="">Select…</option>
+                <option value="weight_loss">Weight Loss</option>
+                <option value="muscle_gain">Muscle Gain</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+              {addUserErrors.fitnessGoal && <span className="error-msg">{addUserErrors.fitnessGoal}</span>}
+            </div>
+            <div className="form-group">
+              <label>Activity Level</label>
+              <select name="activityLevel" value={addUserForm.activityLevel} onChange={handleAddUserChange}
+                className={addUserErrors.activityLevel ? 'input-error' : ''}>
+                <option value="">Select…</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+              {addUserErrors.activityLevel && <span className="error-msg">{addUserErrors.activityLevel}</span>}
+            </div>
+            <div className="form-group">
+              <label>Workouts / Week</label>
+              <input name="workoutsPerWeek" type="number" value={addUserForm.workoutsPerWeek}
+                onChange={handleAddUserChange}
+                className={addUserErrors.workoutsPerWeek ? 'input-error' : ''} />
+              {addUserErrors.workoutsPerWeek && <span className="error-msg">{addUserErrors.workoutsPerWeek}</span>}
+            </div>
+            <div className="form-group">
+              <label>Meals / Day</label>
+              <input name="mealsPerDay" type="number" value={addUserForm.mealsPerDay}
+                onChange={handleAddUserChange}
+                className={addUserErrors.mealsPerDay ? 'input-error' : ''} />
+              {addUserErrors.mealsPerDay && <span className="error-msg">{addUserErrors.mealsPerDay}</span>}
+            </div>
+          </div>
+
+          {addUserApiError && <div className="api-error">{addUserApiError}</div>}
+
+          <div className="add-user-actions">
+            <button className="action-btn save" disabled={addUserSaving} onClick={handleAddUserSubmit}>
+              {addUserSaving ? 'Creating…' : 'Create User'}
+            </button>
+            <button className="action-btn cancel" disabled={addUserSaving}
+              onClick={() => { setShowAddUser(false); setAddUserErrors({}); setAddUserApiError(''); }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="table-wrapper">
       <table className="data-table">
         <thead>
           <tr>
@@ -208,7 +413,8 @@ function AdminPage() {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 
   const renderWorkoutPlans = () => (

@@ -61,3 +61,40 @@
   border-radius: 6px;
   font-size: 0.88rem;
 }
+
+.add-user-form {
+  background: var(--purple-bg);
+  border: 1px solid var(--purple-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-user-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+
+.add-user-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.add-user-grid .form-group--full {
+  grid-column: 1 / -1;
+}
+
+.add-user-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .add-user-grid { grid-template-columns: 1fr; }
+  .add-user-grid .form-group--full { grid-column: 1; }
+}

@@ -44,7 +44,7 @@ FitWise is a two-tier web app:
 - Daily meal plan browsing with food alternatives
 - Weekly check-ins that update weight trend
 - Progress tracking dashboard with SVG weight graph
-- Admin/Manager panel for managing users, workout plans, and meal plans
+- Admin/Manager panel for creating and managing users, workout plans, and meal plans
 
 > **Data persistence:** all data lives in-memory. The server ships with seed data for six demo users. Restarting the server resets everything to defaults.
 
@@ -86,12 +86,12 @@ The application supports three roles:
 | Role | Permissions |
 |---|---|
 | `user` | Access and manage own data only |
-| `manager` | View and edit all users, workout plans, and meal plans. Cannot delete. |
+| `manager` | View and edit all users, create users through the full registration flow ,workout plans, and meal plans. Cannot delete. |
 | `admin` | Full access including delete on all resources |
 
 Admin and manager users see an **Admin** link in the navbar after login.
 The Admin panel (`/admin`) has three tabs:
-- **Users** — view all users, edit name/role, delete (admin only)
+- **Users** — view all users,  create fully initialized users, edit name/role, delete (admin only)
 - **Workout Plans** — view all plans, delete (admin only)
 - **Meal Plans** — view all plans, delete (admin only)
 
@@ -122,7 +122,7 @@ All passwords are `password123`.
 | `john@fitwize.com` | user | Has workout logs and check-ins |
 | `noam@fitwize.com` | admin | Full admin access |
 | `dana@fitwize.com` | user | Basic user |
-| `roi@fitwize.com` | manager | Treated as admin |
+| `roi@fitwize.com` | manager | Admin-like access without delete permissions |
 | `maya@fitwize.com` | user | Basic user |
 | `eitan@fitwize.com` | user | Basic user |
 
@@ -214,6 +214,8 @@ No-op endpoint. The frontend clears `localStorage` client-side; no server state 
 #### POST /api/auth/register
 
 Creates a new user account, profile, and settings. Automatically generates a personalized workout plan and meal plan based on the supplied fitness profile.
+
+> This endpoint is also used internally by the Admin panel Add User feature to create fully initialized users.
 
 **Request body:**
 ```json
