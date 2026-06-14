@@ -18,11 +18,6 @@ const settingsRoutes = require("./routes/settings.routes");
 const profilesRoutes = require("./routes/profiles.routes");
 const progressDataRoutes = require("./routes/progressData.routes");
 
-console.log("GEMINI_API_KEY exists:", Boolean(process.env.GEMINI_API_KEY));
-console.log("GEMINI_API_KEY length:", process.env.GEMINI_API_KEY?.length);
-console.log("GEMINI_API_KEY starts with:", process.env.GEMINI_API_KEY?.slice(0, 6));
-
-
 const { initChatSocket } = require('./sockets/chat.socket');
 const app = express();
 const server = http.createServer(app);
