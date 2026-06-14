@@ -1,7 +1,20 @@
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
+# IDE settings
+.idea/
+.vscode/
+
+# Build output
+client/build/
+build/
+
+# Dependencies
+node_modules/
+backend/node_modules/
+client/node_modules/
+
+# Environment files
+.env
 backend/.env
 client/.env
+
+# Local Claude settings
+.claude/settings.local.json
