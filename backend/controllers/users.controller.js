@@ -17,16 +17,16 @@ const {
 const { isAdminRole } = require('../middleware/roleUtils');
 
 // GET /api/users
-const getAllUsers = (req, res) => {
+const getAllUsers = async (req, res) => {
     try {
-        return sendSuccess(res, 200, UsersModel.getAll());
+        return sendSuccess(res, 200, await UsersModel.getAll());
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // GET /api/users/:id
-const getUserById = (req, res) => {
+const getUserById = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
@@ -34,7 +34,7 @@ const getUserById = (req, res) => {
             return sendValidationError(res, 'Invalid id', { field: 'id', value: req.params.id });
         }
 
-        const user = UsersModel.getById(id);
+        const user = await UsersModel.getById(id);
 
         if (!user) {
             return sendNotFound(res, 'User not found', {});
@@ -55,7 +55,7 @@ const getUserById = (req, res) => {
 };
 
 // GET /api/users/me
-const getMe = (req, res) => {
+const getMe = async (req, res) => {
     try {
         const userId = parseInt(req.headers['x-user-id']);
 
@@ -63,7 +63,7 @@ const getMe = (req, res) => {
             return sendValidationError(res, 'x-user-id header is required and must be a valid number', {});
         }
 
-        const user = UsersModel.getById(userId);
+        const user = await UsersModel.getById(userId);
 
         if (!user) {
             return sendNotFound(res, 'User not found', {});
@@ -77,7 +77,7 @@ const getMe = (req, res) => {
 };
 
 // POST /api/users
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
     try {
         const { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences } = req.body;
 
@@ -107,7 +107,7 @@ const createUser = (req, res) => {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
-        const newUser = UsersModel.create({ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
+        const newUser = await UsersModel.create({ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
         return sendSuccess(res, 201, newUser);
     } catch (err) {
         return sendServerError(res);
@@ -115,7 +115,7 @@ const createUser = (req, res) => {
 };
 
 // PUT /api/users/:id
-const updateUser = (req, res) => {
+const updateUser = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
@@ -123,7 +123,7 @@ const updateUser = (req, res) => {
             return sendValidationError(res, 'Invalid id', { field: 'id', value: req.params.id });
         }
 
-        if (!UsersModel.getById(id)) {
+        if (!(await UsersModel.getById(id))) {
             return sendNotFound(res, 'User not found', {});
         }
 
@@ -155,7 +155,7 @@ const updateUser = (req, res) => {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
-        const updated = UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
+        const updated = await UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
@@ -163,7 +163,7 @@ const updateUser = (req, res) => {
 };
 
 // DELETE /api/users/:id
-const deleteUser = (req, res) => {
+const deleteUser = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
 
@@ -171,7 +171,7 @@ const deleteUser = (req, res) => {
             return sendValidationError(res, 'Invalid id', { field: 'id', value: req.params.id });
         }
 
-        const deleted = UsersModel.remove(id);
+        const deleted = await UsersModel.remove(id);
 
         if (!deleted) {
             return sendNotFound(res, 'User not found', {});

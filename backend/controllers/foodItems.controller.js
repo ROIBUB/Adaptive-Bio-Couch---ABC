@@ -10,16 +10,16 @@ const {
 const { validateId, getMissingFields, validateNumericFields } = require('../middleware/validation');
 
 // GET /api/food-items
-const getAllFoodItems = (req, res) => {
+const getAllFoodItems = async (req, res) => {
     try {
-        return sendSuccess(res, 200, FoodItemsModel.getAll());
+        return sendSuccess(res, 200, await FoodItemsModel.getAll());
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // GET /api/food-items/:id
-const getFoodItemById = (req, res) => {
+const getFoodItemById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -27,7 +27,7 @@ const getFoodItemById = (req, res) => {
             return sendValidationError(res, 'Invalid food item id', { field: 'id', value: req.params.id });
         }
 
-        const foodItem = FoodItemsModel.getById(id);
+        const foodItem = await FoodItemsModel.getById(id);
 
         if (!foodItem) {
             return sendNotFound(res, 'Food item not found', { foodItemId: id });
@@ -40,7 +40,7 @@ const getFoodItemById = (req, res) => {
 };
 
 // POST /api/food-items
-const createFoodItem = (req, res) => {
+const createFoodItem = async (req, res) => {
     try {
         const { name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g } = req.body;
 
@@ -54,7 +54,7 @@ const createFoodItem = (req, res) => {
             return sendValidationError(res, 'Invalid numeric food item fields', { invalidFields });
         }
 
-        const newItem = FoodItemsModel.create({ name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g });
+        const newItem = await FoodItemsModel.create({ name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g });
         return sendSuccess(res, 201, newItem);
     } catch (err) {
         return sendServerError(res);
@@ -62,7 +62,7 @@ const createFoodItem = (req, res) => {
 };
 
 // PUT /api/food-items/:id
-const updateFoodItem = (req, res) => {
+const updateFoodItem = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -82,7 +82,7 @@ const updateFoodItem = (req, res) => {
             return sendValidationError(res, 'Invalid numeric food item fields', { invalidFields });
         }
 
-        const updated = FoodItemsModel.update(id, { name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g });
+        const updated = await FoodItemsModel.update(id, { name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g });
 
         if (!updated) {
             return sendNotFound(res, 'Food item not found', { foodItemId: id });
@@ -95,7 +95,7 @@ const updateFoodItem = (req, res) => {
 };
 
 // DELETE /api/food-items/:id
-const deleteFoodItem = (req, res) => {
+const deleteFoodItem = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -103,7 +103,7 @@ const deleteFoodItem = (req, res) => {
             return sendValidationError(res, 'Invalid food item id', { field: 'id', value: req.params.id });
         }
 
-        const deleted = FoodItemsModel.remove(id);
+        const deleted = await FoodItemsModel.remove(id);
 
         if (!deleted) {
             return sendNotFound(res, 'Food item not found', { foodItemId: id });
@@ -116,7 +116,7 @@ const deleteFoodItem = (req, res) => {
 };
 
 // GET /api/food-items/alternatives/:foodItemId?grams=<number>
-const getAlternatives = (req, res) => {
+const getAlternatives = async (req, res) => {
     try {
         const foodItemId = Number(req.params.foodItemId);
         const grams      = Number(req.query.grams);
@@ -128,14 +128,15 @@ const getAlternatives = (req, res) => {
             return sendValidationError(res, 'grams must be a positive number', { field: 'grams', value: req.query.grams });
         }
 
-        const original = FoodItemsModel.getById(foodItemId);
+        const original = await FoodItemsModel.getById(foodItemId);
         if (!original) {
             return sendNotFound(res, 'Food item not found', { foodItemId });
         }
 
         const originalCalories = (original.caloriesPer100g / 100) * grams;
 
-        const alternatives = FoodItemsModel.getAll()
+        const allFoodItems = await FoodItemsModel.getAll();
+        const alternatives = allFoodItems
             .filter(alt => alt.category === original.category && alt.foodItemId !== foodItemId)
             .reduce((acc, alt) => {
                 const alternativeGrams = Math.round((originalCalories / alt.caloriesPer100g) * 100);

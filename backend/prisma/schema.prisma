@@ -81,6 +81,7 @@ model LogExercise {
   id             Int        @id @default(autoincrement())
   workout_log_id Int
   exercise_id    Int
+  exercise_name  String     @db.VarChar(100)
   workoutLog     WorkoutLog @relation(fields: [workout_log_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "log_exercises_ibfk_1")
   exercise       Exercise   @relation(fields: [exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "log_exercises_ibfk_2")
   logSets        LogSet[]
@@ -120,6 +121,7 @@ model MealFoodItem {
   id             Int      @id @default(autoincrement())
   meal_id        Int
   food_item_id   Int
+  food_name      String   @db.VarChar(100)
   quantity_grams Float    @db.Float
   meal           Meal     @relation(fields: [meal_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "meal_entries_ibfk_1")
   foodItem       FoodItem @relation(fields: [food_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "meal_entries_ibfk_2")
@@ -133,6 +135,7 @@ model PlanExercise {
   id             Int            @id @default(autoincrement())
   day_id         Int
   exercise_id    Int
+  exercise_name  String         @db.VarChar(100)
   target_sets    Int?
   target_reps    Int?
   target_weight  Float?         @db.Float

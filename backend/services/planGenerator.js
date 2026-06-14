@@ -25,7 +25,7 @@ const DailyMealPlansModel = require('../models/dailyMealPlans.model');
 // The controller that calls this function will pass the output directly into
 // ProfilesModel.update — do not change the field names.
 
-const generatePlan = (profile) => {
+const generatePlan = async (profile) => {
     const { userId, firstName, age, gender, height, currentWeight, fitnessGoal, activityLevel, workoutsPerWeek } = profile;
 
     // ── Mifflin-St Jeor BMR ──
@@ -61,9 +61,9 @@ const generatePlan = (profile) => {
     else                                    templateMealId = caloricTarget >= 2300 ? 5 : 6;
 
     // ── Deep copy: workout plan ──
-    const template = WorkoutPlansModel.getById(templateWorkoutId);
+    const template = await WorkoutPlansModel.getById(templateWorkoutId);
 
-    const newPlan = WorkoutPlansModel.create({
+    const newPlan = await WorkoutPlansModel.create({
         userId,
         name: `${firstName} - ${fitnessGoal} Workout Plan`,
         goal: fitnessGoal,
@@ -71,14 +71,14 @@ const generatePlan = (profile) => {
     });
 
     for (const templateDay of template.days) {
-        const newDay = WorkoutPlansModel.createDay({
+        const newDay = await WorkoutPlansModel.createDay({
             workoutPlanId: newPlan.workoutPlanId,
             day: templateDay.day,
             title: templateDay.title
         });
 
         for (const exercise of templateDay.exercises) {
-            WorkoutPlansModel.createDayExercise({
+            await WorkoutPlansModel.createDayExercise({
                 workoutDayId: newDay.workoutDayId,
                 exerciseId: exercise.exerciseId,
                 exerciseName: exercise.exerciseName,
@@ -92,9 +92,9 @@ const generatePlan = (profile) => {
     const assignedWorkoutPlanId = newPlan.workoutPlanId;
 
     // ── Deep copy: meal plan ──
-    const mealTemplate = DailyMealPlansModel.getById(templateMealId);
+    const mealTemplate = await DailyMealPlansModel.getById(templateMealId);
 
-    const newMealPlan = DailyMealPlansModel.create({
+    const newMealPlan = await DailyMealPlansModel.create({
         userId,
         name: `${firstName} - ${fitnessGoal} Meal Plan`,
         goal: fitnessGoal,
@@ -104,7 +104,7 @@ const generatePlan = (profile) => {
     });
 
     for (const templateMeal of mealTemplate.meals) {
-        const newMeal = DailyMealPlansModel.createMeal({
+        const newMeal = await DailyMealPlansModel.createMeal({
             dailyMealPlanId: newMealPlan.dailyMealPlanId,
             mealType: templateMeal.mealType,
             title: templateMeal.title,
@@ -113,7 +113,7 @@ const generatePlan = (profile) => {
         });
 
         for (const fi of templateMeal.foodItems) {
-            DailyMealPlansModel.createMealFoodItem({
+            await DailyMealPlansModel.createMealFoodItem({
                 mealId: newMeal.mealId,
                 foodItemId: fi.foodItemId,
                 foodName: fi.foodName,
