@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DataTable from '../components/DataTable';
+import AIChatWidget from '../components/AIChatWidget';
 import { getProfile } from '../services/profileService';
 import { getWorkoutPlans, getWorkoutLogs } from '../services/workoutService';
 import { getCheckIns } from '../services/checkInService';
@@ -380,7 +381,7 @@ function DashboardPage() {
             )}
           </div>
 
-          {/* AI Coach Chat — to be implemented separately */}
+          <AIChatWidget />
         </>
       )}
     </div>

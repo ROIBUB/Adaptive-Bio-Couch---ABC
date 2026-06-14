@@ -1,5 +1,7 @@
 //our server
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const logger = require('./middleware/logger');
 const authorize = require('./middleware/auth');
 const usersRoutes = require('./routes/users.routes');
@@ -13,7 +15,15 @@ const authRoutes = require("./routes/auth.routes");
 const settingsRoutes = require("./routes/settings.routes");
 const profilesRoutes = require("./routes/profiles.routes");
 const progressDataRoutes = require("./routes/progressData.routes");
+const { initChatSocket } = require('./sockets/chat.socket');
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST'],
+    },
+});
 
 // Allow the React frontend (localhost:5173) to call this API
 app.use((req, res, next) => {
@@ -59,6 +69,8 @@ app.use("/api/profiles", profilesRoutes);
 // every request to /api/progress is sent to progressData.routes.js
 app.use("/api/progress", progressDataRoutes);
 
-app.listen(port, () => {
+initChatSocket(io);
+
+server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
