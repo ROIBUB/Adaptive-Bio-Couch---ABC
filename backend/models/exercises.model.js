@@ -1,48 +1,64 @@
-let exercises = [
-    { exerciseId: 1, name: "Leg Press",       muscleGroup: "Legs",      difficultyLevel: "Beginner",     equipment: "Machine",       description: "A lower-body exercise that mainly targets the quadriceps, glutes, and hamstrings." },
-    { exerciseId: 2, name: "Chest Press",     muscleGroup: "Chest",     difficultyLevel: "Beginner",     equipment: "Machine",       description: "An upper-body pushing exercise that mainly targets the chest muscles." },
-    { exerciseId: 3, name: "Lat Pulldown",    muscleGroup: "Back",      difficultyLevel: "Beginner",     equipment: "Machine",       description: "An upper-body pulling exercise that mainly targets the back muscles, especially the lats." },
-    { exerciseId: 4, name: "Shoulder Press",  muscleGroup: "Shoulders", difficultyLevel: "Intermediate", equipment: "Dumbbells",     description: "An upper-body pushing exercise that mainly targets the shoulder muscles." },
-    { exerciseId: 5, name: "Biceps Curl",     muscleGroup: "Biceps",    difficultyLevel: "Beginner",     equipment: "Dumbbells",     description: "An isolation exercise that targets the front upper-arm muscles." },
-    { exerciseId: 6, name: "Triceps Pushdown",muscleGroup: "Triceps",   difficultyLevel: "Beginner",     equipment: "Cable Machine", description: "An isolation exercise that targets the back upper-arm muscles." },
-    { exerciseId: 7, name: "Plank",           muscleGroup: "Core",      difficultyLevel: "Beginner",     equipment: "Bodyweight",    description: "A core stability exercise that strengthens the abdominal and trunk muscles." }
-];
+const prisma = require('../prisma/prismaClient');
 
-const getAll = () => exercises;
+const mapExercise = (e) => ({
+    exerciseId: e.id,
+    name: e.name,
+    muscleGroup: e.muscle_group,
+    difficultyLevel: e.difficulty,
+    equipment: e.equipment,
+    description: e.description
+});
 
-const getById = (id) => exercises.find(e => e.exerciseId === id) || null;
-
-const create = (data) => {
-    const newExercise = {
-        exerciseId: exercises.length > 0 ? exercises[exercises.length - 1].exerciseId + 1 : 1,
-        name: data.name,
-        muscleGroup: data.muscleGroup,
-        difficultyLevel: data.difficultyLevel,
-        equipment: data.equipment || "",
-        description: data.description || ""
-    };
-    exercises.push(newExercise);
-    return newExercise;
+const getAll = async () => {
+    const exercises = await prisma.exercise.findMany();
+    return exercises.map(mapExercise);
 };
 
-const update = (id, data) => {
-    const index = exercises.findIndex(e => e.exerciseId === id);
-    if (index === -1) return null;
-    exercises[index] = {
-        exerciseId: id,
-        name: data.name,
-        muscleGroup: data.muscleGroup,
-        difficultyLevel: data.difficultyLevel,
-        equipment: data.equipment || "",
-        description: data.description || ""
-    };
-    return exercises[index];
+const getById = async (id) => {
+    const exercise = await prisma.exercise.findUnique({ where: { id } });
+    return exercise ? mapExercise(exercise) : null;
 };
 
-const remove = (id) => {
-    const index = exercises.findIndex(e => e.exerciseId === id);
-    if (index === -1) return null;
-    return exercises.splice(index, 1)[0];
+const create = async (data) => {
+    const created = await prisma.exercise.create({
+        data: {
+            name: data.name,
+            muscle_group: data.muscleGroup,
+            difficulty: data.difficultyLevel,
+            equipment: data.equipment || "",
+            description: data.description || ""
+        }
+    });
+    return mapExercise(created);
+};
+
+const update = async (id, data) => {
+    try {
+        const updated = await prisma.exercise.update({
+            where: { id },
+            data: {
+                name: data.name,
+                muscle_group: data.muscleGroup,
+                difficulty: data.difficultyLevel,
+                equipment: data.equipment || "",
+                description: data.description || ""
+            }
+        });
+        return mapExercise(updated);
+    } catch (err) {
+        if (err.code === 'P2025') return null;
+        throw err;
+    }
+};
+
+const remove = async (id) => {
+    try {
+        const deleted = await prisma.exercise.delete({ where: { id } });
+        return mapExercise(deleted);
+    } catch (err) {
+        if (err.code === 'P2025') return null;
+        throw err;
+    }
 };
 
 module.exports = { getAll, getById, create, update, remove };

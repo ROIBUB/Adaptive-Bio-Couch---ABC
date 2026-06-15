@@ -1,32 +1,55 @@
-let settings = [
-    { userId: 1, displayName: 'John Doe',      email: 'john@fitwize.com',  theme: 'light', fitnessGoal: 'muscle gain', activityLevel: 1 },
-    { userId: 2, displayName: 'Noam Levi',      email: 'noam@fitwize.com',  theme: 'dark',  fitnessGoal: 'fat loss',    activityLevel: 4 },
-    { userId: 3, displayName: 'Dana Cohen',     email: 'dana@fitwize.com',  theme: 'light', fitnessGoal: 'muscle gain', activityLevel: 3 },
-    { userId: 4, displayName: 'Roi Bublil',  email: 'roi@fitwize.com', theme: 'light', fitnessGoal: 'weight loss', activityLevel: 2 },
-    { userId: 5, displayName: 'Maya Ben-David', email: 'maya@fitwize.com',  theme: 'light', fitnessGoal: 'maintenance', activityLevel: 5 },
-    { userId: 6, displayName: 'Eitan Katz',     email: 'eitan@fitwize.com', theme: 'dark',  fitnessGoal: 'fat loss',    activityLevel: 1 }
-];
+const prisma = require('../prisma/prismaClient');
 
-const getByUserId = (userId) => settings.find(s => s.userId === userId) || null;
+const mapSettings = (s) => ({
+    userId: s.user_id,
+    displayName: s.display_name,
+    email: s.email,
+    theme: s.theme,
+    fitnessGoal: s.fitness_goal,
+    activityLevel: s.activity_level
+});
 
-const create = (data) => {
-    const newSettings = {
-        userId:        data.userId,
-        displayName:   data.displayName,
-        email:         data.email,
-        theme:         'light',
-        fitnessGoal:   data.fitnessGoal   || '',
-        activityLevel: data.activityLevel || ''
-    };
-    settings.push(newSettings);
-    return newSettings;
+const getByUserId = async (userId) => {
+    const settings = await prisma.setting.findUnique({ where: { user_id: userId } });
+    return settings ? mapSettings(settings) : null;
 };
 
-const update = (userId, data) => {
-    const index = settings.findIndex(s => s.userId === userId);
-    if (index === -1) return null;
-    settings[index] = { ...settings[index], ...data };
-    return settings[index];
+const create = async (data) => {
+    const activityLevel = Number(data.activityLevel);
+    const created = await prisma.setting.create({
+        data: {
+            user_id: data.userId,
+            display_name: data.displayName,
+            email: data.email,
+            theme: 'light',
+            fitness_goal: data.fitnessGoal || '',
+            activity_level: Number.isFinite(activityLevel) ? activityLevel : null
+        }
+    });
+    return mapSettings(created);
+};
+
+const update = async (userId, data) => {
+    const updateData = {};
+    if (data.displayName !== undefined) updateData.display_name = data.displayName;
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.theme !== undefined) updateData.theme = data.theme;
+    if (data.fitnessGoal !== undefined) updateData.fitness_goal = data.fitnessGoal;
+    if (data.activityLevel !== undefined) {
+        const activityLevel = Number(data.activityLevel);
+        updateData.activity_level = Number.isFinite(activityLevel) ? activityLevel : null;
+    }
+
+    try {
+        const updated = await prisma.setting.update({
+            where: { user_id: userId },
+            data: updateData
+        });
+        return mapSettings(updated);
+    } catch (err) {
+        if (err.code === 'P2025') return null;
+        throw err;
+    }
 };
 
 module.exports = { getByUserId, create, update };

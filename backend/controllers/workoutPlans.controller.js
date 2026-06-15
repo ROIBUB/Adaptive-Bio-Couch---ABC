@@ -12,27 +12,27 @@ const { validateId, getMissingFields } = require('../middleware/validation');
 const { isAdminRole } = require('../middleware/roleUtils');
 
 // GET /api/workout-plans
-const getAllWorkoutPlans = (req, res) => {
+const getAllWorkoutPlans = async (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
         if (isAdminRole(userRole)) {
-            return sendSuccess(res, 200, WorkoutPlansModel.getAll());
+            return sendSuccess(res, 200, await WorkoutPlansModel.getAll());
         }
 
         if (!validateId(requestUserId)) {
             return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
 
-        return sendSuccess(res, 200, WorkoutPlansModel.getByUserId(requestUserId));
+        return sendSuccess(res, 200, await WorkoutPlansModel.getByUserId(requestUserId));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // GET /api/workout-plans/:id
-const getWorkoutPlanById = (req, res) => {
+const getWorkoutPlanById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -40,7 +40,7 @@ const getWorkoutPlanById = (req, res) => {
             return sendValidationError(res, 'Invalid workout plan id', { field: 'id', value: req.params.id });
         }
 
-        const plan = WorkoutPlansModel.getById(id);
+        const plan = await WorkoutPlansModel.getById(id);
 
         if (!plan) {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
@@ -60,7 +60,7 @@ const getWorkoutPlanById = (req, res) => {
 };
 
 // POST /api/workout-plans
-const createWorkoutPlan = (req, res) => {
+const createWorkoutPlan = async (req, res) => {
     try {
         const userId = parseInt(req.headers['userid']);
         if (!userId || isNaN(userId)) {
@@ -78,7 +78,7 @@ const createWorkoutPlan = (req, res) => {
             return sendValidationError(res, 'Invalid isActive value', { field: 'isActive', value: isActive });
         }
 
-        const newPlan = WorkoutPlansModel.create({ userId, name, goal, isActive });
+        const newPlan = await WorkoutPlansModel.create({ userId, name, goal, isActive });
         return sendSuccess(res, 201, newPlan);
     } catch (err) {
         return sendServerError(res);
@@ -86,7 +86,7 @@ const createWorkoutPlan = (req, res) => {
 };
 
 // PUT /api/workout-plans/:id
-const updateWorkoutPlan = (req, res) => {
+const updateWorkoutPlan = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -94,7 +94,7 @@ const updateWorkoutPlan = (req, res) => {
             return sendValidationError(res, 'Invalid workout plan id', { field: 'id', value: req.params.id });
         }
 
-        const plan = WorkoutPlansModel.getById(id);
+        const plan = await WorkoutPlansModel.getById(id);
 
         if (!plan) {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
@@ -118,7 +118,7 @@ const updateWorkoutPlan = (req, res) => {
             return sendValidationError(res, 'Invalid isActive value', { field: 'isActive', value: isActive });
         }
 
-        const updated = WorkoutPlansModel.update(id, { name, goal, isActive });
+        const updated = await WorkoutPlansModel.update(id, { name, goal, isActive });
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
@@ -126,7 +126,7 @@ const updateWorkoutPlan = (req, res) => {
 };
 
 // DELETE /api/workout-plans/:id
-const deleteWorkoutPlan = (req, res) => {
+const deleteWorkoutPlan = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -134,7 +134,7 @@ const deleteWorkoutPlan = (req, res) => {
             return sendValidationError(res, 'Invalid workout plan id', { field: 'id', value: req.params.id });
         }
 
-        const plan = WorkoutPlansModel.getById(id);
+        const plan = await WorkoutPlansModel.getById(id);
 
         if (!plan) {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
@@ -147,7 +147,7 @@ const deleteWorkoutPlan = (req, res) => {
             return sendNotFound(res, 'Workout plan not found', { workoutPlanId: id });
         }
 
-        const deleted = WorkoutPlansModel.remove(id);
+        const deleted = await WorkoutPlansModel.remove(id);
         return sendSuccess(res, 200, { workoutPlanId: deleted.workoutPlanId });
     } catch (err) {
         return sendServerError(res);

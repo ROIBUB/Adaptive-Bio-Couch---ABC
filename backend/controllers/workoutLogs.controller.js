@@ -7,7 +7,7 @@ const { validateId, getMissingFields } = require('../middleware/validation');
 const { isAdminRole } = require('../middleware/roleUtils');
 
 // GET /api/workout-logs
-const getAllWorkoutLogs = (req, res) => {
+const getAllWorkoutLogs = async (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
@@ -18,12 +18,12 @@ const getAllWorkoutLogs = (req, res) => {
         let logs;
 
         if (isAdminRole(userRole)) {
-            logs = WorkoutLogsModel.getAll();
+            logs = await WorkoutLogsModel.getAll();
         } else {
             if (!validateId(requestUserId)) {
                 return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
             }
-            logs = WorkoutLogsModel.getByUserId(requestUserId);
+            logs = await WorkoutLogsModel.getByUserId(requestUserId);
         }
 
         if (filterPlanId) {
@@ -40,7 +40,7 @@ const getAllWorkoutLogs = (req, res) => {
 };
 
 // GET /api/workout-logs/:id
-const getWorkoutLogById = (req, res) => {
+const getWorkoutLogById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -48,7 +48,7 @@ const getWorkoutLogById = (req, res) => {
             return sendValidationError(res, 'Invalid workout log id', { field: 'id', value: req.params.id });
         }
 
-        const log = WorkoutLogsModel.getById(id);
+        const log = await WorkoutLogsModel.getById(id);
 
         if (!log) {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
@@ -68,7 +68,7 @@ const getWorkoutLogById = (req, res) => {
 };
 
 // POST /api/workout-logs
-const createWorkoutLog = (req, res) => {
+const createWorkoutLog = async (req, res) => {
     try {
         const userId = parseInt(req.headers['userid']);
         if (!userId || isNaN(userId)) {
@@ -136,32 +136,32 @@ const createWorkoutLog = (req, res) => {
             return sendValidationError(res, 'Invalid workout log sets', { invalidSets });
         }
 
-        const newLog = WorkoutLogsModel.create({ userId, workoutPlanId, workoutDayId: workoutDayId || null, date, workoutTitle, durationMinutes, difficultyRating, notes });
+        const newLog = await WorkoutLogsModel.create({ userId, workoutPlanId, workoutDayId: workoutDayId || null, date, workoutTitle, durationMinutes, difficultyRating, notes });
 
-        exercises.forEach(exercise => {
-            const newExercise = WorkoutLogsModel.createLogExercise({
+        for (const exercise of exercises) {
+            const newExercise = await WorkoutLogsModel.createLogExercise({
                 workoutLogId: newLog.workoutLogId,
                 exerciseId: exercise.exerciseId,
                 exerciseName: exercise.exerciseName
             });
-            exercise.sets.forEach(set => {
-                WorkoutLogsModel.createLogSet({
+            for (const set of exercise.sets) {
+                await WorkoutLogsModel.createLogSet({
                     workoutLogExerciseId: newExercise.id,
                     setNumber: set.setNumber,
                     reps: set.reps,
                     weight: set.weight
                 });
-            });
-        });
+            }
+        }
 
-        return sendSuccess(res, 201, WorkoutLogsModel.getById(newLog.workoutLogId));
+        return sendSuccess(res, 201, await WorkoutLogsModel.getById(newLog.workoutLogId));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // PUT /api/workout-logs/:id
-const updateWorkoutLog = (req, res) => {
+const updateWorkoutLog = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -169,7 +169,7 @@ const updateWorkoutLog = (req, res) => {
             return sendValidationError(res, 'Invalid workout log id', { field: 'id', value: req.params.id });
         }
 
-        const log = WorkoutLogsModel.getById(id);
+        const log = await WorkoutLogsModel.getById(id);
 
         if (!log) {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
@@ -243,34 +243,37 @@ const updateWorkoutLog = (req, res) => {
             return sendValidationError(res, 'Invalid workout log sets', { invalidSets });
         }
 
-        WorkoutLogsModel.getLogExercises(id).forEach(e => WorkoutLogsModel.removeLogExercise(e.id));
+        const existingExercises = await WorkoutLogsModel.getLogExercises(id);
+        for (const e of existingExercises) {
+            await WorkoutLogsModel.removeLogExercise(e.id);
+        }
 
-        WorkoutLogsModel.update(id, { workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
+        await WorkoutLogsModel.update(id, { workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
 
-        exercises.forEach(exercise => {
-            const newExercise = WorkoutLogsModel.createLogExercise({
+        for (const exercise of exercises) {
+            const newExercise = await WorkoutLogsModel.createLogExercise({
                 workoutLogId: id,
                 exerciseId: exercise.exerciseId,
                 exerciseName: exercise.exerciseName
             });
-            exercise.sets.forEach(set => {
-                WorkoutLogsModel.createLogSet({
+            for (const set of exercise.sets) {
+                await WorkoutLogsModel.createLogSet({
                     workoutLogExerciseId: newExercise.id,
                     setNumber: set.setNumber,
                     reps: set.reps,
                     weight: set.weight
                 });
-            });
-        });
+            }
+        }
 
-        return sendSuccess(res, 200, WorkoutLogsModel.getById(id));
+        return sendSuccess(res, 200, await WorkoutLogsModel.getById(id));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // DELETE /api/workout-logs/:id
-const deleteWorkoutLog = (req, res) => {
+const deleteWorkoutLog = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -278,7 +281,7 @@ const deleteWorkoutLog = (req, res) => {
             return sendValidationError(res, 'Invalid workout log id', { field: 'id', value: req.params.id });
         }
 
-        const log = WorkoutLogsModel.getById(id);
+        const log = await WorkoutLogsModel.getById(id);
 
         if (!log) {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
@@ -291,7 +294,7 @@ const deleteWorkoutLog = (req, res) => {
             return sendNotFound(res, 'Workout log not found', { workoutLogId: id });
         }
 
-        const deleted = WorkoutLogsModel.remove(id);
+        const deleted = await WorkoutLogsModel.remove(id);
         return sendSuccess(res, 200, { workoutLogId: deleted.workoutLogId });
     } catch (err) {
         return sendServerError(res);

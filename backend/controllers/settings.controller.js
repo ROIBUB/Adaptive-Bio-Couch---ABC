@@ -8,7 +8,7 @@ const {
 } = require('../middleware/errorHandlers');
 
 // GET /api/settings
-const getSettings = (req, res) => {
+const getSettings = async (req, res) => {
     try {
         const userId = parseInt(req.headers['x-user-id']);
 
@@ -16,7 +16,7 @@ const getSettings = (req, res) => {
             return sendValidationError(res, 'x-user-id header is required', {});
         }
 
-        const settings = SettingsModel.getByUserId(userId);
+        const settings = await SettingsModel.getByUserId(userId);
 
         if (!settings) {
             return sendSuccess(res, 200, {
@@ -32,7 +32,7 @@ const getSettings = (req, res) => {
 };
 
 // PUT /api/settings
-const updateSettings = (req, res) => {
+const updateSettings = async (req, res) => {
     try {
         const userId = parseInt(req.headers['x-user-id']);
 
@@ -40,7 +40,7 @@ const updateSettings = (req, res) => {
             return sendValidationError(res, 'x-user-id header is required', {});
         }
 
-        if (!SettingsModel.getByUserId(userId)) {
+        if (!(await SettingsModel.getByUserId(userId))) {
             return sendNotFound(res, 'Settings not found for this user', {});
         }
 
@@ -56,7 +56,7 @@ const updateSettings = (req, res) => {
         if (fitnessGoal !== undefined) updates.fitnessGoal = fitnessGoal;
         if (activityLevel !== undefined) updates.activityLevel = activityLevel;
 
-        const updated = SettingsModel.update(userId, updates);
+        const updated = await SettingsModel.update(userId, updates);
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);

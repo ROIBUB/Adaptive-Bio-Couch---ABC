@@ -1,38 +1,66 @@
-let progressData = [
-    { progressId: 1, userId: 1, date: '2026-05-20', caloriesConsumed: 2650, workoutsCompleted: 1, activeMinutes: 60 },
-    { progressId: 2, userId: 1, date: '2026-05-21', caloriesConsumed: 2800, workoutsCompleted: 0, activeMinutes: 20 },
-    { progressId: 3, userId: 1, date: '2026-05-22', caloriesConsumed: 2700, workoutsCompleted: 1, activeMinutes: 55 },
-    { progressId: 4, userId: 3, date: '2026-05-20', caloriesConsumed: 2200, workoutsCompleted: 1, activeMinutes: 45 },
-    { progressId: 5, userId: 3, date: '2026-05-22', caloriesConsumed: 2350, workoutsCompleted: 0, activeMinutes: 15 }
-];
+const prisma = require('../prisma/prismaClient');
+const { toDateOnly } = require('./_dateUtils');
 
-const getAll = () => progressData;
+const mapProgress = (p) => ({
+    progressId: p.id,
+    userId: p.user_id,
+    date: toDateOnly(p.date),
+    caloriesConsumed: p.calories_consumed,
+    workoutsCompleted: p.workouts_completed,
+    activeMinutes: p.active_minutes
+});
 
-const getById = (id) => progressData.find(p => p.progressId === id) || null;
-
-const getByUserId = (userId) => progressData.filter(p => p.userId === userId);
-
-const getByUserAndDate = (userId, date) =>
-    progressData.find(p => p.userId === userId && p.date === date) || null;
-
-const create = (data) => {
-    const newRecord = {
-        progressId: progressData.length > 0 ? progressData[progressData.length - 1].progressId + 1 : 1,
-        userId: data.userId,
-        date: data.date,
-        caloriesConsumed: data.caloriesConsumed,
-        workoutsCompleted: data.workoutsCompleted,
-        activeMinutes: data.activeMinutes
-    };
-    progressData.push(newRecord);
-    return newRecord;
+const getAll = async () => {
+    const records = await prisma.progress.findMany();
+    return records.map(mapProgress);
 };
 
-const update = (id, data) => {
-    const index = progressData.findIndex(p => p.progressId === id);
-    if (index === -1) return null;
-    progressData[index] = { ...progressData[index], ...data };
-    return progressData[index];
+const getById = async (id) => {
+    const record = await prisma.progress.findUnique({ where: { id } });
+    return record ? mapProgress(record) : null;
+};
+
+const getByUserId = async (userId) => {
+    const records = await prisma.progress.findMany({ where: { user_id: userId } });
+    return records.map(mapProgress);
+};
+
+const getByUserAndDate = async (userId, date) => {
+    const record = await prisma.progress.findUnique({
+        where: { user_id_date: { user_id: userId, date: new Date(date) } }
+    });
+    return record ? mapProgress(record) : null;
+};
+
+const create = async (data) => {
+    const created = await prisma.progress.create({
+        data: {
+            user_id: data.userId,
+            date: new Date(data.date),
+            calories_consumed: data.caloriesConsumed,
+            workouts_completed: data.workoutsCompleted,
+            active_minutes: data.activeMinutes
+        }
+    });
+    return mapProgress(created);
+};
+
+const update = async (id, data) => {
+    try {
+        const updated = await prisma.progress.update({
+            where: { id },
+            data: {
+                date: new Date(data.date),
+                calories_consumed: data.caloriesConsumed,
+                workouts_completed: data.workoutsCompleted,
+                active_minutes: data.activeMinutes
+            }
+        });
+        return mapProgress(updated);
+    } catch (err) {
+        if (err.code === 'P2025') return null;
+        throw err;
+    }
 };
 
 module.exports = { getAll, getById, getByUserId, getByUserAndDate, create, update };

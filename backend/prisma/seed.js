@@ -1,0 +1,402 @@
+const prisma = require('./prismaClient');
+
+// ---------------------------------------------------------------------
+// Users (ids 1-6)
+// ---------------------------------------------------------------------
+const users = [
+    { id: 1, first_name: 'John',  last_name: 'Doe',       email: 'john@fitwize.com',  password: 'password123', role: 'user',    preferences: 5 },
+    { id: 2, first_name: 'Noam',  last_name: 'Levi',      email: 'noam@fitwize.com',  password: 'password123', role: 'admin',   preferences: 4 },
+    { id: 3, first_name: 'Dana',  last_name: 'Cohen',     email: 'dana@fitwize.com',  password: 'password123', role: 'user',    preferences: 5 },
+    { id: 4, first_name: 'Roi',   last_name: 'Bublil',    email: 'roi@fitwize.com',   password: 'password123', role: 'manager', preferences: 3 },
+    { id: 5, first_name: 'Maya',  last_name: 'Ben-David', email: 'maya@fitwize.com',  password: 'password123', role: 'user',    preferences: 4 },
+    { id: 6, first_name: 'Eitan', last_name: 'Katz',      email: 'eitan@fitwize.com', password: 'password123', role: 'user',    preferences: 3 }
+];
+
+// ---------------------------------------------------------------------
+// Exercises (ids 1-7)
+// ---------------------------------------------------------------------
+const exercises = [
+    { id: 1, name: 'Leg Press',        muscle_group: 'Legs',      difficulty: 'Beginner',     equipment: 'Machine',       description: 'A lower-body exercise that mainly targets the quadriceps, glutes, and hamstrings.' },
+    { id: 2, name: 'Chest Press',      muscle_group: 'Chest',     difficulty: 'Beginner',     equipment: 'Machine',       description: 'An upper-body pushing exercise that mainly targets the chest muscles.' },
+    { id: 3, name: 'Lat Pulldown',     muscle_group: 'Back',      difficulty: 'Beginner',     equipment: 'Machine',       description: 'An upper-body pulling exercise that mainly targets the back muscles, especially the lats.' },
+    { id: 4, name: 'Shoulder Press',   muscle_group: 'Shoulders', difficulty: 'Intermediate', equipment: 'Dumbbells',     description: 'An upper-body pushing exercise that mainly targets the shoulder muscles.' },
+    { id: 5, name: 'Biceps Curl',      muscle_group: 'Biceps',    difficulty: 'Beginner',     equipment: 'Dumbbells',     description: 'An isolation exercise that targets the front upper-arm muscles.' },
+    { id: 6, name: 'Triceps Pushdown', muscle_group: 'Triceps',   difficulty: 'Beginner',     equipment: 'Cable Machine', description: 'An isolation exercise that targets the back upper-arm muscles.' },
+    { id: 7, name: 'Plank',            muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'A core stability exercise that strengthens the abdominal and trunk muscles.' }
+];
+
+// ---------------------------------------------------------------------
+// Food items (ids 1-10)
+// ---------------------------------------------------------------------
+const foodItems = [
+    { id: 1,  name: 'Chicken Breast', category: 'protein',   calories_per_100g: 165, protein_per_100g: 31,   carbs_per_100g: 0,    fat_per_100g: 3.6 },
+    { id: 2,  name: 'Greek Yogurt',   category: 'dairy',     calories_per_100g: 59,  protein_per_100g: 10,   carbs_per_100g: 3.6,  fat_per_100g: 0.4 },
+    { id: 3,  name: 'White Rice',     category: 'carb',      calories_per_100g: 130, protein_per_100g: 2.7,  carbs_per_100g: 28,   fat_per_100g: 0.3 },
+    { id: 4,  name: 'Salmon',         category: 'protein',   calories_per_100g: 208, protein_per_100g: 20,   carbs_per_100g: 0,    fat_per_100g: 13 },
+    { id: 5,  name: 'Egg',            category: 'protein',   calories_per_100g: 155, protein_per_100g: 13,   carbs_per_100g: 1.1,  fat_per_100g: 11 },
+    { id: 6,  name: 'Oats',           category: 'carb',      calories_per_100g: 389, protein_per_100g: 16.9, carbs_per_100g: 66.3, fat_per_100g: 6.9 },
+    { id: 7,  name: 'Avocado',        category: 'fat',       calories_per_100g: 160, protein_per_100g: 2,    carbs_per_100g: 8.5,  fat_per_100g: 14.7 },
+    { id: 8,  name: 'Sweet Potato',   category: 'carb',      calories_per_100g: 86,  protein_per_100g: 1.6,  carbs_per_100g: 20,   fat_per_100g: 0.1 },
+    { id: 9,  name: 'Cottage Cheese', category: 'dairy',     calories_per_100g: 98,  protein_per_100g: 11,   carbs_per_100g: 3.4,  fat_per_100g: 4.3 },
+    { id: 10, name: 'Broccoli',       category: 'vegetable', calories_per_100g: 34,  protein_per_100g: 2.8,  carbs_per_100g: 6.6,  fat_per_100g: 0.4 }
+];
+
+// ---------------------------------------------------------------------
+// Workout plan templates (ids 1-6) - looked up by planGenerator.js via
+// templateWorkoutId (1-6), based on fitnessGoal + workoutsPerWeek
+// ---------------------------------------------------------------------
+const workoutPlans = [
+    { id: 1, user_id: 1, plan_name: 'John Doe - 3 Day Muscle Gain Plan',       fitness_goal: 'muscle_gain', is_active: true, created_at: new Date('2026-05-05') },
+    { id: 2, user_id: 3, plan_name: 'Dana Cohen - 3 Day Muscle Gain Plan',     fitness_goal: 'muscle_gain', is_active: true, created_at: new Date('2026-05-05') },
+    { id: 3, user_id: 4, plan_name: 'Roi Bublil - 3 Day Weight Loss Plan',     fitness_goal: 'weight_loss', is_active: true, created_at: new Date('2026-05-05') },
+    { id: 4, user_id: 2, plan_name: 'Noam Levi - 4 Day Weight Loss Plan',      fitness_goal: 'weight_loss', is_active: true, created_at: new Date('2026-05-05') },
+    { id: 5, user_id: 5, plan_name: 'Maya Ben-David - 3 Day Maintenance Plan', fitness_goal: 'maintenance', is_active: true, created_at: new Date('2026-05-05') },
+    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - 5 Day Maintenance Plan', fitness_goal: 'maintenance', is_active: true, created_at: new Date('2026-05-05') }
+];
+
+// ---------------------------------------------------------------------
+// Workout plan days (ids 1-21)
+// ---------------------------------------------------------------------
+const workoutPlanDays = [
+    { id: 1,  workout_plan_id: 1, day: 'Sunday',    workout_title: 'Full Body A' },
+    { id: 2,  workout_plan_id: 1, day: 'Tuesday',   workout_title: 'Upper Body Focus' },
+    { id: 3,  workout_plan_id: 1, day: 'Thursday',  workout_title: 'Full Body B' },
+
+    { id: 4,  workout_plan_id: 2, day: 'Monday',    workout_title: 'Lower Body And Core' },
+    { id: 5,  workout_plan_id: 2, day: 'Wednesday', workout_title: 'Upper Body Push' },
+    { id: 6,  workout_plan_id: 2, day: 'Friday',    workout_title: 'Upper Body Pull' },
+
+    { id: 7,  workout_plan_id: 3, day: 'Monday',    workout_title: 'Full Body Circuit A' },
+    { id: 8,  workout_plan_id: 3, day: 'Wednesday', workout_title: 'Full Body Circuit B' },
+    { id: 9,  workout_plan_id: 3, day: 'Friday',    workout_title: 'Full Body Circuit C' },
+
+    { id: 10, workout_plan_id: 4, day: 'Monday',    workout_title: 'Lower Body' },
+    { id: 11, workout_plan_id: 4, day: 'Tuesday',   workout_title: 'Upper Body Push' },
+    { id: 12, workout_plan_id: 4, day: 'Thursday',  workout_title: 'Full Body' },
+    { id: 13, workout_plan_id: 4, day: 'Friday',    workout_title: 'Upper Body Pull' },
+
+    { id: 14, workout_plan_id: 5, day: 'Tuesday',   workout_title: 'Lower Body' },
+    { id: 15, workout_plan_id: 5, day: 'Thursday',  workout_title: 'Upper Body' },
+    { id: 16, workout_plan_id: 5, day: 'Saturday',  workout_title: 'Full Body' },
+
+    { id: 17, workout_plan_id: 6, day: 'Monday',    workout_title: 'Chest And Triceps' },
+    { id: 18, workout_plan_id: 6, day: 'Tuesday',   workout_title: 'Back And Biceps' },
+    { id: 19, workout_plan_id: 6, day: 'Wednesday', workout_title: 'Legs And Core' },
+    { id: 20, workout_plan_id: 6, day: 'Thursday',  workout_title: 'Shoulders And Arms' },
+    { id: 21, workout_plan_id: 6, day: 'Friday',    workout_title: 'Full Body' }
+];
+
+// ---------------------------------------------------------------------
+// Plan exercises (ids 1-63)
+// ---------------------------------------------------------------------
+const planExercises = [
+    { id: 1,  day_id: 1,  exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 10, target_weight: 80 },
+    { id: 2,  day_id: 1,  exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 10, target_weight: 35 },
+    { id: 3,  day_id: 1,  exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 10, target_weight: 40 },
+
+    { id: 4,  day_id: 2,  exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 10, target_weight: 12 },
+    { id: 5,  day_id: 2,  exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 12, target_weight: 10 },
+    { id: 6,  day_id: 2,  exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 12, target_weight: 25 },
+
+    { id: 7,  day_id: 3,  exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 4, target_reps: 8,  target_weight: 90 },
+    { id: 8,  day_id: 3,  exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 8,  target_weight: 45 },
+    { id: 9,  day_id: 3,  exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 45, target_weight: 0 },
+
+    { id: 10, day_id: 4,  exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 12, target_weight: 60 },
+    { id: 11, day_id: 4,  exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 40, target_weight: 0 },
+
+    { id: 12, day_id: 5,  exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 10, target_weight: 25 },
+    { id: 13, day_id: 5,  exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 10, target_weight: 8 },
+    { id: 14, day_id: 5,  exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 12, target_weight: 18 },
+
+    { id: 15, day_id: 6,  exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 10, target_weight: 30 },
+    { id: 16, day_id: 6,  exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 12, target_weight: 7 },
+    { id: 17, day_id: 6,  exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 45, target_weight: 0 },
+
+    { id: 18, day_id: 7,  exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 15, target_weight: 60 },
+    { id: 19, day_id: 7,  exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 15, target_weight: 20 },
+    { id: 20, day_id: 7,  exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 15, target_weight: 30 },
+    { id: 21, day_id: 7,  exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 30, target_weight: 0 },
+
+    { id: 22, day_id: 8,  exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 12, target_weight: 65 },
+    { id: 23, day_id: 8,  exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 15, target_weight: 8 },
+    { id: 24, day_id: 8,  exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 15, target_weight: 6 },
+    { id: 25, day_id: 8,  exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 30, target_weight: 0 },
+
+    { id: 26, day_id: 9,  exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 15, target_weight: 20 },
+    { id: 27, day_id: 9,  exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 15, target_weight: 30 },
+    { id: 28, day_id: 9,  exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 15, target_weight: 15 },
+    { id: 29, day_id: 9,  exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 45, target_weight: 0 },
+
+    { id: 30, day_id: 10, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 4, target_reps: 15, target_weight: 70 },
+    { id: 31, day_id: 10, exercise_id: 7, exercise_name: 'Plank',            target_sets: 4, target_reps: 45, target_weight: 0 },
+
+    { id: 32, day_id: 11, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 15, target_weight: 25 },
+    { id: 33, day_id: 11, exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 15, target_weight: 10 },
+    { id: 34, day_id: 11, exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 15, target_weight: 20 },
+
+    { id: 35, day_id: 12, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 15, target_weight: 75 },
+    { id: 36, day_id: 12, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 15, target_weight: 35 },
+    { id: 37, day_id: 12, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 45, target_weight: 0 },
+
+    { id: 38, day_id: 13, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 15, target_weight: 35 },
+    { id: 39, day_id: 13, exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 15, target_weight: 8 },
+    { id: 40, day_id: 13, exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 15, target_weight: 10 },
+
+    { id: 41, day_id: 14, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 10, target_weight: 80 },
+    { id: 42, day_id: 14, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 40, target_weight: 0 },
+
+    { id: 43, day_id: 15, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 10, target_weight: 30 },
+    { id: 44, day_id: 15, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 10, target_weight: 35 },
+    { id: 45, day_id: 15, exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 10, target_weight: 12 },
+
+    { id: 46, day_id: 16, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 10, target_weight: 80 },
+    { id: 47, day_id: 16, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 10, target_weight: 30 },
+    { id: 48, day_id: 16, exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 12, target_weight: 10 },
+    { id: 49, day_id: 16, exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 12, target_weight: 20 },
+    { id: 50, day_id: 16, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 45, target_weight: 0 },
+
+    { id: 51, day_id: 17, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 4, target_reps: 10, target_weight: 40 },
+    { id: 52, day_id: 17, exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 12, target_weight: 30 },
+
+    { id: 53, day_id: 18, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 4, target_reps: 10, target_weight: 50 },
+    { id: 54, day_id: 18, exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 12, target_weight: 12 },
+
+    { id: 55, day_id: 19, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 4, target_reps: 10, target_weight: 100 },
+    { id: 56, day_id: 19, exercise_id: 7, exercise_name: 'Plank',            target_sets: 4, target_reps: 60, target_weight: 0 },
+
+    { id: 57, day_id: 20, exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 4, target_reps: 10, target_weight: 16 },
+    { id: 58, day_id: 20, exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 12, target_weight: 12 },
+    { id: 59, day_id: 20, exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 12, target_weight: 30 },
+
+    { id: 60, day_id: 21, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 12, target_weight: 90 },
+    { id: 61, day_id: 21, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 12, target_weight: 35 },
+    { id: 62, day_id: 21, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 12, target_weight: 45 },
+    { id: 63, day_id: 21, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 60, target_weight: 0 }
+];
+
+// ---------------------------------------------------------------------
+// Daily meal plan templates (ids 1-6) - looked up by planGenerator.js via
+// templateMealId (1-6), based on fitnessGoal + caloricTarget
+// ---------------------------------------------------------------------
+const dailyMealPlans = [
+    { id: 1, user_id: 1, plan_name: 'John Doe - Muscle Gain Daily Meal Plan',              fitness_goal: 'muscle_gain', target_calories: 2800, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 2, user_id: 3, plan_name: 'Dana Cohen - Muscle Gain Daily Meal Plan',            fitness_goal: 'muscle_gain', target_calories: 2300, target_protein: 120, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 3, user_id: 4, plan_name: 'Roi Bublil - Weight Loss Daily Meal Plan',            fitness_goal: 'weight_loss', target_calories: 1800, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 4, user_id: 2, plan_name: 'Noam Levi - Weight Loss Daily Meal Plan',             fitness_goal: 'weight_loss', target_calories: 1600, target_protein: 110, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 5, user_id: 5, plan_name: 'Maya Ben-David - Maintenance Daily Meal Plan',        fitness_goal: 'maintenance', target_calories: 2200, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - Active Maintenance Daily Meal Plan', fitness_goal: 'maintenance', target_calories: 2500, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') }
+];
+
+// ---------------------------------------------------------------------
+// Meals (ids 1-24)
+// ---------------------------------------------------------------------
+const meals = [
+    { id: 1,  daily_meal_plan_id: 1, meal_type: 'Breakfast', title: 'Greek Yogurt With Oats',         estimated_calories: 550, estimated_protein: 35 },
+    { id: 2,  daily_meal_plan_id: 1, meal_type: 'Lunch',     title: 'Chicken Breast With Rice',       estimated_calories: 750, estimated_protein: 55 },
+    { id: 3,  daily_meal_plan_id: 1, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 800, estimated_protein: 45 },
+    { id: 4,  daily_meal_plan_id: 1, meal_type: 'Snack',     title: 'Cottage Cheese And Egg',         estimated_calories: 350, estimated_protein: 30 },
+
+    { id: 5,  daily_meal_plan_id: 2, meal_type: 'Breakfast', title: 'Greek Yogurt Bowl',              estimated_calories: 450, estimated_protein: 30 },
+    { id: 6,  daily_meal_plan_id: 2, meal_type: 'Lunch',     title: 'Chicken Rice Bowl',              estimated_calories: 650, estimated_protein: 45 },
+    { id: 7,  daily_meal_plan_id: 2, meal_type: 'Dinner',    title: 'Eggs With Sweet Potato',         estimated_calories: 600, estimated_protein: 35 },
+    { id: 8,  daily_meal_plan_id: 2, meal_type: 'Snack',     title: 'Cottage Cheese Snack',           estimated_calories: 300, estimated_protein: 25 },
+
+    { id: 9,  daily_meal_plan_id: 3, meal_type: 'Breakfast', title: 'Oats And Greek Yogurt Bowl',     estimated_calories: 400, estimated_protein: 28 },
+    { id: 10, daily_meal_plan_id: 3, meal_type: 'Lunch',     title: 'Chicken And Rice With Broccoli', estimated_calories: 580, estimated_protein: 68 },
+    { id: 11, daily_meal_plan_id: 3, meal_type: 'Dinner',    title: 'Salmon And Sweet Potato',        estimated_calories: 560, estimated_protein: 40 },
+    { id: 12, daily_meal_plan_id: 3, meal_type: 'Snack',     title: 'Cottage Cheese',                 estimated_calories: 260, estimated_protein: 29 },
+
+    { id: 13, daily_meal_plan_id: 4, meal_type: 'Breakfast', title: 'Scrambled Eggs With Broccoli',   estimated_calories: 360, estimated_protein: 30 },
+    { id: 14, daily_meal_plan_id: 4, meal_type: 'Lunch',     title: 'Chicken And Sweet Potato',       estimated_calories: 470, estimated_protein: 59 },
+    { id: 15, daily_meal_plan_id: 4, meal_type: 'Dinner',    title: 'Salmon With Greek Yogurt',       estimated_calories: 500, estimated_protein: 50 },
+    { id: 16, daily_meal_plan_id: 4, meal_type: 'Snack',     title: 'Greek Yogurt And Oats',          estimated_calories: 270, estimated_protein: 23 },
+
+    { id: 17, daily_meal_plan_id: 5, meal_type: 'Breakfast', title: 'Oats With Egg And Avocado',      estimated_calories: 500, estimated_protein: 30 },
+    { id: 18, daily_meal_plan_id: 5, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 700, estimated_protein: 65 },
+    { id: 19, daily_meal_plan_id: 5, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 700, estimated_protein: 42 },
+    { id: 20, daily_meal_plan_id: 5, meal_type: 'Snack',     title: 'Cottage Cheese And Oats',        estimated_calories: 300, estimated_protein: 25 },
+
+    { id: 21, daily_meal_plan_id: 6, meal_type: 'Breakfast', title: 'Oats Greek Yogurt And Egg',      estimated_calories: 600, estimated_protein: 35 },
+    { id: 22, daily_meal_plan_id: 6, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 800, estimated_protein: 65 },
+    { id: 23, daily_meal_plan_id: 6, meal_type: 'Dinner',    title: 'Salmon With Rice And Broccoli',  estimated_calories: 750, estimated_protein: 55 },
+    { id: 24, daily_meal_plan_id: 6, meal_type: 'Snack',     title: 'Cottage Cheese With Oats',       estimated_calories: 350, estimated_protein: 28 }
+];
+
+// ---------------------------------------------------------------------
+// Meal food items (ids 1-56)
+// ---------------------------------------------------------------------
+const mealFoodItems = [
+    { id: 1,  meal_id: 1,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 250 },
+    { id: 2,  meal_id: 1,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 60 },
+
+    { id: 3,  meal_id: 2,  food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 180 },
+    { id: 4,  meal_id: 2,  food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 250 },
+
+    { id: 5,  meal_id: 3,  food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 180 },
+    { id: 6,  meal_id: 3,  food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 250 },
+
+    { id: 7,  meal_id: 4,  food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 200 },
+    { id: 8,  meal_id: 4,  food_item_id: 5,  food_name: 'Egg',            quantity_grams: 50 },
+
+    { id: 9,  meal_id: 5,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 220 },
+    { id: 10, meal_id: 5,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 45 },
+
+    { id: 11, meal_id: 6,  food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 150 },
+    { id: 12, meal_id: 6,  food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 220 },
+    { id: 13, meal_id: 6,  food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+
+    { id: 14, meal_id: 7,  food_item_id: 5,  food_name: 'Egg',            quantity_grams: 100 },
+    { id: 15, meal_id: 7,  food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 250 },
+    { id: 16, meal_id: 7,  food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+
+    { id: 17, meal_id: 8,  food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 200 },
+
+    { id: 18, meal_id: 9,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 80 },
+    { id: 19, meal_id: 9,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 150 },
+
+    { id: 20, meal_id: 10, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 200 },
+    { id: 21, meal_id: 10, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 150 },
+    { id: 22, meal_id: 10, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+
+    { id: 23, meal_id: 11, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 180 },
+    { id: 24, meal_id: 11, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 250 },
+
+    { id: 25, meal_id: 12, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 265 },
+
+    { id: 26, meal_id: 13, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 200 },
+    { id: 27, meal_id: 13, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+
+    { id: 28, meal_id: 14, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 180 },
+    { id: 29, meal_id: 14, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 200 },
+    { id: 30, meal_id: 14, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 100 },
+
+    { id: 31, meal_id: 15, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 150 },
+    { id: 32, meal_id: 15, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 200 },
+
+    { id: 33, meal_id: 16, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 200 },
+    { id: 34, meal_id: 16, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 30 },
+
+    { id: 35, meal_id: 17, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 80 },
+    { id: 36, meal_id: 17, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 100 },
+    { id: 37, meal_id: 17, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 80 },
+
+    { id: 38, meal_id: 18, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 200 },
+    { id: 39, meal_id: 18, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 250 },
+    { id: 40, meal_id: 18, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 80 },
+
+    { id: 41, meal_id: 19, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 200 },
+    { id: 42, meal_id: 19, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 300 },
+    { id: 43, meal_id: 19, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 200 },
+
+    { id: 44, meal_id: 20, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 200 },
+    { id: 45, meal_id: 20, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 20 },
+
+    { id: 46, meal_id: 21, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 100 },
+    { id: 47, meal_id: 21, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 250 },
+    { id: 48, meal_id: 21, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 100 },
+
+    { id: 49, meal_id: 22, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 250 },
+    { id: 50, meal_id: 22, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 280 },
+    { id: 51, meal_id: 22, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 100 },
+
+    { id: 52, meal_id: 23, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 200 },
+    { id: 53, meal_id: 23, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 200 },
+    { id: 54, meal_id: 23, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 200 },
+
+    { id: 55, meal_id: 24, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 250 },
+    { id: 56, meal_id: 24, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 30 }
+];
+
+// ---------------------------------------------------------------------
+// Profiles (ids 1-6) - assigned_workout_plan_id / assigned_meal_plan_id
+// reference the WorkoutPlan / DailyMealPlan templates (ids 1-6) above
+// ---------------------------------------------------------------------
+const profiles = [
+    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 72, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 2, assigned_meal_plan_id: 1 },
+    { id: 2, user_id: 2, age: 28, gender: 'male',   height_cm: 180, current_weight: 82, target_weight: 78, fitness_goal: 'weight_loss', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 4, onboarding_completed: true, caloric_target: 2622, assigned_workout_plan_id: 4, assigned_meal_plan_id: 3 },
+    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 58, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 1, assigned_meal_plan_id: 2 },
+    { id: 4, user_id: 4, age: 35, gender: 'male',   height_cm: 175, current_weight: 90, target_weight: 82, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 2008, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 },
+    { id: 5, user_id: 5, age: 22, gender: 'female', height_cm: 170, current_weight: 58, target_weight: 58, fitness_goal: 'maintenance', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 5, onboarding_completed: true, caloric_target: 2366, assigned_workout_plan_id: 6, assigned_meal_plan_id: 5 },
+    { id: 6, user_id: 6, age: 30, gender: 'male',   height_cm: 178, current_weight: 85, target_weight: 80, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 1999, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 }
+];
+
+// ---------------------------------------------------------------------
+// Settings (ids 1-6)
+// ---------------------------------------------------------------------
+const settings = [
+    { id: 1, user_id: 1, display_name: 'John Doe',      email: 'john@fitwize.com',  theme: 'light', fitness_goal: 'muscle gain', activity_level: 1 },
+    { id: 2, user_id: 2, display_name: 'Noam Levi',      email: 'noam@fitwize.com',  theme: 'dark',  fitness_goal: 'fat loss',    activity_level: 4 },
+    { id: 3, user_id: 3, display_name: 'Dana Cohen',     email: 'dana@fitwize.com',  theme: 'light', fitness_goal: 'muscle gain', activity_level: 3 },
+    { id: 4, user_id: 4, display_name: 'Roi Bublil',     email: 'roi@fitwize.com',   theme: 'light', fitness_goal: 'weight loss', activity_level: 2 },
+    { id: 5, user_id: 5, display_name: 'Maya Ben-David', email: 'maya@fitwize.com',  theme: 'light', fitness_goal: 'maintenance', activity_level: 5 },
+    { id: 6, user_id: 6, display_name: 'Eitan Katz',     email: 'eitan@fitwize.com', theme: 'dark',  fitness_goal: 'fat loss',    activity_level: 1 }
+];
+
+async function main() {
+    console.log('Seeding database...');
+
+    // Clean slate, children first, so the script is safe to rerun.
+    await prisma.logSet.deleteMany();
+    await prisma.logExercise.deleteMany();
+    await prisma.mealFoodItem.deleteMany();
+    await prisma.meal.deleteMany();
+    await prisma.planExercise.deleteMany();
+    await prisma.aiRecommendation.deleteMany();
+    await prisma.checkIn.deleteMany();
+    await prisma.progress.deleteMany();
+    await prisma.workoutLog.deleteMany();
+    await prisma.workoutPlanDay.deleteMany();
+    await prisma.setting.deleteMany();
+    await prisma.profile.deleteMany();
+    await prisma.dailyMealPlan.deleteMany();
+    await prisma.workoutPlan.deleteMany();
+    await prisma.foodItem.deleteMany();
+    await prisma.exercise.deleteMany();
+    await prisma.user.deleteMany();
+
+    // Recreate, parent before child, with explicit ids preserved.
+    await prisma.user.createMany({ data: users });
+    console.log(`Seeded ${users.length} users`);
+
+    await prisma.exercise.createMany({ data: exercises });
+    console.log(`Seeded ${exercises.length} exercises`);
+
+    await prisma.foodItem.createMany({ data: foodItems });
+    console.log(`Seeded ${foodItems.length} food items`);
+
+    await prisma.workoutPlan.createMany({ data: workoutPlans });
+    console.log(`Seeded ${workoutPlans.length} workout plans (templates 1-6)`);
+
+    await prisma.workoutPlanDay.createMany({ data: workoutPlanDays });
+    console.log(`Seeded ${workoutPlanDays.length} workout plan days`);
+
+    await prisma.planExercise.createMany({ data: planExercises });
+    console.log(`Seeded ${planExercises.length} plan exercises`);
+
+    await prisma.dailyMealPlan.createMany({ data: dailyMealPlans });
+    console.log(`Seeded ${dailyMealPlans.length} daily meal plans (templates 1-6)`);
+
+    await prisma.meal.createMany({ data: meals });
+    console.log(`Seeded ${meals.length} meals`);
+
+    await prisma.mealFoodItem.createMany({ data: mealFoodItems });
+    console.log(`Seeded ${mealFoodItems.length} meal food items`);
+
+    await prisma.profile.createMany({ data: profiles });
+    console.log(`Seeded ${profiles.length} profiles`);
+
+    await prisma.setting.createMany({ data: settings });
+    console.log(`Seeded ${settings.length} settings`);
+
+    console.log('Seeding complete.');
+}
+
+main()
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });

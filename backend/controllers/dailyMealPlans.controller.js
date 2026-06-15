@@ -7,27 +7,27 @@ const { validateId, getMissingFields } = require('../middleware/validation');
 const { isAdminRole } = require('../middleware/roleUtils');
 
 // GET /api/daily-meal-plans
-const getAllDailyMealPlans = (req, res) => {
+const getAllDailyMealPlans = async (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
         if (isAdminRole(userRole)) {
-            return sendSuccess(res, 200, DailyMealPlansModel.getAll());
+            return sendSuccess(res, 200, await DailyMealPlansModel.getAll());
         }
 
         if (!validateId(requestUserId)) {
             return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
 
-        return sendSuccess(res, 200, DailyMealPlansModel.getByUserId(requestUserId));
+        return sendSuccess(res, 200, await DailyMealPlansModel.getByUserId(requestUserId));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // GET /api/daily-meal-plans/:id
-const getDailyMealPlanById = (req, res) => {
+const getDailyMealPlanById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -35,7 +35,7 @@ const getDailyMealPlanById = (req, res) => {
             return sendValidationError(res, 'Invalid daily meal plan id', { field: 'id', value: req.params.id });
         }
 
-        const plan = DailyMealPlansModel.getById(id);
+        const plan = await DailyMealPlansModel.getById(id);
 
         if (!plan) {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
@@ -55,7 +55,7 @@ const getDailyMealPlanById = (req, res) => {
 };
 
 // POST /api/daily-meal-plans
-const createDailyMealPlan = (req, res) => {
+const createDailyMealPlan = async (req, res) => {
     try {
         const userId = parseInt(req.headers['userid']);
         if (!userId || isNaN(userId)) {
@@ -125,34 +125,34 @@ const createDailyMealPlan = (req, res) => {
             return sendValidationError(res, 'Invalid food items in daily meal plan', { invalidFoodItems });
         }
 
-        const newPlan = DailyMealPlansModel.create({ userId, name, goal, targetCalories, targetProtein, isActive });
+        const newPlan = await DailyMealPlansModel.create({ userId, name, goal, targetCalories, targetProtein, isActive });
 
-        meals.forEach(meal => {
-            const newMeal = DailyMealPlansModel.createMeal({
+        for (const meal of meals) {
+            const newMeal = await DailyMealPlansModel.createMeal({
                 dailyMealPlanId: newPlan.dailyMealPlanId,
                 mealType: meal.mealType,
                 title: meal.title,
                 estimatedCalories: meal.estimatedCalories,
                 estimatedProtein: meal.estimatedProtein
             });
-            meal.foodItems.forEach(fi => {
-                DailyMealPlansModel.createMealFoodItem({
+            for (const fi of meal.foodItems) {
+                await DailyMealPlansModel.createMealFoodItem({
                     mealId: newMeal.mealId,
                     foodItemId: fi.foodItemId,
                     foodName: fi.foodName,
                     quantityGrams: fi.quantityGrams
                 });
-            });
-        });
+            }
+        }
 
-        return sendSuccess(res, 201, DailyMealPlansModel.getById(newPlan.dailyMealPlanId));
+        return sendSuccess(res, 201, await DailyMealPlansModel.getById(newPlan.dailyMealPlanId));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // PUT /api/daily-meal-plans/:id
-const updateDailyMealPlan = (req, res) => {
+const updateDailyMealPlan = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -160,7 +160,7 @@ const updateDailyMealPlan = (req, res) => {
             return sendValidationError(res, 'Invalid daily meal plan id', { field: 'id', value: req.params.id });
         }
 
-        const plan = DailyMealPlansModel.getById(id);
+        const plan = await DailyMealPlansModel.getById(id);
 
         if (!plan) {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
@@ -236,36 +236,39 @@ const updateDailyMealPlan = (req, res) => {
             return sendValidationError(res, 'Invalid food items in daily meal plan', { invalidFoodItems });
         }
 
-        DailyMealPlansModel.getMeals(id).forEach(m => DailyMealPlansModel.removeMeal(m.mealId));
+        const existingMeals = await DailyMealPlansModel.getMeals(id);
+        for (const m of existingMeals) {
+            await DailyMealPlansModel.removeMeal(m.mealId);
+        }
 
-        DailyMealPlansModel.update(id, { name, goal, targetCalories, targetProtein, isActive });
+        await DailyMealPlansModel.update(id, { name, goal, targetCalories, targetProtein, isActive });
 
-        meals.forEach(meal => {
-            const newMeal = DailyMealPlansModel.createMeal({
+        for (const meal of meals) {
+            const newMeal = await DailyMealPlansModel.createMeal({
                 dailyMealPlanId: id,
                 mealType: meal.mealType,
                 title: meal.title,
                 estimatedCalories: meal.estimatedCalories,
                 estimatedProtein: meal.estimatedProtein
             });
-            meal.foodItems.forEach(fi => {
-                DailyMealPlansModel.createMealFoodItem({
+            for (const fi of meal.foodItems) {
+                await DailyMealPlansModel.createMealFoodItem({
                     mealId: newMeal.mealId,
                     foodItemId: fi.foodItemId,
                     foodName: fi.foodName,
                     quantityGrams: fi.quantityGrams
                 });
-            });
-        });
+            }
+        }
 
-        return sendSuccess(res, 200, DailyMealPlansModel.getById(id));
+        return sendSuccess(res, 200, await DailyMealPlansModel.getById(id));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // DELETE /api/daily-meal-plans/:id
-const deleteDailyMealPlan = (req, res) => {
+const deleteDailyMealPlan = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -273,7 +276,7 @@ const deleteDailyMealPlan = (req, res) => {
             return sendValidationError(res, 'Invalid daily meal plan id', { field: 'id', value: req.params.id });
         }
 
-        const plan = DailyMealPlansModel.getById(id);
+        const plan = await DailyMealPlansModel.getById(id);
 
         if (!plan) {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
@@ -286,7 +289,7 @@ const deleteDailyMealPlan = (req, res) => {
             return sendNotFound(res, 'Daily meal plan not found', { dailyMealPlanId: id });
         }
 
-        const deleted = DailyMealPlansModel.remove(id);
+        const deleted = await DailyMealPlansModel.remove(id);
         return sendSuccess(res, 200, { dailyMealPlanId: deleted.dailyMealPlanId });
     } catch (err) {
         return sendServerError(res);

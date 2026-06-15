@@ -1,0 +1,323 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AiRecommendation {
+  id                   Int       @id @default(autoincrement())
+  user_id              Int
+  generated_at         DateTime? @default(now()) @db.DateTime(0)
+  weight_assessment    String?   @db.Text
+  nutrition_assessment String?   @db.Text
+  workout_assessment   String?   @db.Text
+  recommendations      Json
+  user                 User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ai_recommendations_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+  @@map("ai_recommendations")
+}
+
+model CheckIn {
+  id                 Int      @id @default(autoincrement())
+  user_id            Int
+  weight             Float    @db.Float
+  workouts_completed Int
+  feedback           String?  @db.Text
+  check_in_date      DateTime @db.DateTime(0)
+  user               User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "check_ins_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+  @@map("check_ins")
+}
+
+model DailyMealPlan {
+  id              Int                         @id @default(autoincrement())
+  user_id         Int
+  plan_name       String                      @db.VarChar(150)
+  target_calories Int?
+  target_protein  Int?
+  is_active       Boolean?                    @default(true)
+  fitness_goal    workout_plans_fitness_goal?
+  created_at      DateTime?                   @default(dbgenerated("(curdate())")) @db.Date
+  user            User                        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "daily_meal_plans_ibfk_1")
+  meals           Meal[]
+  profiles        Profile[]
+
+  @@index([user_id], map: "user_id")
+  @@map("daily_meal_plans")
+}
+
+model Exercise {
+  id            Int                   @id @default(autoincrement())
+  name          String                @db.VarChar(100)
+  muscle_group  String?               @db.VarChar(50)
+  difficulty    exercises_difficulty?
+  equipment     String?               @db.VarChar(100)
+  description   String?               @db.Text
+  logExercises  LogExercise[]
+  planExercises PlanExercise[]
+
+  @@map("exercises")
+}
+
+model FoodItem {
+  id                Int            @id @default(autoincrement())
+  name              String         @db.VarChar(100)
+  calories_per_100g Float          @db.Float
+  protein_per_100g  Float?         @db.Float
+  carbs_per_100g    Float?         @db.Float
+  fat_per_100g      Float?         @db.Float
+  category          String?        @db.VarChar(50)
+  mealFoodItems     MealFoodItem[]
+
+  @@map("food_items")
+}
+
+model LogExercise {
+  id             Int        @id @default(autoincrement())
+  workout_log_id Int
+  exercise_id    Int
+  exercise_name  String     @db.VarChar(100)
+  workoutLog     WorkoutLog @relation(fields: [workout_log_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "log_exercises_ibfk_1")
+  exercise       Exercise   @relation(fields: [exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "log_exercises_ibfk_2")
+  logSets        LogSet[]
+
+  @@index([exercise_id], map: "exercise_id")
+  @@index([workout_log_id], map: "workout_log_id")
+  @@map("log_exercises")
+}
+
+model LogSet {
+  id              Int         @id @default(autoincrement())
+  log_exercise_id Int
+  reps            Int
+  weight_kg       Float?      @db.Float
+  set_number      Int?
+  logExercise     LogExercise @relation(fields: [log_exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "log_sets_ibfk_1")
+
+  @@index([log_exercise_id], map: "log_exercise_id")
+  @@map("log_sets")
+}
+
+model Meal {
+  id                 Int             @id @default(autoincrement())
+  daily_meal_plan_id Int
+  meal_type          meals_meal_type
+  title              String          @db.VarChar(150)
+  estimated_calories Int
+  estimated_protein  Int
+  mealFoodItems      MealFoodItem[]
+  dailyMealPlan      DailyMealPlan   @relation(fields: [daily_meal_plan_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "meals_ibfk_1")
+
+  @@index([daily_meal_plan_id], map: "daily_meal_plan_id")
+  @@map("meals")
+}
+
+model MealFoodItem {
+  id             Int      @id @default(autoincrement())
+  meal_id        Int
+  food_item_id   Int
+  food_name      String   @db.VarChar(100)
+  quantity_grams Float    @db.Float
+  meal           Meal     @relation(fields: [meal_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "meal_entries_ibfk_1")
+  foodItem       FoodItem @relation(fields: [food_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "meal_entries_ibfk_2")
+
+  @@index([food_item_id], map: "food_item_id")
+  @@index([meal_id], map: "meal_id")
+  @@map("meal_entries")
+}
+
+model PlanExercise {
+  id             Int            @id @default(autoincrement())
+  day_id         Int
+  exercise_id    Int
+  exercise_name  String         @db.VarChar(100)
+  target_sets    Int?
+  target_reps    Int?
+  target_weight  Float?         @db.Float
+  workoutPlanDay WorkoutPlanDay @relation(fields: [day_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "plan_exercises_ibfk_1")
+  exercise       Exercise       @relation(fields: [exercise_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "plan_exercises_ibfk_2")
+
+  @@index([day_id], map: "day_id")
+  @@index([exercise_id], map: "exercise_id")
+  @@map("plan_exercises")
+}
+
+model Profile {
+  id                       Int                     @id @default(autoincrement())
+  user_id                  Int                     @unique(map: "user_id")
+  age                      Int?
+  gender                   profiles_gender?
+  height_cm                Float?                  @db.Float
+  current_weight           Float?                  @db.Float
+  target_weight            Float?                  @db.Float
+  fitness_goal             profiles_fitness_goal
+  activity_level           profiles_activity_level
+  workouts_per_week        Int?                    @default(3)
+  meals_per_day            Int?                    @default(3)
+  assigned_workout_plan_id Int?
+  assigned_meal_plan_id    Int?
+  caloric_target           Float?                  @db.Float
+  onboarding_completed     Boolean?                @default(false)
+  dailyMealPlan            DailyMealPlan?          @relation(fields: [assigned_meal_plan_id], references: [id], onUpdate: NoAction, map: "fk_profile_meal_plan")
+  workoutPlan              WorkoutPlan?            @relation(fields: [assigned_workout_plan_id], references: [id], onUpdate: NoAction, map: "fk_profile_workout_plan")
+  user                     User                    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "profiles_ibfk_1")
+
+  @@index([assigned_meal_plan_id], map: "fk_profile_meal_plan")
+  @@index([assigned_workout_plan_id], map: "fk_profile_workout_plan")
+  @@map("profiles")
+}
+
+model Progress {
+  id                 Int      @id @default(autoincrement())
+  user_id            Int
+  date               DateTime @db.Date
+  calories_consumed  Int?     @default(0)
+  workouts_completed Int?     @default(0)
+  active_minutes     Int?     @default(0)
+  user               User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "progress_ibfk_1")
+
+  @@unique([user_id, date], map: "unique_user_date")
+  @@map("progress")
+}
+
+model Setting {
+  id             Int     @id @default(autoincrement())
+  user_id        Int     @unique(map: "user_id")
+  display_name   String? @db.VarChar(100)
+  email          String? @db.VarChar(255)
+  theme          String? @default("light") @db.VarChar(20)
+  fitness_goal   String? @db.VarChar(50)
+  activity_level Int?
+  user           User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "settings_ibfk_1")
+
+  @@map("settings")
+}
+
+model User {
+  id                Int                @id @default(autoincrement())
+  first_name        String             @db.VarChar(50)
+  last_name         String             @db.VarChar(50)
+  email             String             @unique(map: "email") @db.VarChar(255)
+  password          String             @db.VarChar(255)
+  role              users_role         @default(user)
+  created_at        DateTime?          @default(now()) @db.DateTime(0)
+  preferences       Int?
+  aiRecommendations AiRecommendation[]
+  checkIns          CheckIn[]
+  dailyMealPlans    DailyMealPlan[]
+  profile           Profile?
+  progress          Progress[]
+  setting           Setting?
+  workoutLogs       WorkoutLog[]
+  workoutPlans      WorkoutPlan[]
+
+  @@map("users")
+}
+
+model WorkoutLog {
+  id                  Int             @id @default(autoincrement())
+  user_id             Int
+  workout_plan_id     Int?
+  duration_minutes    Int?
+  notes               String?         @db.Text
+  log_date            DateTime        @db.Date
+  workout_plan_day_id Int?
+  workout_title       String?         @db.VarChar(100)
+  difficulty_rating   Int?
+  logExercises        LogExercise[]
+  user                User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "workout_logs_ibfk_1")
+  workoutPlan         WorkoutPlan?    @relation(fields: [workout_plan_id], references: [id], onUpdate: NoAction, map: "workout_logs_ibfk_2")
+  workoutPlanDay      WorkoutPlanDay? @relation(fields: [workout_plan_day_id], references: [id], onUpdate: NoAction, map: "workout_logs_ibfk_3")
+
+  @@index([user_id], map: "user_id")
+  @@index([workout_plan_id], map: "workout_plan_id")
+  @@index([workout_plan_day_id], map: "workout_plan_day_id")
+  @@map("workout_logs")
+}
+
+model WorkoutPlan {
+  id              Int                         @id @default(autoincrement())
+  user_id         Int
+  plan_name       String                      @db.VarChar(150)
+  fitness_goal    workout_plans_fitness_goal?
+  is_active       Boolean?                    @default(true)
+  created_at      DateTime?                   @default(dbgenerated("(curdate())")) @db.Date
+  profiles        Profile[]
+  workoutLogs     WorkoutLog[]
+  workoutPlanDays WorkoutPlanDay[]
+  user            User                        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "workout_plans_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+  @@map("workout_plans")
+}
+
+model WorkoutPlanDay {
+  id              Int                   @id @default(autoincrement())
+  workout_plan_id Int
+  workout_title   String?               @db.VarChar(100)
+  day             workout_plan_days_day
+  planExercises   PlanExercise[]
+  workoutLogs     WorkoutLog[]
+  workoutPlan     WorkoutPlan           @relation(fields: [workout_plan_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "workout_plan_days_ibfk_1")
+
+  @@index([workout_plan_id], map: "workout_plan_id")
+  @@map("workout_plan_days")
+}
+
+enum profiles_gender {
+  male
+  female
+  other
+}
+
+enum exercises_difficulty {
+  Beginner
+  Intermediate
+  Advanced
+}
+
+enum meals_meal_type {
+  Breakfast
+  Lunch
+  Dinner
+  Snack
+}
+
+enum workout_plans_fitness_goal {
+  weight_loss
+  muscle_gain
+  maintenance
+}
+
+enum users_role {
+  user
+  admin
+  manager
+}
+
+enum profiles_fitness_goal {
+  weight_loss
+  muscle_gain
+  maintenance
+}
+
+enum profiles_activity_level {
+  beginner
+  intermediate
+  advanced
+}
+
+enum workout_plan_days_day {
+  Sunday
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+}

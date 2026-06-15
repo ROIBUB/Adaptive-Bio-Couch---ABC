@@ -13,27 +13,27 @@ const { validateId, getMissingFields } = require('../middleware/validation');
 const { isAdminRole } = require('../middleware/roleUtils');
 
 // GET /api/check-ins
-const getAllCheckIns = (req, res) => {
+const getAllCheckIns = async (req, res) => {
     try {
         const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
 
         if (isAdminRole(userRole)) {
-            return sendSuccess(res, 200, CheckInsModel.getAll());
+            return sendSuccess(res, 200, await CheckInsModel.getAll());
         }
 
         if (!validateId(requestUserId)) {
             return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
 
-        return sendSuccess(res, 200, CheckInsModel.getByUserId(requestUserId));
+        return sendSuccess(res, 200, await CheckInsModel.getByUserId(requestUserId));
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // GET /api/check-ins/:id
-const getCheckInById = (req, res) => {
+const getCheckInById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -41,7 +41,7 @@ const getCheckInById = (req, res) => {
             return sendValidationError(res, 'Invalid check-in id', { field: 'id', value: req.params.id });
         }
 
-        const checkIn = CheckInsModel.getById(id);
+        const checkIn = await CheckInsModel.getById(id);
 
         if (!checkIn) {
             return sendNotFound(res, 'Check-in not found', { checkInId: id });
@@ -61,7 +61,7 @@ const getCheckInById = (req, res) => {
 };
 
 // POST /api/check-ins
-const createCheckIn = (req, res) => {
+const createCheckIn = async (req, res) => {
     try {
         const missingFields = getMissingFields(req.body, ['checkInDate', 'weight', 'workoutsCompleted']);
         if (missingFields.length > 0) {
@@ -83,9 +83,9 @@ const createCheckIn = (req, res) => {
             return sendValidationError(res, 'Invalid workouts completed value', { field: 'workoutsCompleted', value: workoutsCompleted });
         }
 
-        const newCheckIn = CheckInsModel.create({ userId: requestUserId, weight, workoutsCompleted, feedback, checkInDate });
+        const newCheckIn = await CheckInsModel.create({ userId: requestUserId, weight, workoutsCompleted, feedback, checkInDate });
         // Keep profile.currentWeight in sync so the dashboard reflects the latest weight
-        ProfilesModel.update(requestUserId, { currentWeight: weight });
+        await ProfilesModel.update(requestUserId, { currentWeight: weight });
         return sendSuccess(res, 201, newCheckIn);
     } catch (err) {
         return sendServerError(res);
@@ -93,7 +93,7 @@ const createCheckIn = (req, res) => {
 };
 
 // PUT /api/check-ins/:id
-const updateCheckIn = (req, res) => {
+const updateCheckIn = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -101,7 +101,7 @@ const updateCheckIn = (req, res) => {
             return sendValidationError(res, 'Invalid check-in id', { field: 'id', value: req.params.id });
         }
 
-        const checkIn = CheckInsModel.getById(id);
+        const checkIn = await CheckInsModel.getById(id);
 
         if (!checkIn) {
             return sendNotFound(res, 'Check-in not found', { checkInId: id });
@@ -129,7 +129,7 @@ const updateCheckIn = (req, res) => {
             return sendValidationError(res, 'Invalid workouts completed value', { field: 'workoutsCompleted', value: workoutsCompleted });
         }
 
-        const updated = CheckInsModel.update(id, { weight, workoutsCompleted, feedback, checkInDate });
+        const updated = await CheckInsModel.update(id, { weight, workoutsCompleted, feedback, checkInDate });
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
@@ -137,7 +137,7 @@ const updateCheckIn = (req, res) => {
 };
 
 // DELETE /api/check-ins/:id
-const deleteCheckIn = (req, res) => {
+const deleteCheckIn = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -145,7 +145,7 @@ const deleteCheckIn = (req, res) => {
             return sendValidationError(res, 'Invalid check-in id', { field: 'id', value: req.params.id });
         }
 
-        const checkIn = CheckInsModel.getById(id);
+        const checkIn = await CheckInsModel.getById(id);
 
         if (!checkIn) {
             return sendNotFound(res, 'Check-in not found', { checkInId: id });
@@ -158,7 +158,7 @@ const deleteCheckIn = (req, res) => {
             return sendNotFound(res, 'Check-in not found', { checkInId: id });
         }
 
-        const deleted = CheckInsModel.remove(id);
+        const deleted = await CheckInsModel.remove(id);
         return sendSuccess(res, 200, { checkInId: deleted.checkInId });
     } catch (err) {
         return sendServerError(res);

@@ -10,16 +10,16 @@ const {
 const { validateId, getMissingFields } = require('../middleware/validation');
 
 // GET /api/exercises
-const getAllExercises = (req, res) => {
+const getAllExercises = async (req, res) => {
     try {
-        return sendSuccess(res, 200, ExercisesModel.getAll());
+        return sendSuccess(res, 200, await ExercisesModel.getAll());
     } catch (err) {
         return sendServerError(res);
     }
 };
 
 // GET /api/exercises/:id
-const getExerciseById = (req, res) => {
+const getExerciseById = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -27,7 +27,7 @@ const getExerciseById = (req, res) => {
             return sendValidationError(res, 'Invalid exercise id', { field: 'id', value: req.params.id });
         }
 
-        const exercise = ExercisesModel.getById(id);
+        const exercise = await ExercisesModel.getById(id);
 
         if (!exercise) {
             return sendNotFound(res, 'Exercise not found', { exerciseId: id });
@@ -40,7 +40,7 @@ const getExerciseById = (req, res) => {
 };
 
 // POST /api/exercises
-const createExercise = (req, res) => {
+const createExercise = async (req, res) => {
     try {
         const { name, muscleGroup, difficultyLevel, equipment, description } = req.body;
 
@@ -49,7 +49,7 @@ const createExercise = (req, res) => {
             return sendValidationError(res, 'Missing required exercise fields', { missingFields });
         }
 
-        const newExercise = ExercisesModel.create({ name, muscleGroup, difficultyLevel, equipment, description });
+        const newExercise = await ExercisesModel.create({ name, muscleGroup, difficultyLevel, equipment, description });
         return sendSuccess(res, 201, newExercise);
     } catch (err) {
         return sendServerError(res);
@@ -57,7 +57,7 @@ const createExercise = (req, res) => {
 };
 
 // PUT /api/exercises/:id
-const updateExercise = (req, res) => {
+const updateExercise = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -72,7 +72,7 @@ const updateExercise = (req, res) => {
             return sendValidationError(res, 'Missing required exercise fields', { missingFields });
         }
 
-        const updated = ExercisesModel.update(id, { name, muscleGroup, difficultyLevel, equipment, description });
+        const updated = await ExercisesModel.update(id, { name, muscleGroup, difficultyLevel, equipment, description });
 
         if (!updated) {
             return sendNotFound(res, 'Exercise not found', { exerciseId: id });
@@ -85,7 +85,7 @@ const updateExercise = (req, res) => {
 };
 
 // DELETE /api/exercises/:id
-const deleteExercise = (req, res) => {
+const deleteExercise = async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -93,7 +93,7 @@ const deleteExercise = (req, res) => {
             return sendValidationError(res, 'Invalid exercise id', { field: 'id', value: req.params.id });
         }
 
-        const deleted = ExercisesModel.remove(id);
+        const deleted = await ExercisesModel.remove(id);
 
         if (!deleted) {
             return sendNotFound(res, 'Exercise not found', { exerciseId: id });

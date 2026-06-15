@@ -5,7 +5,7 @@ const { generatePlan } = require('../services/planGenerator');
 const { sendSuccess, sendValidationError, sendServerError } = require('../middleware/errorHandlers');
 
 // POST /api/auth/login
-const login = (req, res) => {
+const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -15,7 +15,7 @@ const login = (req, res) => {
             });
         }
 
-        const user = UsersModel.findByEmail(email);
+        const user = await UsersModel.findByEmail(email);
 
         if (!user || user.password !== password) {
             return res.status(401).json({
@@ -44,7 +44,7 @@ const logout = (req, res) => {
 };
 
 // POST /api/auth/register
-const register = (req, res) => {
+const register = async (req, res) => {
     try {
         const {
             firstName, lastName, email, password,
@@ -59,7 +59,7 @@ const register = (req, res) => {
             return sendValidationError(res, 'Missing required fields', { missingFields });
         }
 
-        const existing = UsersModel.findByEmail(email);
+        const existing = await UsersModel.findByEmail(email);
         if (existing) {
             return res.status(409).json({
                 success: false,
@@ -68,7 +68,7 @@ const register = (req, res) => {
             });
         }
 
-        const newUser = UsersModel.create({
+        const newUser = await UsersModel.create({
             firstName, lastName, email, password,
             age, gender, height, weight,
             fitnessGoal, activityLevel,
@@ -76,7 +76,7 @@ const register = (req, res) => {
             preferences: null
         });
 
-        const newProfile = ProfilesModel.create({
+        const newProfile = await ProfilesModel.create({
             userId: newUser.userid,
             age, gender, height,
             currentWeight: weight,
@@ -86,7 +86,7 @@ const register = (req, res) => {
             onboardingCompleted: true
         });
 
-        SettingsModel.create({
+        await SettingsModel.create({
             userId:        newUser.userid,
             displayName:   `${firstName} ${lastName}`,
             email,
@@ -94,8 +94,8 @@ const register = (req, res) => {
             activityLevel
         });
 
-        const plan = generatePlan({...newProfile, userId: newUser.userid, firstName: newUser.firstName });
-        ProfilesModel.update(newProfile.userId, plan);
+        const plan = await generatePlan({...newProfile, userId: newUser.userid, firstName: newUser.firstName });
+        await ProfilesModel.update(newProfile.userId, plan);
 
         return sendSuccess(res, 201, {
             userId: newUser.userid,

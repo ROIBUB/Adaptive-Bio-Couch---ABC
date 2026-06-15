@@ -17,7 +17,7 @@ const { validateId, getMissingFields } = require('../middleware/validation');
 const { isAdminRole } = require('../middleware/roleUtils');
 
 // GET /api/profiles/:userId
-const getProfileByUserId = (req, res) => {
+const getProfileByUserId = async (req, res) => {
     try {
         const userId = Number(req.params.userId);
 
@@ -32,7 +32,7 @@ const getProfileByUserId = (req, res) => {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
-        const profile = ProfilesModel.getByUserId(userId);
+        const profile = await ProfilesModel.getByUserId(userId);
 
         if (!profile) {
             return sendNotFound(res, 'Profile not found', { userId });
@@ -45,7 +45,7 @@ const getProfileByUserId = (req, res) => {
 };
 
 // POST /api/profiles
-const createProfile = (req, res) => {
+const createProfile = async (req, res) => {
     try {
         const userId = parseInt(req.headers['userid']);
         if (!userId || isNaN(userId)) {
@@ -57,13 +57,13 @@ const createProfile = (req, res) => {
             return sendValidationError(res, 'Missing required profile fields', { missingFields });
         }
 
-        if (ProfilesModel.getByUserId(userId)) {
+        if (await ProfilesModel.getByUserId(userId)) {
             return sendValidationError(res, 'A profile already exists for this user', { userId });
         }
 
         const { age, gender, height, currentWeight, targetWeight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay } = req.body;
 
-        const newProfile = ProfilesModel.create({
+        const newProfile = await ProfilesModel.create({
             userId,
             age: age ?? null,
             gender: gender ?? null,
@@ -84,7 +84,7 @@ const createProfile = (req, res) => {
 };
 
 // PUT /api/profiles/:userId
-const updateProfile = (req, res) => {
+const updateProfile = async (req, res) => {
     try {
         const userId = Number(req.params.userId);
 
@@ -99,7 +99,7 @@ const updateProfile = (req, res) => {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
-        if (!ProfilesModel.getByUserId(userId)) {
+        if (!(await ProfilesModel.getByUserId(userId))) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
@@ -120,7 +120,7 @@ const updateProfile = (req, res) => {
         if (mealsPerDay !== undefined)        updates.mealsPerDay = mealsPerDay;
         if (onboardingCompleted !== undefined) updates.onboardingCompleted = onboardingCompleted;
 
-        const updated = ProfilesModel.update(userId, updates);
+        const updated = await ProfilesModel.update(userId, updates);
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
@@ -128,7 +128,7 @@ const updateProfile = (req, res) => {
 };
 
 // POST /api/profiles/:userId/replan
-const replanProfile = (req, res) => {
+const replanProfile = async (req, res) => {
     try {
         const userId = Number(req.params.userId);
 
@@ -143,7 +143,7 @@ const replanProfile = (req, res) => {
             return sendNotFound(res, 'Profile not found', { userId });
         }
 
-        const profile = ProfilesModel.getByUserId(userId);
+        const profile = await ProfilesModel.getByUserId(userId);
         if (!profile) {
             return sendNotFound(res, 'Profile not found', { userId });
         }
@@ -159,22 +159,22 @@ const replanProfile = (req, res) => {
         if (height !== undefined)        profileUpdates.height = Number(height);
         if (currentWeight !== undefined) profileUpdates.currentWeight = Number(currentWeight);
 
-        const updatedProfile = ProfilesModel.update(userId, profileUpdates);
+        const updatedProfile = await ProfilesModel.update(userId, profileUpdates);
 
-        const user = UsersModel.getById(userId);
+        const user = await UsersModel.getById(userId);
         const firstName = user ? user.firstName : 'User';
 
-        WorkoutPlansModel.deactivateByUserId(userId);
-        DailyMealPlansModel.deactivateByUserId(userId);
+        await WorkoutPlansModel.deactivateByUserId(userId);
+        await DailyMealPlansModel.deactivateByUserId(userId);
 
-        const plan = generatePlan({ ...updatedProfile, userId, firstName });
-        const finalProfile = ProfilesModel.update(userId, plan);
+        const plan = await generatePlan({ ...updatedProfile, userId, firstName });
+        const finalProfile = await ProfilesModel.update(userId, plan);
 
         // Reset today's consumed calories so the old plan's eaten meals don't carry over
         const today = new Date().toISOString().split('T')[0];
-        const todayRecord = ProgressDataModel.getByUserAndDate(userId, today);
+        const todayRecord = await ProgressDataModel.getByUserAndDate(userId, today);
         if (todayRecord) {
-            ProgressDataModel.update(todayRecord.progressId, {
+            await ProgressDataModel.update(todayRecord.progressId, {
                 ...todayRecord,
                 caloriesConsumed: 0
             });

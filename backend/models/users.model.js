@@ -1,40 +1,98 @@
-let users = [
-    { userid: 1, firstName: 'John',  lastName: 'Doe',       email: 'john@fitwize.com',  password: 'password123', createDate: new Date(), updateDate: new Date(), userRole: 'user',    age: 25, gender: 'male',   height: 175, weight: 75, activityLevel: 'intermediate', fitnessGoal: 'muscle_gain',  preferences: 5 },
-    { userid: 2, firstName: 'Noam',  lastName: 'Levi',      email: 'noam@fitwize.com',  password: 'password123', createDate: new Date(), updateDate: new Date(), userRole: 'admin',   age: 28, gender: 'male',   height: 180, weight: 82, activityLevel: 'advanced',     fitnessGoal: 'weight_loss',  preferences: 4 },
-    { userid: 3, firstName: 'Dana',  lastName: 'Cohen',     email: 'dana@fitwize.com',  password: 'password123', createDate: new Date(), updateDate: new Date(), userRole: 'user',    age: 24, gender: 'female', height: 165, weight: 60, activityLevel: 'intermediate', fitnessGoal: 'muscle_gain',  preferences: 5 },
-    { userid: 4, firstName: 'Roi', lastName: 'Bublil',   email: 'roi@fitwize.com', password: 'password123', createDate: new Date(), updateDate: new Date(), userRole: 'manager', age: 35, gender: 'male',   height: 175, weight: 90, activityLevel: 'beginner',     fitnessGoal: 'weight_loss',  preferences: 3 },
-    { userid: 5, firstName: 'Maya',  lastName: 'Ben-David', email: 'maya@fitwize.com',  password: 'password123', createDate: new Date(), updateDate: new Date(), userRole: 'user',    age: 22, gender: 'female', height: 170, weight: 58, activityLevel: 'advanced',     fitnessGoal: 'maintenance',  preferences: 4 },
-    { userid: 6, firstName: 'Eitan', lastName: 'Katz',      email: 'eitan@fitwize.com', password: 'password123', createDate: new Date(), updateDate: new Date(), userRole: 'user',    age: 30, gender: 'male',   height: 178, weight: 85, activityLevel: 'beginner',     fitnessGoal: 'weight_loss',  preferences: 3 }
-];
+const prisma = require('../prisma/prismaClient');
 
-const getAll = () => users;
+const mapUser = (u, updateDate) => ({
+    userid: u.id,
+    firstName: u.first_name,
+    lastName: u.last_name,
+    email: u.email,
+    password: u.password,
+    createDate: u.created_at,
+    updateDate: updateDate || u.created_at,
+    userRole: u.role,
+    age: u.profile ? u.profile.age : null,
+    gender: u.profile ? u.profile.gender : null,
+    height: u.profile ? u.profile.height_cm : null,
+    weight: u.profile ? u.profile.current_weight : null,
+    activityLevel: u.profile ? u.profile.activity_level : null,
+    fitnessGoal: u.profile ? u.profile.fitness_goal : null,
+    preferences: u.preferences
+});
 
-const getById = (id) => users.find(u => u.userid === id) || null;
-
-const findByEmail = (email) => users.find(u => u.email === email) || null;
-
-const create = (data) => {
-    const newUser = {
-        userid: users.length > 0 ? users[users.length - 1].userid + 1 : 1,
-        ...data,
-        createDate: new Date(),
-        updateDate: new Date()
-    };
-    users.push(newUser);
-    return newUser;
+const getAll = async () => {
+    const users = await prisma.user.findMany({ include: { profile: true } });
+    return users.map((u) => mapUser(u));
 };
 
-const update = (id, data) => {
-    const index = users.findIndex(u => u.userid === id);
-    if (index === -1) return null;
-    users[index] = { ...users[index], ...data, updateDate: new Date() };
-    return users[index];
+const getById = async (id) => {
+    const user = await prisma.user.findUnique({ where: { id }, include: { profile: true } });
+    return user ? mapUser(user) : null;
 };
 
-const remove = (id) => {
-    const index = users.findIndex(u => u.userid === id);
-    if (index === -1) return null;
-    return users.splice(index, 1)[0];
+const findByEmail = async (email) => {
+    const user = await prisma.user.findUnique({ where: { email }, include: { profile: true } });
+    return user ? mapUser(user) : null;
+};
+
+const create = async (data) => {
+    const created = await prisma.user.create({
+        data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            password: data.password,
+            role: data.userRole,
+            preferences: data.preferences ?? null
+        },
+        include: { profile: true }
+    });
+    return mapUser(created);
+};
+
+const update = async (id, data) => {
+    const userUpdate = {};
+    if (data.firstName !== undefined) userUpdate.first_name = data.firstName;
+    if (data.lastName !== undefined) userUpdate.last_name = data.lastName;
+    if (data.userRole !== undefined) userUpdate.role = data.userRole;
+    if (data.preferences !== undefined) userUpdate.preferences = data.preferences;
+
+    const profileUpdate = {};
+    if (data.age !== undefined) profileUpdate.age = data.age;
+    if (data.gender !== undefined) profileUpdate.gender = data.gender;
+    if (data.height !== undefined) profileUpdate.height_cm = data.height;
+    if (data.weight !== undefined) profileUpdate.current_weight = data.weight;
+    if (data.activityLevel !== undefined) profileUpdate.activity_level = data.activityLevel;
+    if (data.fitnessGoal !== undefined) profileUpdate.fitness_goal = data.fitnessGoal;
+
+    try {
+        await prisma.$transaction(async (tx) => {
+            if (Object.keys(userUpdate).length > 0) {
+                await tx.user.update({ where: { id }, data: userUpdate });
+            }
+            if (Object.keys(profileUpdate).length > 0) {
+                await tx.profile.upsert({
+                    where: { user_id: id },
+                    update: profileUpdate,
+                    create: { user_id: id, ...profileUpdate }
+                });
+            }
+        });
+    } catch (err) {
+        if (err.code === 'P2025') return null;
+        throw err;
+    }
+
+    const updated = await prisma.user.findUnique({ where: { id }, include: { profile: true } });
+    return mapUser(updated, new Date());
+};
+
+const remove = async (id) => {
+    try {
+        const deleted = await prisma.user.delete({ where: { id }, include: { profile: true } });
+        return mapUser(deleted);
+    } catch (err) {
+        if (err.code === 'P2025') return null;
+        throw err;
+    }
 };
 
 module.exports = { getAll, getById, findByEmail, create, update, remove };
