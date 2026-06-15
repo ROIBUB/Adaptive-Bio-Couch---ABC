@@ -17,4 +17,5 @@ backend/.env
 client/.env
 
 # Local Claude settings
-.claude/settings.local.json
+.claude/settings.local.json.claude/settings.local.json
+.idea/
