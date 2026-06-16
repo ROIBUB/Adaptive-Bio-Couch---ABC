@@ -180,132 +180,132 @@ const planExercises = [
 // templateMealId (1-6), based on fitnessGoal + caloricTarget
 // ---------------------------------------------------------------------
 const dailyMealPlans = [
-    { id: 1, user_id: 1, plan_name: 'John Doe - Muscle Gain Daily Meal Plan',              fitness_goal: 'muscle_gain', target_calories: 2800, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') },
-    { id: 2, user_id: 3, plan_name: 'Dana Cohen - Muscle Gain Daily Meal Plan',            fitness_goal: 'muscle_gain', target_calories: 2300, target_protein: 120, is_active: true, created_at: new Date('2026-05-05') },
-    { id: 3, user_id: 4, plan_name: 'Roi Bublil - Weight Loss Daily Meal Plan',            fitness_goal: 'weight_loss', target_calories: 1800, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
-    { id: 4, user_id: 2, plan_name: 'Noam Levi - Weight Loss Daily Meal Plan',             fitness_goal: 'weight_loss', target_calories: 1600, target_protein: 110, is_active: true, created_at: new Date('2026-05-05') },
-    { id: 5, user_id: 5, plan_name: 'Maya Ben-David - Maintenance Daily Meal Plan',        fitness_goal: 'maintenance', target_calories: 2200, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
-    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - Active Maintenance Daily Meal Plan', fitness_goal: 'maintenance', target_calories: 2500, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') }
+    { id: 1, user_id: 1, plan_name: 'John Doe - Muscle Gain Daily Meal Plan',              fitness_goal: 'muscle_gain', target_calories: 2972, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 2, user_id: 3, plan_name: 'Dana Cohen - Muscle Gain Daily Meal Plan',            fitness_goal: 'muscle_gain', target_calories: 2393, target_protein: 120, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 3, user_id: 4, plan_name: 'Roi Bublil - Weight Loss Daily Meal Plan',            fitness_goal: 'weight_loss', target_calories: 2008, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 4, user_id: 2, plan_name: 'Noam Levi - Weight Loss Daily Meal Plan',             fitness_goal: 'weight_loss', target_calories: 2622, target_protein: 110, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 5, user_id: 5, plan_name: 'Maya Ben-David - Maintenance Daily Meal Plan',        fitness_goal: 'maintenance', target_calories: 2366, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - Active Maintenance Daily Meal Plan', fitness_goal: 'maintenance', target_calories: 2366, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') }
 ];
 
 // ---------------------------------------------------------------------
 // Meals (ids 1-24)
 // ---------------------------------------------------------------------
 const meals = [
-    { id: 1,  daily_meal_plan_id: 1, meal_type: 'Breakfast', title: 'Greek Yogurt With Oats',         estimated_calories: 550, estimated_protein: 35 },
-    { id: 2,  daily_meal_plan_id: 1, meal_type: 'Lunch',     title: 'Chicken Breast With Rice',       estimated_calories: 750, estimated_protein: 55 },
-    { id: 3,  daily_meal_plan_id: 1, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 800, estimated_protein: 45 },
-    { id: 4,  daily_meal_plan_id: 1, meal_type: 'Snack',     title: 'Cottage Cheese And Egg',         estimated_calories: 350, estimated_protein: 30 },
+    { id: 1,  daily_meal_plan_id: 1, meal_type: 'Breakfast', title: 'Greek Yogurt With Oats',         estimated_calories: 667, estimated_protein: 35 },
+    { id: 2,  daily_meal_plan_id: 1, meal_type: 'Lunch',     title: 'Chicken Breast With Rice',       estimated_calories: 910, estimated_protein: 55 },
+    { id: 3,  daily_meal_plan_id: 1, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 970, estimated_protein: 45 },
+    { id: 4,  daily_meal_plan_id: 1, meal_type: 'Snack',     title: 'Cottage Cheese And Egg',         estimated_calories: 425, estimated_protein: 30 },
 
-    { id: 5,  daily_meal_plan_id: 2, meal_type: 'Breakfast', title: 'Greek Yogurt Bowl',              estimated_calories: 450, estimated_protein: 30 },
-    { id: 6,  daily_meal_plan_id: 2, meal_type: 'Lunch',     title: 'Chicken Rice Bowl',              estimated_calories: 650, estimated_protein: 45 },
-    { id: 7,  daily_meal_plan_id: 2, meal_type: 'Dinner',    title: 'Eggs With Sweet Potato',         estimated_calories: 600, estimated_protein: 35 },
-    { id: 8,  daily_meal_plan_id: 2, meal_type: 'Snack',     title: 'Cottage Cheese Snack',           estimated_calories: 300, estimated_protein: 25 },
+    { id: 5,  daily_meal_plan_id: 2, meal_type: 'Breakfast', title: 'Greek Yogurt Bowl',              estimated_calories: 538, estimated_protein: 30 },
+    { id: 6,  daily_meal_plan_id: 2, meal_type: 'Lunch',     title: 'Chicken Rice Bowl',              estimated_calories: 778, estimated_protein: 45 },
+    { id: 7,  daily_meal_plan_id: 2, meal_type: 'Dinner',    title: 'Eggs With Sweet Potato',         estimated_calories: 718, estimated_protein: 35 },
+    { id: 8,  daily_meal_plan_id: 2, meal_type: 'Snack',     title: 'Cottage Cheese Snack',           estimated_calories: 359, estimated_protein: 25 },
 
-    { id: 9,  daily_meal_plan_id: 3, meal_type: 'Breakfast', title: 'Oats And Greek Yogurt Bowl',     estimated_calories: 400, estimated_protein: 28 },
-    { id: 10, daily_meal_plan_id: 3, meal_type: 'Lunch',     title: 'Chicken And Rice With Broccoli', estimated_calories: 580, estimated_protein: 68 },
-    { id: 11, daily_meal_plan_id: 3, meal_type: 'Dinner',    title: 'Salmon And Sweet Potato',        estimated_calories: 560, estimated_protein: 40 },
-    { id: 12, daily_meal_plan_id: 3, meal_type: 'Snack',     title: 'Cottage Cheese',                 estimated_calories: 260, estimated_protein: 29 },
+    { id: 9,  daily_meal_plan_id: 3, meal_type: 'Breakfast', title: 'Oats And Greek Yogurt Bowl',     estimated_calories: 446, estimated_protein: 28 },
+    { id: 10, daily_meal_plan_id: 3, meal_type: 'Lunch',     title: 'Chicken And Rice With Broccoli', estimated_calories: 647, estimated_protein: 68 },
+    { id: 11, daily_meal_plan_id: 3, meal_type: 'Dinner',    title: 'Salmon And Sweet Potato',        estimated_calories: 625, estimated_protein: 40 },
+    { id: 12, daily_meal_plan_id: 3, meal_type: 'Snack',     title: 'Cottage Cheese',                 estimated_calories: 290, estimated_protein: 29 },
 
-    { id: 13, daily_meal_plan_id: 4, meal_type: 'Breakfast', title: 'Scrambled Eggs With Broccoli',   estimated_calories: 360, estimated_protein: 30 },
-    { id: 14, daily_meal_plan_id: 4, meal_type: 'Lunch',     title: 'Chicken And Sweet Potato',       estimated_calories: 470, estimated_protein: 59 },
-    { id: 15, daily_meal_plan_id: 4, meal_type: 'Dinner',    title: 'Salmon With Greek Yogurt',       estimated_calories: 500, estimated_protein: 50 },
-    { id: 16, daily_meal_plan_id: 4, meal_type: 'Snack',     title: 'Greek Yogurt And Oats',          estimated_calories: 270, estimated_protein: 23 },
+    { id: 13, daily_meal_plan_id: 4, meal_type: 'Breakfast', title: 'Scrambled Eggs With Broccoli',   estimated_calories: 590, estimated_protein: 30 },
+    { id: 14, daily_meal_plan_id: 4, meal_type: 'Lunch',     title: 'Chicken And Sweet Potato',       estimated_calories: 770, estimated_protein: 59 },
+    { id: 15, daily_meal_plan_id: 4, meal_type: 'Dinner',    title: 'Salmon With Greek Yogurt',       estimated_calories: 819, estimated_protein: 50 },
+    { id: 16, daily_meal_plan_id: 4, meal_type: 'Snack',     title: 'Greek Yogurt And Oats',          estimated_calories: 442, estimated_protein: 23 },
 
-    { id: 17, daily_meal_plan_id: 5, meal_type: 'Breakfast', title: 'Oats With Egg And Avocado',      estimated_calories: 500, estimated_protein: 30 },
-    { id: 18, daily_meal_plan_id: 5, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 700, estimated_protein: 65 },
-    { id: 19, daily_meal_plan_id: 5, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 700, estimated_protein: 42 },
-    { id: 20, daily_meal_plan_id: 5, meal_type: 'Snack',     title: 'Cottage Cheese And Oats',        estimated_calories: 300, estimated_protein: 25 },
+    { id: 17, daily_meal_plan_id: 5, meal_type: 'Breakfast', title: 'Oats With Egg And Avocado',      estimated_calories: 538, estimated_protein: 30 },
+    { id: 18, daily_meal_plan_id: 5, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 753, estimated_protein: 65 },
+    { id: 19, daily_meal_plan_id: 5, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 753, estimated_protein: 42 },
+    { id: 20, daily_meal_plan_id: 5, meal_type: 'Snack',     title: 'Cottage Cheese And Oats',        estimated_calories: 323, estimated_protein: 25 },
 
-    { id: 21, daily_meal_plan_id: 6, meal_type: 'Breakfast', title: 'Oats Greek Yogurt And Egg',      estimated_calories: 600, estimated_protein: 35 },
-    { id: 22, daily_meal_plan_id: 6, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 800, estimated_protein: 65 },
-    { id: 23, daily_meal_plan_id: 6, meal_type: 'Dinner',    title: 'Salmon With Rice And Broccoli',  estimated_calories: 750, estimated_protein: 55 },
-    { id: 24, daily_meal_plan_id: 6, meal_type: 'Snack',     title: 'Cottage Cheese With Oats',       estimated_calories: 350, estimated_protein: 28 }
+    { id: 21, daily_meal_plan_id: 6, meal_type: 'Breakfast', title: 'Oats Greek Yogurt And Egg',      estimated_calories: 568, estimated_protein: 35 },
+    { id: 22, daily_meal_plan_id: 6, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 757, estimated_protein: 65 },
+    { id: 23, daily_meal_plan_id: 6, meal_type: 'Dinner',    title: 'Salmon With Rice And Broccoli',  estimated_calories: 710, estimated_protein: 55 },
+    { id: 24, daily_meal_plan_id: 6, meal_type: 'Snack',     title: 'Cottage Cheese With Oats',       estimated_calories: 331, estimated_protein: 28 }
 ];
 
 // ---------------------------------------------------------------------
 // Meal food items (ids 1-56)
 // ---------------------------------------------------------------------
 const mealFoodItems = [
-    { id: 1,  meal_id: 1,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 250 },
-    { id: 2,  meal_id: 1,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 60 },
+    { id: 1,  meal_id: 1,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 303.3 },
+    { id: 2,  meal_id: 1,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 72.8 },
 
-    { id: 3,  meal_id: 2,  food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 180 },
-    { id: 4,  meal_id: 2,  food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 250 },
+    { id: 3,  meal_id: 2,  food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 218.4 },
+    { id: 4,  meal_id: 2,  food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 303.3 },
 
-    { id: 5,  meal_id: 3,  food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 180 },
-    { id: 6,  meal_id: 3,  food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 250 },
+    { id: 5,  meal_id: 3,  food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 218.4 },
+    { id: 6,  meal_id: 3,  food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 303.3 },
 
-    { id: 7,  meal_id: 4,  food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 200 },
-    { id: 8,  meal_id: 4,  food_item_id: 5,  food_name: 'Egg',            quantity_grams: 50 },
+    { id: 7,  meal_id: 4,  food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 242.6 },
+    { id: 8,  meal_id: 4,  food_item_id: 5,  food_name: 'Egg',            quantity_grams: 60.7 },
 
-    { id: 9,  meal_id: 5,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 220 },
-    { id: 10, meal_id: 5,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 45 },
+    { id: 9,  meal_id: 5,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 263.2 },
+    { id: 10, meal_id: 5,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 53.8 },
 
-    { id: 11, meal_id: 6,  food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 150 },
-    { id: 12, meal_id: 6,  food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 220 },
-    { id: 13, meal_id: 6,  food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+    { id: 11, meal_id: 6,  food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 179.5 },
+    { id: 12, meal_id: 6,  food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 263.2 },
+    { id: 13, meal_id: 6,  food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 179.5 },
 
-    { id: 14, meal_id: 7,  food_item_id: 5,  food_name: 'Egg',            quantity_grams: 100 },
-    { id: 15, meal_id: 7,  food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 250 },
-    { id: 16, meal_id: 7,  food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+    { id: 14, meal_id: 7,  food_item_id: 5,  food_name: 'Egg',            quantity_grams: 119.7 },
+    { id: 15, meal_id: 7,  food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 299.1 },
+    { id: 16, meal_id: 7,  food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 179.5 },
 
-    { id: 17, meal_id: 8,  food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 200 },
+    { id: 17, meal_id: 8,  food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 239.3 },
 
-    { id: 18, meal_id: 9,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 80 },
-    { id: 19, meal_id: 9,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 150 },
+    { id: 18, meal_id: 9,  food_item_id: 6,  food_name: 'Oats',           quantity_grams: 89.2 },
+    { id: 19, meal_id: 9,  food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 167.3 },
 
-    { id: 20, meal_id: 10, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 200 },
-    { id: 21, meal_id: 10, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 150 },
-    { id: 22, meal_id: 10, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+    { id: 20, meal_id: 10, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 223.1 },
+    { id: 21, meal_id: 10, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 167.3 },
+    { id: 22, meal_id: 10, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 167.3 },
 
-    { id: 23, meal_id: 11, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 180 },
-    { id: 24, meal_id: 11, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 250 },
+    { id: 23, meal_id: 11, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 200.8 },
+    { id: 24, meal_id: 11, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 278.9 },
 
-    { id: 25, meal_id: 12, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 265 },
+    { id: 25, meal_id: 12, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 295.6 },
 
-    { id: 26, meal_id: 13, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 200 },
-    { id: 27, meal_id: 13, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150 },
+    { id: 26, meal_id: 13, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 327.8 },
+    { id: 27, meal_id: 13, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 245.8 },
 
-    { id: 28, meal_id: 14, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 180 },
-    { id: 29, meal_id: 14, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 200 },
-    { id: 30, meal_id: 14, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 100 },
+    { id: 28, meal_id: 14, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 295.0 },
+    { id: 29, meal_id: 14, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 327.8 },
+    { id: 30, meal_id: 14, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 163.9 },
 
-    { id: 31, meal_id: 15, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 150 },
-    { id: 32, meal_id: 15, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 200 },
+    { id: 31, meal_id: 15, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 245.8 },
+    { id: 32, meal_id: 15, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 327.8 },
 
-    { id: 33, meal_id: 16, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 200 },
-    { id: 34, meal_id: 16, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 30 },
+    { id: 33, meal_id: 16, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 327.8 },
+    { id: 34, meal_id: 16, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 49.2 },
 
-    { id: 35, meal_id: 17, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 80 },
-    { id: 36, meal_id: 17, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 100 },
-    { id: 37, meal_id: 17, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 80 },
+    { id: 35, meal_id: 17, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 86.0 },
+    { id: 36, meal_id: 17, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 107.5 },
+    { id: 37, meal_id: 17, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 86.0 },
 
-    { id: 38, meal_id: 18, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 200 },
-    { id: 39, meal_id: 18, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 250 },
-    { id: 40, meal_id: 18, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 80 },
+    { id: 38, meal_id: 18, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 215.1 },
+    { id: 39, meal_id: 18, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 268.9 },
+    { id: 40, meal_id: 18, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 86.0 },
 
-    { id: 41, meal_id: 19, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 200 },
-    { id: 42, meal_id: 19, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 300 },
-    { id: 43, meal_id: 19, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 200 },
+    { id: 41, meal_id: 19, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 215.1 },
+    { id: 42, meal_id: 19, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 322.6 },
+    { id: 43, meal_id: 19, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 215.1 },
 
-    { id: 44, meal_id: 20, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 200 },
-    { id: 45, meal_id: 20, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 20 },
+    { id: 44, meal_id: 20, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 215.1 },
+    { id: 45, meal_id: 20, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 21.5 },
 
-    { id: 46, meal_id: 21, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 100 },
-    { id: 47, meal_id: 21, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 250 },
-    { id: 48, meal_id: 21, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 100 },
+    { id: 46, meal_id: 21, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 94.6 },
+    { id: 47, meal_id: 21, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 236.6 },
+    { id: 48, meal_id: 21, food_item_id: 5,  food_name: 'Egg',            quantity_grams: 94.6 },
 
-    { id: 49, meal_id: 22, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 250 },
-    { id: 50, meal_id: 22, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 280 },
-    { id: 51, meal_id: 22, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 100 },
+    { id: 49, meal_id: 22, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 236.6 },
+    { id: 50, meal_id: 22, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 265.0 },
+    { id: 51, meal_id: 22, food_item_id: 7,  food_name: 'Avocado',        quantity_grams: 94.6 },
 
-    { id: 52, meal_id: 23, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 200 },
-    { id: 53, meal_id: 23, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 200 },
-    { id: 54, meal_id: 23, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 200 },
+    { id: 52, meal_id: 23, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 189.3 },
+    { id: 53, meal_id: 23, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 189.3 },
+    { id: 54, meal_id: 23, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 189.3 },
 
-    { id: 55, meal_id: 24, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 250 },
-    { id: 56, meal_id: 24, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 30 }
+    { id: 55, meal_id: 24, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 236.6 },
+    { id: 56, meal_id: 24, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 28.4 }
 ];
 
 // ---------------------------------------------------------------------
@@ -313,9 +313,9 @@ const mealFoodItems = [
 // reference the WorkoutPlan / DailyMealPlan templates (ids 1-6) above
 // ---------------------------------------------------------------------
 const profiles = [
-    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 72, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 2, assigned_meal_plan_id: 1 },
+    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 80, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 2, assigned_meal_plan_id: 1 },
     { id: 2, user_id: 2, age: 28, gender: 'male',   height_cm: 180, current_weight: 82, target_weight: 78, fitness_goal: 'weight_loss', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 4, onboarding_completed: true, caloric_target: 2622, assigned_workout_plan_id: 4, assigned_meal_plan_id: 3 },
-    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 58, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 1, assigned_meal_plan_id: 2 },
+    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 65, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 1, assigned_meal_plan_id: 2 },
     { id: 4, user_id: 4, age: 35, gender: 'male',   height_cm: 175, current_weight: 90, target_weight: 82, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 2008, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 },
     { id: 5, user_id: 5, age: 22, gender: 'female', height_cm: 170, current_weight: 58, target_weight: 58, fitness_goal: 'maintenance', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 5, onboarding_completed: true, caloric_target: 2366, assigned_workout_plan_id: 6, assigned_meal_plan_id: 5 },
     { id: 6, user_id: 6, age: 30, gender: 'male',   height_cm: 178, current_weight: 85, target_weight: 80, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 1999, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 }
@@ -331,6 +331,60 @@ const settings = [
     { id: 4, user_id: 4, display_name: 'Roi Bublil',     email: 'roi@fitwize.com',   theme: 'light', fitness_goal: 'weight loss', activity_level: 2 },
     { id: 5, user_id: 5, display_name: 'Maya Ben-David', email: 'maya@fitwize.com',  theme: 'light', fitness_goal: 'maintenance', activity_level: 5 },
     { id: 6, user_id: 6, display_name: 'Eitan Katz',     email: 'eitan@fitwize.com', theme: 'dark',  fitness_goal: 'fat loss',    activity_level: 1 }
+];
+
+// ---------------------------------------------------------------------
+// Check-ins (ids 1-36) — 6 weekly check-ins per user, dates going back
+// 6 weeks. Weights reflect each user's fitness goal trend.
+// ---------------------------------------------------------------------
+const checkIns = [
+    // User 1 — John, muscle_gain — ✅ ON TRACK: steady weight gain
+    { id: 1,  user_id: 1, weight: 75.0, workouts_completed: 4, feedback: 'Feeling strong, starting the program',     check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 2,  user_id: 1, weight: 75.4, workouts_completed: 4, feedback: 'Good week, energy levels up',              check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 3,  user_id: 1, weight: 75.8, workouts_completed: 3, feedback: 'Slightly tired but pushing through',       check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 4,  user_id: 1, weight: 76.2, workouts_completed: 4, feedback: 'Strength increasing noticeably',           check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 5,  user_id: 1, weight: 76.5, workouts_completed: 4, feedback: 'Great progress this month',                check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 6,  user_id: 1, weight: 76.9, workouts_completed: 4, feedback: 'Feeling bigger and stronger',              check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 2 — Noam, weight_loss — ❌ NEEDS ADJUSTMENT: plateau then gaining
+    { id: 7,  user_id: 2, weight: 82.0, workouts_completed: 5, feedback: 'Starting strong',                          check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 8,  user_id: 2, weight: 81.8, workouts_completed: 5, feedback: 'Slight drop, good',                        check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 9,  user_id: 2, weight: 81.9, workouts_completed: 4, feedback: 'Weight not moving much',                   check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 10, user_id: 2, weight: 82.1, workouts_completed: 3, feedback: 'Missed some workouts, ate more',           check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 11, user_id: 2, weight: 82.4, workouts_completed: 4, feedback: 'Frustrated, weight going up',              check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 12, user_id: 2, weight: 82.7, workouts_completed: 4, feedback: 'Not sure what is happening',               check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 3 — Dana, muscle_gain — ✅ ON TRACK: slow steady gain
+    { id: 13, user_id: 3, weight: 60.0, workouts_completed: 3, feedback: 'Starting fresh',                           check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 14, user_id: 3, weight: 60.2, workouts_completed: 3, feedback: 'Eating more protein',                      check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 15, user_id: 3, weight: 60.4, workouts_completed: 3, feedback: 'Strength improving',                       check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 16, user_id: 3, weight: 60.6, workouts_completed: 3, feedback: 'Consistent progress',                      check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 17, user_id: 3, weight: 60.9, workouts_completed: 3, feedback: 'Feeling stronger each week',               check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 18, user_id: 3, weight: 61.1, workouts_completed: 3, feedback: 'Happy with the progress',                  check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 4 — Roi, weight_loss — ✅ ON TRACK: consistent steady loss
+    { id: 19, user_id: 4, weight: 90.0, workouts_completed: 3, feedback: 'Starting the journey',                     check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 20, user_id: 4, weight: 89.1, workouts_completed: 3, feedback: 'Diet on track, feeling good',              check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 21, user_id: 4, weight: 88.3, workouts_completed: 3, feedback: 'Consistent, getting easier',               check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 22, user_id: 4, weight: 87.4, workouts_completed: 3, feedback: 'Clothes fitting better',                   check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 23, user_id: 4, weight: 86.6, workouts_completed: 3, feedback: 'Very motivated',                           check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 24, user_id: 4, weight: 85.8, workouts_completed: 3, feedback: 'Steady and sustainable',                   check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 5 — Maya, maintenance — ✅ ON TRACK: stable weight
+    { id: 25, user_id: 5, weight: 58.0, workouts_completed: 5, feedback: 'All good',                                 check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 26, user_id: 5, weight: 58.1, workouts_completed: 5, feedback: 'Stable as expected',                       check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 27, user_id: 5, weight: 57.9, workouts_completed: 5, feedback: 'Normal fluctuation',                       check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 28, user_id: 5, weight: 58.0, workouts_completed: 4, feedback: 'Perfectly on track',                       check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 29, user_id: 5, weight: 58.2, workouts_completed: 5, feedback: 'Feeling great',                            check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 30, user_id: 5, weight: 58.0, workouts_completed: 5, feedback: 'Maintaining perfectly',                    check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 6 — Eitan, weight_loss — ❌ NEEDS ADJUSTMENT: consistently gaining
+    { id: 31, user_id: 6, weight: 85.0, workouts_completed: 2, feedback: 'Starting out',                             check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 32, user_id: 6, weight: 85.4, workouts_completed: 2, feedback: 'Hard to stick to the diet',               check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 33, user_id: 6, weight: 85.9, workouts_completed: 1, feedback: 'Busy week, ate out a lot',                check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 34, user_id: 6, weight: 86.3, workouts_completed: 2, feedback: 'Weight keeps going up',                   check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 35, user_id: 6, weight: 86.7, workouts_completed: 2, feedback: 'Discouraged',                             check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 36, user_id: 6, weight: 87.1, workouts_completed: 1, feedback: 'Need help, nothing is working',           check_in_date: new Date('2026-06-09T08:00:00') },
 ];
 
 async function main() {
@@ -388,6 +442,9 @@ async function main() {
 
     await prisma.setting.createMany({ data: settings });
     console.log(`Seeded ${settings.length} settings`);
+
+    await prisma.checkIn.createMany({ data: checkIns });
+    console.log(`Seeded ${checkIns.length} check-ins`);
 
     console.log('Seeding complete.');
 }

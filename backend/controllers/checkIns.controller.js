@@ -1,5 +1,6 @@
 const CheckInsModel = require('../models/checkIns.model');
 const ProfilesModel = require('../models/profiles.model');
+const { analyzeProgress } = require('../services/aiAnalysisService');
 
 const {
     sendSuccess,
@@ -86,7 +87,10 @@ const createCheckIn = async (req, res) => {
         const newCheckIn = await CheckInsModel.create({ userId: requestUserId, weight, workoutsCompleted, feedback, checkInDate });
         // Keep profile.currentWeight in sync so the dashboard reflects the latest weight
         await ProfilesModel.update(requestUserId, { currentWeight: weight });
-        return sendSuccess(res, 201, newCheckIn);
+        sendSuccess(res, 201, newCheckIn);
+        analyzeProgress(requestUserId).catch(err =>
+            console.error('AI analysis failed after check-in:', err.message)
+        );
     } catch (err) {
         return sendServerError(res);
     }
