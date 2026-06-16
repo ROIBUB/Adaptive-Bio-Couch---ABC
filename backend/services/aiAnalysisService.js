@@ -2,17 +2,15 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const AiRecommendationsModel  = require('../models/aiRecommendations.model');
 const ProfilesModel           = require('../models/profiles.model');
 const CheckInsModel           = require('../models/checkIns.model');
-const ProgressDataModel       = require('../models/progressData.model');
 const WorkoutLogsModel        = require('../models/workoutLogs.model');
 const WorkoutPlansModel       = require('../models/workoutPlans.model');
 const DailyMealPlansModel     = require('../models/dailyMealPlans.model');
 
 const analyzeProgress = async (userId) => {
     // ── STEP 1 ── collect data in parallel ──────────────────────────────────
-    const [profile, checkIns, progressData, workoutLogs, activePlans, activeMealPlans] = await Promise.all([
+    const [profile, checkIns, workoutLogs, activePlans, activeMealPlans] = await Promise.all([
         ProfilesModel.getByUserId(userId),
         CheckInsModel.getByUserId(userId),
-        ProgressDataModel.getByUserId(userId),
         WorkoutLogsModel.getByUserId(userId),
         WorkoutPlansModel.getByUserId(userId),
         DailyMealPlansModel.getByUserId(userId)
@@ -31,19 +29,6 @@ const analyzeProgress = async (userId) => {
         const sorted = [...checkIns].sort((a, b) => new Date(a.checkInDate) - new Date(b.checkInDate));
         const recent = sorted.slice(-6);
         weightSummary = recent.map(ci => `${ci.checkInDate}: ${ci.weight} kg`).join('\n');
-    }
-
-    // Nutrition — last 7 progress records ascending by date
-    let nutritionSummary;
-    if (!progressData || progressData.length === 0) {
-        nutritionSummary = 'No nutrition history available yet.';
-    } else {
-        const sorted = [...progressData].sort((a, b) => new Date(a.date) - new Date(b.date));
-        const recent = sorted.slice(-7);
-        const target = profile ? profile.caloricTarget : null;
-        nutritionSummary = recent
-            .map(p => `${p.date}: ${p.caloriesConsumed} kcal consumed (target: ${target ?? 'unknown'} kcal)`)
-            .join('\n');
     }
 
     // Workout performance — logs from the last 21 days only
@@ -96,8 +81,8 @@ USER PROFILE:
 WEIGHT TREND (last 6 check-ins):
 ${weightSummary}
 
-NUTRITION (last 7 days):
-${nutritionSummary}
+NUTRITION:
+No direct nutrition data is tracked. Reason about caloric adherence indirectly using the weight trend and the user's caloric target of ${profile?.caloricTarget ?? 'unknown'} kcal.
 
 WORKOUT PERFORMANCE (last 21 days):
 ${workoutSummary}
@@ -156,7 +141,7 @@ EXPECTED JSON SHAPE — return exactly this structure:
     // ── STEP 4 ── call Gemini ────────────────────────────────────────────────
     if (!process.env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY is not set');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const result = await model.generateContent(prompt);
     const raw = result.response.text();
 
