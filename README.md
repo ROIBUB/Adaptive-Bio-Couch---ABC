@@ -60,7 +60,7 @@ FitWise is a two-tier web app:
 ```bash
 # From the project root
 npm install
-npm start          # or: node server.js
+npm start          # or: npm run dev
 ```
 
 The server starts on **http://localhost:3000**.  

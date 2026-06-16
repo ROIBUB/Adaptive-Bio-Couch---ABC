@@ -182,6 +182,7 @@ const replanProfile = async (req, res) => {
 
         return sendSuccess(res, 200, finalProfile);
     } catch (err) {
+        console.error('Replan error:', err.message, err.stack);
         return sendServerError(res);
     }
 };

@@ -5,7 +5,7 @@ const ExercisesModel      = require('../models/exercises.model');
 const FoodItemsModel      = require('../models/foodItems.model');
 
 const generatePlan = async (profile) => {
-    const { userId, firstName, age, gender, height, currentWeight, fitnessGoal, activityLevel, workoutsPerWeek } = profile;
+    const { userId, firstName, age, gender, height, currentWeight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay } = profile;
 
     // ── BMR (Mifflin-St Jeor) ──
     const bmrMale   = 10 * currentWeight + 6.25 * height - 5 * age + 5;
@@ -46,6 +46,7 @@ USER:
 - Fitness goal: ${fitnessGoal}
 - Activity level: ${activityLevel}
 - Workouts per week: ${workoutsPerWeek}
+- Meals per day: ${mealsPerDay}
 - Daily caloric target: ${caloricTarget} kcal
 - Age: ${age}
 - Gender: ${gender}
@@ -60,11 +61,12 @@ ${foodRows}
 STRICT REQUIREMENTS:
 1. Respond with ONLY raw JSON. No markdown, no code fences, no backticks, no extra text.
 2. workoutPlan.days must have EXACTLY ${workoutsPerWeek} entries.
-3. Each "day" value must be one of: Sunday Monday Tuesday Wednesday Thursday Friday Saturday — no duplicates. Distribute evenly across the week (e.g. Monday/Wednesday/Friday for 3 days).
-4. Each "mealType" value must be one of: Breakfast Lunch Dinner Snack.
-5. Only use exerciseId and foodItemId values from the lists above — no others.
-6. Each day must have 3–5 exercises. Each meal must have 2–4 food items.
-7. targetWeight values must be realistic for the user's activity level (${activityLevel}) and gender (${gender}).
+3. mealPlan.meals must have EXACTLY ${mealsPerDay} entries.
+4. Each "day" value must be one of: Sunday Monday Tuesday Wednesday Thursday Friday Saturday — no duplicates. Distribute evenly across the week (e.g. Monday/Wednesday/Friday for 3 days).
+5. Each "mealType" value must be one of: Breakfast Lunch Dinner Snack.
+6. Only use exerciseId and foodItemId values from the lists above — no others.
+7. Each day must have 3–5 exercises. Each meal must have 2–4 food items.
+8. targetWeight values must be realistic for the user's activity level (${activityLevel}) and gender (${gender}).
 
 Return exactly this JSON shape and nothing else:
 {
@@ -129,10 +131,6 @@ Return exactly this JSON shape and nothing else:
             }
         }
     }
-
-    // ── Deactivate existing plans before creating new ones ──
-    await WorkoutPlansModel.deactivateByUserId(userId);
-    await DailyMealPlansModel.deactivateByUserId(userId);
 
     // ── Write workout plan to DB ──
     const newPlan = await WorkoutPlansModel.create({
