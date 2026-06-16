@@ -313,9 +313,9 @@ const mealFoodItems = [
 // reference the WorkoutPlan / DailyMealPlan templates (ids 1-6) above
 // ---------------------------------------------------------------------
 const profiles = [
-    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 72, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 2, assigned_meal_plan_id: 1 },
+    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 80, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 2, assigned_meal_plan_id: 1 },
     { id: 2, user_id: 2, age: 28, gender: 'male',   height_cm: 180, current_weight: 82, target_weight: 78, fitness_goal: 'weight_loss', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 4, onboarding_completed: true, caloric_target: 2622, assigned_workout_plan_id: 4, assigned_meal_plan_id: 3 },
-    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 58, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 1, assigned_meal_plan_id: 2 },
+    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 65, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 1, assigned_meal_plan_id: 2 },
     { id: 4, user_id: 4, age: 35, gender: 'male',   height_cm: 175, current_weight: 90, target_weight: 82, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 2008, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 },
     { id: 5, user_id: 5, age: 22, gender: 'female', height_cm: 170, current_weight: 58, target_weight: 58, fitness_goal: 'maintenance', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 5, onboarding_completed: true, caloric_target: 2366, assigned_workout_plan_id: 6, assigned_meal_plan_id: 5 },
     { id: 6, user_id: 6, age: 30, gender: 'male',   height_cm: 178, current_weight: 85, target_weight: 80, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 1999, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 }
@@ -331,6 +331,60 @@ const settings = [
     { id: 4, user_id: 4, display_name: 'Roi Bublil',     email: 'roi@fitwize.com',   theme: 'light', fitness_goal: 'weight loss', activity_level: 2 },
     { id: 5, user_id: 5, display_name: 'Maya Ben-David', email: 'maya@fitwize.com',  theme: 'light', fitness_goal: 'maintenance', activity_level: 5 },
     { id: 6, user_id: 6, display_name: 'Eitan Katz',     email: 'eitan@fitwize.com', theme: 'dark',  fitness_goal: 'fat loss',    activity_level: 1 }
+];
+
+// ---------------------------------------------------------------------
+// Check-ins (ids 1-36) — 6 weekly check-ins per user, dates going back
+// 6 weeks. Weights reflect each user's fitness goal trend.
+// ---------------------------------------------------------------------
+const checkIns = [
+    // User 1 — John, muscle_gain — ✅ ON TRACK: steady weight gain
+    { id: 1,  user_id: 1, weight: 75.0, workouts_completed: 4, feedback: 'Feeling strong, starting the program',     check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 2,  user_id: 1, weight: 75.4, workouts_completed: 4, feedback: 'Good week, energy levels up',              check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 3,  user_id: 1, weight: 75.8, workouts_completed: 3, feedback: 'Slightly tired but pushing through',       check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 4,  user_id: 1, weight: 76.2, workouts_completed: 4, feedback: 'Strength increasing noticeably',           check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 5,  user_id: 1, weight: 76.5, workouts_completed: 4, feedback: 'Great progress this month',                check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 6,  user_id: 1, weight: 76.9, workouts_completed: 4, feedback: 'Feeling bigger and stronger',              check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 2 — Noam, weight_loss — ❌ NEEDS ADJUSTMENT: plateau then gaining
+    { id: 7,  user_id: 2, weight: 82.0, workouts_completed: 5, feedback: 'Starting strong',                          check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 8,  user_id: 2, weight: 81.8, workouts_completed: 5, feedback: 'Slight drop, good',                        check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 9,  user_id: 2, weight: 81.9, workouts_completed: 4, feedback: 'Weight not moving much',                   check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 10, user_id: 2, weight: 82.1, workouts_completed: 3, feedback: 'Missed some workouts, ate more',           check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 11, user_id: 2, weight: 82.4, workouts_completed: 4, feedback: 'Frustrated, weight going up',              check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 12, user_id: 2, weight: 82.7, workouts_completed: 4, feedback: 'Not sure what is happening',               check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 3 — Dana, muscle_gain — ✅ ON TRACK: slow steady gain
+    { id: 13, user_id: 3, weight: 60.0, workouts_completed: 3, feedback: 'Starting fresh',                           check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 14, user_id: 3, weight: 60.2, workouts_completed: 3, feedback: 'Eating more protein',                      check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 15, user_id: 3, weight: 60.4, workouts_completed: 3, feedback: 'Strength improving',                       check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 16, user_id: 3, weight: 60.6, workouts_completed: 3, feedback: 'Consistent progress',                      check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 17, user_id: 3, weight: 60.9, workouts_completed: 3, feedback: 'Feeling stronger each week',               check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 18, user_id: 3, weight: 61.1, workouts_completed: 3, feedback: 'Happy with the progress',                  check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 4 — Roi, weight_loss — ✅ ON TRACK: consistent steady loss
+    { id: 19, user_id: 4, weight: 90.0, workouts_completed: 3, feedback: 'Starting the journey',                     check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 20, user_id: 4, weight: 89.1, workouts_completed: 3, feedback: 'Diet on track, feeling good',              check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 21, user_id: 4, weight: 88.3, workouts_completed: 3, feedback: 'Consistent, getting easier',               check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 22, user_id: 4, weight: 87.4, workouts_completed: 3, feedback: 'Clothes fitting better',                   check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 23, user_id: 4, weight: 86.6, workouts_completed: 3, feedback: 'Very motivated',                           check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 24, user_id: 4, weight: 85.8, workouts_completed: 3, feedback: 'Steady and sustainable',                   check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 5 — Maya, maintenance — ✅ ON TRACK: stable weight
+    { id: 25, user_id: 5, weight: 58.0, workouts_completed: 5, feedback: 'All good',                                 check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 26, user_id: 5, weight: 58.1, workouts_completed: 5, feedback: 'Stable as expected',                       check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 27, user_id: 5, weight: 57.9, workouts_completed: 5, feedback: 'Normal fluctuation',                       check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 28, user_id: 5, weight: 58.0, workouts_completed: 4, feedback: 'Perfectly on track',                       check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 29, user_id: 5, weight: 58.2, workouts_completed: 5, feedback: 'Feeling great',                            check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 30, user_id: 5, weight: 58.0, workouts_completed: 5, feedback: 'Maintaining perfectly',                    check_in_date: new Date('2026-06-09T08:00:00') },
+
+    // User 6 — Eitan, weight_loss — ❌ NEEDS ADJUSTMENT: consistently gaining
+    { id: 31, user_id: 6, weight: 85.0, workouts_completed: 2, feedback: 'Starting out',                             check_in_date: new Date('2026-05-05T08:00:00') },
+    { id: 32, user_id: 6, weight: 85.4, workouts_completed: 2, feedback: 'Hard to stick to the diet',               check_in_date: new Date('2026-05-12T08:00:00') },
+    { id: 33, user_id: 6, weight: 85.9, workouts_completed: 1, feedback: 'Busy week, ate out a lot',                check_in_date: new Date('2026-05-19T08:00:00') },
+    { id: 34, user_id: 6, weight: 86.3, workouts_completed: 2, feedback: 'Weight keeps going up',                   check_in_date: new Date('2026-05-26T08:00:00') },
+    { id: 35, user_id: 6, weight: 86.7, workouts_completed: 2, feedback: 'Discouraged',                             check_in_date: new Date('2026-06-02T08:00:00') },
+    { id: 36, user_id: 6, weight: 87.1, workouts_completed: 1, feedback: 'Need help, nothing is working',           check_in_date: new Date('2026-06-09T08:00:00') },
 ];
 
 async function main() {
@@ -388,6 +442,9 @@ async function main() {
 
     await prisma.setting.createMany({ data: settings });
     console.log(`Seeded ${settings.length} settings`);
+
+    await prisma.checkIn.createMany({ data: checkIns });
+    console.log(`Seeded ${checkIns.length} check-ins`);
 
     console.log('Seeding complete.');
 }
