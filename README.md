@@ -1,5 +1,8 @@
 # FitWise — Adaptive Bio-Coach
 
+// todo- npm detenv, npx prisma generate, npm install prisma --save-dev
+npm install @prisma/client @prisma/adapter-mariadb mariadb
+
 A full-stack fitness and nutrition coaching web application. Users log in, receive AI-generated workout and meal plans tailored to their goals, log workouts, track meals, submit weekly check-ins, and monitor progress over time. Admins can manage users, exercises, and food items.
 
 ---
