@@ -2,10 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import socket from '../services/socket';
 import './AIChatWidget.css';
 
-// TODO: replace with real userId from auth context
-const USER_ID = 1;
-
 function AIChatWidget() {
+  const { userId: USER_ID } = JSON.parse(localStorage.getItem('user') || '{}');
   const [isOpen, setIsOpen]     = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput]       = useState('');

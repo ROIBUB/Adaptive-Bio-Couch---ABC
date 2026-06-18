@@ -9,12 +9,7 @@ const { isAdminRole } = require('../middleware/roleUtils');
 // GET /api/daily-meal-plans
 const getAllDailyMealPlans = async (req, res) => {
     try {
-        const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
-
-        if (isAdminRole(userRole)) {
-            return sendSuccess(res, 200, await DailyMealPlansModel.getAll());
-        }
 
         if (!validateId(requestUserId)) {
             return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });

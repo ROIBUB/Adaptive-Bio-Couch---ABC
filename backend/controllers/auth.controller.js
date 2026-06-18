@@ -72,8 +72,7 @@ const register = async (req, res) => {
             firstName, lastName, email, password,
             age, gender, height, weight,
             fitnessGoal, activityLevel,
-            userRole: 'user',
-            preferences: null
+            userRole: 'user'
         });
 
         const newProfile = await ProfilesModel.create({
@@ -87,11 +86,9 @@ const register = async (req, res) => {
         });
 
         await SettingsModel.create({
-            userId:        newUser.userid,
-            displayName:   `${firstName} ${lastName}`,
-            email,
-            fitnessGoal,
-            activityLevel
+            userId:      newUser.userid,
+            displayName: `${firstName} ${lastName}`,
+            email
         });
 
         const plan = await generatePlan({...newProfile, userId: newUser.userid, firstName: newUser.firstName });

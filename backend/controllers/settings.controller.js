@@ -20,8 +20,7 @@ const getSettings = async (req, res) => {
 
         if (!settings) {
             return sendSuccess(res, 200, {
-                displayName: '', email: '', theme: 'light',
-                fitnessGoal: '', activityLevel: ''
+                displayName: '', email: '', theme: 'light'
             });
         }
 
@@ -44,7 +43,7 @@ const updateSettings = async (req, res) => {
             return sendNotFound(res, 'Settings not found for this user', {});
         }
 
-        const { displayName, email, theme, fitnessGoal, activityLevel } = req.body;
+        const { displayName, email, theme } = req.body;
 
         if (!displayName || !email || !theme) {
             return sendValidationError(res, 'displayName, email, and theme are required', {
@@ -53,9 +52,6 @@ const updateSettings = async (req, res) => {
         }
 
         const updates = { displayName, email, theme };
-        if (fitnessGoal !== undefined) updates.fitnessGoal = fitnessGoal;
-        if (activityLevel !== undefined) updates.activityLevel = activityLevel;
-
         const updated = await SettingsModel.update(userId, updates);
         return sendSuccess(res, 200, updated);
     } catch (err) {

@@ -18,6 +18,7 @@ const settingsRoutes = require("./routes/settings.routes");
 const profilesRoutes = require("./routes/profiles.routes");
 const progressDataRoutes = require("./routes/progressData.routes");
 const aiRoutes = require("./routes/ai.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 const { initChatSocket } = require('./sockets/chat.socket');
 const app = express();
@@ -74,6 +75,8 @@ app.use("/api/profiles", profilesRoutes);
 app.use("/api/progress", progressDataRoutes);
 // every request to /api/ai is sent to ai.routes.js
 app.use("/api/ai", aiRoutes);
+// every request to /api/admin is sent to admin.routes.js (admin/manager only)
+app.use("/api/admin", adminRoutes);
 
 initChatSocket(io);
 

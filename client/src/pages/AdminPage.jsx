@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   getAllUsers, deleteUser, updateUser,
-  getAllWorkoutPlans, deleteWorkoutPlan,
-  getAllMealPlans, deleteMealPlan, createUserFull
+  getAllWorkoutPlans, getWorkoutPlanById, deleteWorkoutPlan,
+  getAllMealPlans, getMealPlanById, deleteMealPlan,
+  getUsersWithStats, getUserCheckIns,
+  createUserFull,
 } from '../services/adminService';
 import './AdminPage.css';
 
@@ -11,43 +13,51 @@ const TABS = [
   { key: 'users',    label: 'Users' },
   { key: 'workouts', label: 'Workout Plans' },
   { key: 'meals',    label: 'Meal Plans' },
+  { key: 'checkins', label: 'Check-Ins' },
 ];
 
-// DataTable is purely presentational (it stringifies every cell), so it can't
-// host the per-row Edit/Delete buttons or the inline edit form this page needs.
-// Following the codebase's own convention (e.g. WorkoutLogsPage), the interactive
-// tables are rendered here while reusing DataTable's .table-wrapper / .data-table
-// styles so they look identical.
+const DAY_ORDER  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MEAL_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 function AdminPage() {
-  const user     = JSON.parse(localStorage.getItem('user') || '{}');
-  const userRole = user?.userRole;
+  const user      = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole  = user?.userRole;
   const canAccess = userRole === 'admin' || userRole === 'manager';
-  const isAdmin   = userRole === 'admin'; // only admins may delete
+  const isAdmin   = userRole === 'admin';
 
+  // ── Tab data ──────────────────────────────────────────────────────────────
   const [activeTab,    setActiveTab]    = useState('users');
   const [users,        setUsers]        = useState([]);
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [mealPlans,    setMealPlans]    = useState([]);
+  const [checkInUsers, setCheckInUsers] = useState([]);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
 
-  // Inline user edit
+  // ── User inline edit ──────────────────────────────────────────────────────
   const [editingUserId, setEditingUserId] = useState(null);
   const [editForm,      setEditForm]      = useState({ firstName: '', lastName: '', userRole: '' });
   const [savingEdit,    setSavingEdit]    = useState(false);
 
-  // Add-user form
-  const [showAddUser,   setShowAddUser]   = useState(false);
-  const [addUserForm,   setAddUserForm]   = useState({
+  // ── Add-user form ─────────────────────────────────────────────────────────
+  const [showAddUser,    setShowAddUser]    = useState(false);
+  const [addUserForm,    setAddUserForm]    = useState({
     firstName: '', lastName: '', email: '', password: '',
     age: '', gender: '', height: '', weight: '',
-    fitnessGoal: '', activityLevel: '', workoutsPerWeek: '', mealsPerDay: ''
+    fitnessGoal: '', activityLevel: '', workoutsPerWeek: '', mealsPerDay: '',
   });
-  const [addUserErrors,  setAddUserErrors]  = useState({});
+  const [addUserErrors,   setAddUserErrors]   = useState({});
   const [addUserApiError, setAddUserApiError] = useState('');
-  const [addUserSaving,  setAddUserSaving]  = useState(false);
+  const [addUserSaving,   setAddUserSaving]   = useState(false);
 
+  // ── Detail modals ─────────────────────────────────────────────────────────
+  // null = closed; { loading, plan, error } = open
+  const [planModal,     setPlanModal]     = useState(null);
+  const [mealModal,     setMealModal]     = useState(null);
+  // null = closed; { loading, user, checkIns, error } = open
+  const [checkInsModal, setCheckInsModal] = useState(null);
+
+  // ── Data fetching ─────────────────────────────────────────────────────────
   const fetchActiveTab = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -56,8 +66,10 @@ function AdminPage() {
         setUsers((await getAllUsers()) || []);
       } else if (activeTab === 'workouts') {
         setWorkoutPlans((await getAllWorkoutPlans()) || []);
-      } else {
+      } else if (activeTab === 'meals') {
         setMealPlans((await getAllMealPlans()) || []);
+      } else if (activeTab === 'checkins') {
+        setCheckInUsers((await getUsersWithStats()) || []);
       }
     } catch (err) {
       setError(err.message || 'Failed to load data. Make sure the backend is running on port 3000.');
@@ -67,15 +79,12 @@ function AdminPage() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (!canAccess) return; // unauthorized — redirect handled in render
+    if (!canAccess) return;
     setEditingUserId(null);
     fetchActiveTab();
   }, [fetchActiveTab, canAccess]);
 
-  // Block non-admin/manager users immediately
-  if (!canAccess) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  if (!canAccess) return <Navigate to="/dashboard" replace />;
 
   const switchTab = (key) => {
     if (key === activeTab) return;
@@ -97,26 +106,17 @@ function AdminPage() {
 
   const startEdit = (u) => {
     setEditingUserId(u.userid);
-    setEditForm({
-      firstName: u.firstName || '',
-      lastName:  u.lastName  || '',
-      userRole:  u.userRole  || 'user',
-    });
+    setEditForm({ firstName: u.firstName || '', lastName: u.lastName || '', userRole: u.userRole || 'user' });
   };
-
   const cancelEdit = () => setEditingUserId(null);
-
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditForm(prev => ({ ...prev, [name]: value }));
   };
-
   const saveEdit = async (original) => {
     setSavingEdit(true);
     setError('');
     try {
-      // The backend PUT validates the full user record, so merge the edited
-      // fields onto the original (non-destructive) instead of sending only three.
       await updateUser(original.userid, {
         ...original,
         firstName: editForm.firstName,
@@ -132,6 +132,7 @@ function AdminPage() {
     }
   };
 
+  // ── Add user ───────────────────────────────────────────────────────────────
   const validateAddUser = () => {
     const f = addUserForm;
     const errs = {};
@@ -151,8 +152,8 @@ function AdminPage() {
     const weight = Number(f.weight);
     if (!f.weight || isNaN(weight) || weight < 30 || weight > 300)
       errs.weight = 'Weight must be between 30 and 300 kg';
-    if (!f.fitnessGoal)    errs.fitnessGoal    = 'Fitness goal is required';
-    if (!f.activityLevel)  errs.activityLevel  = 'Activity level is required';
+    if (!f.fitnessGoal)   errs.fitnessGoal   = 'Fitness goal is required';
+    if (!f.activityLevel) errs.activityLevel = 'Activity level is required';
     const wpw = Number(f.workoutsPerWeek);
     if (!f.workoutsPerWeek || !Number.isInteger(wpw) || wpw < 1 || wpw > 7)
       errs.workoutsPerWeek = 'Must be a whole number between 1 and 7';
@@ -167,7 +168,6 @@ function AdminPage() {
     setAddUserErrors(errs);
     setAddUserApiError('');
     if (Object.keys(errs).length > 0) return;
-
     setAddUserSaving(true);
     try {
       await createUserFull({
@@ -178,11 +178,10 @@ function AdminPage() {
         workoutsPerWeek: Number(addUserForm.workoutsPerWeek),
         mealsPerDay:     Number(addUserForm.mealsPerDay),
       });
-      // reset and close form, then refresh list
       setAddUserForm({
         firstName: '', lastName: '', email: '', password: '',
         age: '', gender: '', height: '', weight: '',
-        fitnessGoal: '', activityLevel: '', workoutsPerWeek: '', mealsPerDay: ''
+        fitnessGoal: '', activityLevel: '', workoutsPerWeek: '', mealsPerDay: '',
       });
       setAddUserErrors({});
       setShowAddUser(false);
@@ -222,7 +221,38 @@ function AdminPage() {
     }
   };
 
-  // ── Renderers ───────────────────────────────────────────────────────────────
+  // ── Detail modal handlers ──────────────────────────────────────────────────
+  const handleViewWorkoutPlan = async (planId) => {
+    setPlanModal({ loading: true, plan: null, error: '' });
+    try {
+      const plan = await getWorkoutPlanById(planId);
+      setPlanModal({ loading: false, plan, error: '' });
+    } catch (err) {
+      setPlanModal({ loading: false, plan: null, error: err.message || 'Failed to load plan details.' });
+    }
+  };
+
+  const handleViewMealPlan = async (planId) => {
+    setMealModal({ loading: true, plan: null, error: '' });
+    try {
+      const plan = await getMealPlanById(planId);
+      setMealModal({ loading: false, plan, error: '' });
+    } catch (err) {
+      setMealModal({ loading: false, plan: null, error: err.message || 'Failed to load meal plan details.' });
+    }
+  };
+
+  const handleViewUserCheckIns = async (u) => {
+    setCheckInsModal({ loading: true, user: u, checkIns: [], error: '' });
+    try {
+      const checkIns = await getUserCheckIns(u.userId);
+      setCheckInsModal({ loading: false, user: u, checkIns: checkIns || [], error: '' });
+    } catch (err) {
+      setCheckInsModal({ loading: false, user: u, checkIns: [], error: err.message || 'Failed to load check-ins.' });
+    }
+  };
+
+  // ── Tab renderers ──────────────────────────────────────────────────────────
   const renderUsers = () => (
     <>
       {!showAddUser && (
@@ -238,7 +268,6 @@ function AdminPage() {
       {showAddUser && (
         <div className="add-user-form">
           <h3 className="add-user-title">New User</h3>
-
           <div className="add-user-grid">
             <div className="form-group">
               <label>First Name</label>
@@ -336,9 +365,7 @@ function AdminPage() {
               {addUserErrors.mealsPerDay && <span className="error-msg">{addUserErrors.mealsPerDay}</span>}
             </div>
           </div>
-
           {addUserApiError && <div className="api-error">{addUserApiError}</div>}
-
           <div className="add-user-actions">
             <button className="action-btn save" disabled={addUserSaving} onClick={handleAddUserSubmit}>
               {addUserSaving ? 'Creating…' : 'Create User'}
@@ -352,67 +379,61 @@ function AdminPage() {
       )}
 
       <div className="table-wrapper">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Role</th>
-            <th>Created</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(u => (
-            <React.Fragment key={u.userid}>
-              <tr>
-                <td>{u.userid}</td>
-                <td>{u.firstName}</td>
-                <td>{u.lastName}</td>
-                <td>{u.userRole}</td>
-                <td>{u.createDate ? String(u.createDate).split('T')[0] : '—'}</td>
-                <td>
-                  <button className="action-btn edit" onClick={() => startEdit(u)}>Edit</button>
-                  {isAdmin && (
-                    <button className="action-btn delete" onClick={() => handleDeleteUser(u)}>Delete</button>
-                  )}
-                </td>
-              </tr>
-              {editingUserId === u.userid && (
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(u => (
+              <React.Fragment key={u.userid}>
                 <tr>
-                  <td colSpan={6}>
-                    <div className="inline-edit-form">
-                      <input
-                        name="firstName" value={editForm.firstName}
-                        onChange={handleEditChange} placeholder="First name" aria-label="First name"
-                      />
-                      <input
-                        name="lastName" value={editForm.lastName}
-                        onChange={handleEditChange} placeholder="Last name" aria-label="Last name"
-                      />
-                      <select
-                        name="userRole" value={editForm.userRole}
-                        onChange={handleEditChange} aria-label="Role"
-                      >
-                        <option value="user">user</option>
-                        <option value="admin">admin</option>
-                        <option value="manager">manager</option>
-                      </select>
-                      <button className="action-btn save" disabled={savingEdit} onClick={() => saveEdit(u)}>
-                        {savingEdit ? 'Saving…' : 'Save'}
-                      </button>
-                      <button className="action-btn cancel" disabled={savingEdit} onClick={cancelEdit}>
-                        Cancel
-                      </button>
-                    </div>
+                  <td>{u.userid}</td>
+                  <td>{u.firstName}</td>
+                  <td>{u.lastName}</td>
+                  <td>{u.userRole}</td>
+                  <td>{u.createDate ? String(u.createDate).split('T')[0] : '—'}</td>
+                  <td>
+                    <button className="action-btn edit" onClick={() => startEdit(u)}>Edit</button>
+                    {isAdmin && (
+                      <button className="action-btn delete" onClick={() => handleDeleteUser(u)}>Delete</button>
+                    )}
                   </td>
                 </tr>
-              )}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                {editingUserId === u.userid && (
+                  <tr>
+                    <td colSpan={6}>
+                      <div className="inline-edit-form">
+                        <input name="firstName" value={editForm.firstName}
+                          onChange={handleEditChange} placeholder="First name" aria-label="First name" />
+                        <input name="lastName" value={editForm.lastName}
+                          onChange={handleEditChange} placeholder="Last name" aria-label="Last name" />
+                        <select name="userRole" value={editForm.userRole}
+                          onChange={handleEditChange} aria-label="Role">
+                          <option value="user">user</option>
+                          <option value="admin">admin</option>
+                          <option value="manager">manager</option>
+                        </select>
+                        <button className="action-btn save" disabled={savingEdit} onClick={() => saveEdit(u)}>
+                          {savingEdit ? 'Saving…' : 'Save'}
+                        </button>
+                        <button className="action-btn cancel" disabled={savingEdit} onClick={cancelEdit}>
+                          Cancel
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );
@@ -426,7 +447,7 @@ function AdminPage() {
             <th>Name</th>
             <th>Goal</th>
             <th>User ID</th>
-            {isAdmin && <th>Actions</th>}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -436,11 +457,16 @@ function AdminPage() {
               <td>{p.name}</td>
               <td>{p.goal}</td>
               <td>{p.userId}</td>
-              {isAdmin && (
-                <td>
-                  <button className="action-btn delete" onClick={() => handleDeleteWorkoutPlan(p)}>Delete</button>
-                </td>
-              )}
+              <td>
+                <button className="action-btn edit" onClick={() => handleViewWorkoutPlan(p.workoutPlanId)}>
+                  View
+                </button>
+                {isAdmin && (
+                  <button className="action-btn delete" onClick={() => handleDeleteWorkoutPlan(p)}>
+                    Delete
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -458,7 +484,7 @@ function AdminPage() {
             <th>Goal</th>
             <th>Target Calories</th>
             <th>User ID</th>
-            {isAdmin && <th>Actions</th>}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -469,11 +495,16 @@ function AdminPage() {
               <td>{p.goal}</td>
               <td>{p.targetCalories}</td>
               <td>{p.userId}</td>
-              {isAdmin && (
-                <td>
-                  <button className="action-btn delete" onClick={() => handleDeleteMealPlan(p)}>Delete</button>
-                </td>
-              )}
+              <td>
+                <button className="action-btn edit" onClick={() => handleViewMealPlan(p.dailyMealPlanId)}>
+                  View
+                </button>
+                {isAdmin && (
+                  <button className="action-btn delete" onClick={() => handleDeleteMealPlan(p)}>
+                    Delete
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -481,10 +512,213 @@ function AdminPage() {
     </div>
   );
 
+  const renderCheckIns = () => (
+    <div className="table-wrapper">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Current Weight (kg)</th>
+            <th>Check-Ins</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {checkInUsers.map(u => (
+            <tr key={u.userId}>
+              <td>{u.userId}</td>
+              <td>{u.firstName} {u.lastName}</td>
+              <td>{u.userRole}</td>
+              <td>{u.currentWeight != null ? u.currentWeight : '—'}</td>
+              <td>{u.checkInCount}</td>
+              <td>
+                <button className="action-btn edit" onClick={() => handleViewUserCheckIns(u)}>
+                  View
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  // ── Modal renderers ────────────────────────────────────────────────────────
+  const renderPlanModal = () => {
+    const { loading: pLoading, plan, error: pError } = planModal;
+    return (
+      <div className="ap-modal-backdrop" onClick={() => setPlanModal(null)}>
+        <div className="ap-modal-card" onClick={e => e.stopPropagation()}>
+          <button className="ap-modal-close" onClick={() => setPlanModal(null)} aria-label="Close">✕</button>
+          {pLoading && <p className="loading">Loading plan details…</p>}
+          {pError   && <div className="error-banner">{pError}</div>}
+          {plan && (
+            <>
+              <h2 className="ap-modal-title">{plan.name}</h2>
+              <div className="ap-modal-meta">
+                <span>Goal: {plan.goal}</span>
+                <span>User ID: {plan.userId}</span>
+                <span>{plan.isActive ? 'Active' : 'Inactive'}</span>
+              </div>
+              {plan.days.length === 0 ? (
+                <p className="ap-empty">No workout days found.</p>
+              ) : (
+                [...plan.days]
+                  .sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day))
+                  .map(day => (
+                    <div key={day.workoutDayId} className="ap-plan-day">
+                      <h3 className="ap-section-title">
+                        {day.day}{day.title ? ` — ${day.title}` : ''}
+                      </h3>
+                      {day.exercises.length === 0 ? (
+                        <p className="ap-empty">No exercises.</p>
+                      ) : (
+                        <div className="table-wrapper">
+                          <table className="data-table">
+                            <thead>
+                              <tr>
+                                <th>Exercise</th>
+                                <th>Sets</th>
+                                <th>Reps</th>
+                                <th>Target Weight (kg)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {day.exercises.map(ex => (
+                                <tr key={ex.id}>
+                                  <td>{ex.exerciseName}</td>
+                                  <td>{ex.targetSets  ?? '—'}</td>
+                                  <td>{ex.targetReps  ?? '—'}</td>
+                                  <td>{ex.targetWeight ?? '—'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  ))
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMealModal = () => {
+    const { loading: mLoading, plan, error: mError } = mealModal;
+    return (
+      <div className="ap-modal-backdrop" onClick={() => setMealModal(null)}>
+        <div className="ap-modal-card" onClick={e => e.stopPropagation()}>
+          <button className="ap-modal-close" onClick={() => setMealModal(null)} aria-label="Close">✕</button>
+          {mLoading && <p className="loading">Loading meal plan details…</p>}
+          {mError   && <div className="error-banner">{mError}</div>}
+          {plan && (
+            <>
+              <h2 className="ap-modal-title">{plan.name}</h2>
+              <div className="ap-modal-meta">
+                <span>Goal: {plan.goal}</span>
+                <span>Target: {plan.targetCalories} kcal / {plan.targetProtein}g protein</span>
+                <span>User ID: {plan.userId}</span>
+                <span>{plan.isActive ? 'Active' : 'Inactive'}</span>
+              </div>
+              {plan.meals.length === 0 ? (
+                <p className="ap-empty">No meals found.</p>
+              ) : (
+                [...plan.meals]
+                  .sort((a, b) => MEAL_ORDER.indexOf(a.mealType) - MEAL_ORDER.indexOf(b.mealType))
+                  .map(meal => (
+                    <div key={meal.mealId} className="ap-meal-section">
+                      <h3 className="ap-section-title">{meal.mealType} — {meal.title}</h3>
+                      <p className="ap-meal-meta">
+                        {meal.estimatedCalories} kcal · {meal.estimatedProtein}g protein
+                      </p>
+                      {meal.foodItems.length === 0 ? (
+                        <p className="ap-empty">No food items.</p>
+                      ) : (
+                        <div className="table-wrapper">
+                          <table className="data-table">
+                            <thead>
+                              <tr>
+                                <th>Food Item</th>
+                                <th>Quantity (g)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {meal.foodItems.map(fi => (
+                                <tr key={fi.id}>
+                                  <td>{fi.foodName}</td>
+                                  <td>{fi.quantityGrams}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  ))
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCheckInsModal = () => {
+    const { loading: cLoading, user: u, checkIns, error: cError } = checkInsModal;
+    return (
+      <div className="ap-modal-backdrop" onClick={() => setCheckInsModal(null)}>
+        <div className="ap-modal-card" onClick={e => e.stopPropagation()}>
+          <button className="ap-modal-close" onClick={() => setCheckInsModal(null)} aria-label="Close">✕</button>
+          <h2 className="ap-modal-title">{u.firstName} {u.lastName} — Check-In History</h2>
+          <p className="ap-modal-subtitle">User ID: {u.userId} · Role: {u.userRole}</p>
+          {cLoading && <p className="loading">Loading check-ins…</p>}
+          {cError   && <div className="error-banner">{cError}</div>}
+          {!cLoading && !cError && (
+            checkIns.length === 0 ? (
+              <p className="ap-empty">No check-ins recorded yet.</p>
+            ) : (
+              <div className="table-wrapper">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Weight (kg)</th>
+                      <th>Workouts</th>
+                      <th>Feedback</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...checkIns]
+                      .sort((a, b) => new Date(b.checkInDate) - new Date(a.checkInDate))
+                      .map(ci => (
+                        <tr key={ci.checkInId}>
+                          <td>{ci.checkInDate}</td>
+                          <td>{ci.weight}</td>
+                          <td>{ci.workoutsCompleted}</td>
+                          <td>{ci.feedback || '—'}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   const tabHasData =
     (activeTab === 'users'    && users.length        > 0) ||
     (activeTab === 'workouts' && workoutPlans.length > 0) ||
-    (activeTab === 'meals'    && mealPlans.length    > 0);
+    (activeTab === 'meals'    && mealPlans.length    > 0) ||
+    (activeTab === 'checkins' && checkInUsers.length > 0);
 
   return (
     <div className="admin-page">
@@ -518,9 +752,14 @@ function AdminPage() {
             {activeTab === 'users'    && renderUsers()}
             {activeTab === 'workouts' && renderWorkoutPlans()}
             {activeTab === 'meals'    && renderMealPlans()}
+            {activeTab === 'checkins' && renderCheckIns()}
           </>
         )}
       </div>
+
+      {planModal     && renderPlanModal()}
+      {mealModal     && renderMealModal()}
+      {checkInsModal && renderCheckInsModal()}
     </div>
   );
 }

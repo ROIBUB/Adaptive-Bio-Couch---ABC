@@ -9,22 +9,15 @@ const { isAdminRole } = require('../middleware/roleUtils');
 // GET /api/workout-logs
 const getAllWorkoutLogs = async (req, res) => {
     try {
-        const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
         const filterPlanId = req.query.workoutPlanId ? Number(req.query.workoutPlanId) : null;
-
         const filterDayId  = req.query.workoutDayId  ? Number(req.query.workoutDayId)  : null;
 
-        let logs;
-
-        if (isAdminRole(userRole)) {
-            logs = await WorkoutLogsModel.getAll();
-        } else {
-            if (!validateId(requestUserId)) {
-                return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
-            }
-            logs = await WorkoutLogsModel.getByUserId(requestUserId);
+        if (!validateId(requestUserId)) {
+            return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
         }
+
+        let logs = await WorkoutLogsModel.getByUserId(requestUserId);
 
         if (filterPlanId) {
             logs = logs.filter(l => l.workoutPlanId === filterPlanId);

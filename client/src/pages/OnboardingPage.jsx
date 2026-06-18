@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getProfile, replanProfile } from '../services/profileService';
+import PlanGeneratingOverlay from '../components/PlanGeneratingOverlay';
 import './OnboardingPage.css';
 
 function OnboardingPage() {
@@ -27,8 +28,10 @@ function OnboardingPage() {
   });
   const [errors,   setErrors]   = useState({});
   const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
   const [apiError, setApiError] = useState('');
+
+  // 'idle' | 'generating' | 'done'
+  const [generatingStatus, setGeneratingStatus] = useState('idle');
 
   // Pre-populate from current profile
   useEffect(() => {
@@ -88,6 +91,10 @@ function OnboardingPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Guard against re-entry while generating
+    if (generatingStatus !== 'idle') return;
+
     setApiError('');
     const errs = validate();
     if (Object.keys(errs).length > 0) {
@@ -95,7 +102,8 @@ function OnboardingPage() {
       return;
     }
     setErrors({});
-    setSaving(true);
+
+    setGeneratingStatus('generating');
     try {
       const payload = {
         fitnessGoal:     form.fitnessGoal,
@@ -107,137 +115,161 @@ function OnboardingPage() {
       if (form.currentWeight) payload.currentWeight = Number(form.currentWeight);
 
       await replanProfile(user.userId, payload);
-      navigate('/dashboard', { state: { planCreated: true } });
+      // Hand off to overlay — it will call handlePlanReady after the success animation
+      setGeneratingStatus('done');
     } catch (err) {
+      setGeneratingStatus('idle');
       setApiError(err.message || 'Failed to generate plan. Please try again.');
-    } finally {
-      setSaving(false);
     }
   };
 
+  // Called by PlanGeneratingOverlay after its success animation completes
+  const handlePlanReady = useCallback(() => {
+    navigate('/dashboard', { state: { planCreated: true } });
+  }, [navigate]);
+
   if (!isReplan) return null;
 
+  const isGenerating = generatingStatus !== 'idle';
+
   return (
-    <div className="onboarding-page">
-      <div className="onboarding-card">
+    <>
+      {/* Page — blurred and non-interactive while overlay is active */}
+      <div
+        className={`onboarding-page${isGenerating ? ' onboarding-page--generating' : ''}`}
+        aria-hidden={isGenerating ? 'true' : undefined}
+      >
+        <div className="onboarding-card">
 
-        <div className="onboarding-header">
-          <span className="onboarding-logo">🎯</span>
-          <h1>Generate a New Plan</h1>
-          <p>Update your fitness preferences and we'll build a fresh workout and meal plan for you.</p>
+          <div className="onboarding-header">
+            <span className="onboarding-logo">🎯</span>
+            <h1>Generate a New Plan</h1>
+            <p>Update your fitness preferences and we'll build a fresh workout and meal plan for you.</p>
+          </div>
+
+          {loading ? (
+            <p className="loading">Loading your current preferences…</p>
+          ) : (
+            <form className="onboarding-form" onSubmit={handleSubmit} noValidate>
+
+              {/* ── Body Measurements (optional update) ── */}
+              <div className="form-section">
+                <h3 className="section-title">Body Measurements</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="height">Height (cm)</label>
+                    <input
+                      id="height" name="height" type="number"
+                      value={form.height} onChange={handleChange}
+                      placeholder="e.g. 175" min="100" max="250"
+                      className={errors.height ? 'input-error' : ''}
+                    />
+                    {errors.height && <span className="error-msg">{errors.height}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="currentWeight">Current Weight (kg)</label>
+                    <input
+                      id="currentWeight" name="currentWeight" type="number"
+                      value={form.currentWeight} onChange={handleChange}
+                      placeholder="e.g. 75" min="30" max="300"
+                      className={errors.currentWeight ? 'input-error' : ''}
+                    />
+                    {errors.currentWeight && <span className="error-msg">{errors.currentWeight}</span>}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Goals & Activity ── */}
+              <div className="form-section">
+                <h3 className="section-title">Goals &amp; Activity</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="fitnessGoal">Fitness Goal</label>
+                    <select
+                      id="fitnessGoal" name="fitnessGoal"
+                      value={form.fitnessGoal} onChange={handleChange}
+                      className={errors.fitnessGoal ? 'input-error' : ''}
+                    >
+                      <option value="">Select your goal</option>
+                      <option value="weight_loss">Weight Loss</option>
+                      <option value="muscle_gain">Muscle Gain</option>
+                      <option value="maintenance">Maintenance</option>
+                    </select>
+                    {errors.fitnessGoal && <span className="error-msg">{errors.fitnessGoal}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="activityLevel">Activity Level</label>
+                    <select
+                      id="activityLevel" name="activityLevel"
+                      value={form.activityLevel} onChange={handleChange}
+                      className={errors.activityLevel ? 'input-error' : ''}
+                    >
+                      <option value="">Select activity level</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                    {errors.activityLevel && <span className="error-msg">{errors.activityLevel}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="workoutsPerWeek">Workouts Per Week</label>
+                    <input
+                      id="workoutsPerWeek" name="workoutsPerWeek" type="number"
+                      value={form.workoutsPerWeek} onChange={handleChange}
+                      placeholder="1 – 7" min="1" max="7"
+                      className={errors.workoutsPerWeek ? 'input-error' : ''}
+                    />
+                    {errors.workoutsPerWeek && <span className="error-msg">{errors.workoutsPerWeek}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="mealsPerDay">Meals Per Day</label>
+                    <input
+                      id="mealsPerDay" name="mealsPerDay" type="number"
+                      value={form.mealsPerDay} onChange={handleChange}
+                      placeholder="1 – 8" min="1" max="8"
+                      className={errors.mealsPerDay ? 'input-error' : ''}
+                    />
+                    {errors.mealsPerDay && <span className="error-msg">{errors.mealsPerDay}</span>}
+                  </div>
+                </div>
+              </div>
+
+              {apiError && <div className="api-error">{apiError}</div>}
+
+              <div className="onboarding-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => navigate('/settings')}
+                  disabled={isGenerating}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="generate-btn"
+                  disabled={isGenerating}
+                >
+                  Generate New Plan
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-
-        {loading ? (
-          <p className="loading">Loading your current preferences…</p>
-        ) : (
-          <form className="onboarding-form" onSubmit={handleSubmit} noValidate>
-
-            {/* ── Body Measurements (optional update) ── */}
-            <div className="form-section">
-              <h3 className="section-title">Body Measurements</h3>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="height">Height (cm)</label>
-                  <input
-                    id="height" name="height" type="number"
-                    value={form.height} onChange={handleChange}
-                    placeholder="e.g. 175" min="100" max="250"
-                    className={errors.height ? 'input-error' : ''}
-                  />
-                  {errors.height && <span className="error-msg">{errors.height}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="currentWeight">Current Weight (kg)</label>
-                  <input
-                    id="currentWeight" name="currentWeight" type="number"
-                    value={form.currentWeight} onChange={handleChange}
-                    placeholder="e.g. 75" min="30" max="300"
-                    className={errors.currentWeight ? 'input-error' : ''}
-                  />
-                  {errors.currentWeight && <span className="error-msg">{errors.currentWeight}</span>}
-                </div>
-              </div>
-            </div>
-
-            {/* ── Goals & Activity ── */}
-            <div className="form-section">
-              <h3 className="section-title">Goals &amp; Activity</h3>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="fitnessGoal">Fitness Goal</label>
-                  <select
-                    id="fitnessGoal" name="fitnessGoal"
-                    value={form.fitnessGoal} onChange={handleChange}
-                    className={errors.fitnessGoal ? 'input-error' : ''}
-                  >
-                    <option value="">Select your goal</option>
-                    <option value="weight_loss">Weight Loss</option>
-                    <option value="muscle_gain">Muscle Gain</option>
-                    <option value="maintenance">Maintenance</option>
-                  </select>
-                  {errors.fitnessGoal && <span className="error-msg">{errors.fitnessGoal}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="activityLevel">Activity Level</label>
-                  <select
-                    id="activityLevel" name="activityLevel"
-                    value={form.activityLevel} onChange={handleChange}
-                    className={errors.activityLevel ? 'input-error' : ''}
-                  >
-                    <option value="">Select activity level</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                  {errors.activityLevel && <span className="error-msg">{errors.activityLevel}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="workoutsPerWeek">Workouts Per Week</label>
-                  <input
-                    id="workoutsPerWeek" name="workoutsPerWeek" type="number"
-                    value={form.workoutsPerWeek} onChange={handleChange}
-                    placeholder="1 – 7" min="1" max="7"
-                    className={errors.workoutsPerWeek ? 'input-error' : ''}
-                  />
-                  {errors.workoutsPerWeek && <span className="error-msg">{errors.workoutsPerWeek}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="mealsPerDay">Meals Per Day</label>
-                  <input
-                    id="mealsPerDay" name="mealsPerDay" type="number"
-                    value={form.mealsPerDay} onChange={handleChange}
-                    placeholder="1 – 8" min="1" max="8"
-                    className={errors.mealsPerDay ? 'input-error' : ''}
-                  />
-                  {errors.mealsPerDay && <span className="error-msg">{errors.mealsPerDay}</span>}
-                </div>
-              </div>
-            </div>
-
-            {apiError && <div className="api-error">{apiError}</div>}
-
-            <div className="onboarding-actions">
-              <button type="button" className="cancel-btn" onClick={() => navigate('/settings')}>
-                Cancel
-              </button>
-              <button type="submit" className="generate-btn" disabled={saving}>
-                {saving ? 'Generating…' : 'Generate New Plan'}
-              </button>
-            </div>
-
-            {saving && (
-              <p className="loading-text">
-                Analyzing your profile and generating your personalised plan…
-              </p>
-            )}
-          </form>
-        )}
       </div>
-    </div>
+
+      {/* Overlay — sibling of page div so aria-hidden on page does not affect it */}
+      <PlanGeneratingOverlay
+        visible={isGenerating}
+        status={generatingStatus}
+        firstName={user.firstName || ''}
+        onNavigate={handlePlanReady}
+      />
+    </>
   );
 }
 

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import DataTable from '../components/DataTable';
 import AIChatWidget from '../components/AIChatWidget';
 import { getProfile } from '../services/profileService';
-import { getWorkoutPlans, getWorkoutLogs } from '../services/workoutService';
+import { getWorkoutLogs } from '../services/workoutService';
 import { getCheckIns } from '../services/checkInService';
 import { getProgressData } from '../services/progressService';
 import { getDailyMealPlans } from '../services/mealService';
@@ -53,9 +53,8 @@ function DashboardPage() {
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
-      const [profileRes, , logsRes, checkInsRes, progressRes] = await Promise.allSettled([
+      const [profileRes, logsRes, checkInsRes, progressRes] = await Promise.allSettled([
         getProfile(user.userId),
-        getWorkoutPlans(),
         getWorkoutLogs(),
         getCheckIns(),
         getProgressData(),

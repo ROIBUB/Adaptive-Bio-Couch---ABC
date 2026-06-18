@@ -1,6 +1,5 @@
 const CheckInsModel = require('../models/checkIns.model');
 const ProfilesModel = require('../models/profiles.model');
-const { analyzeProgress } = require('../services/aiAnalysisService');
 
 const {
     sendSuccess,
@@ -13,15 +12,25 @@ const { validateId, getMissingFields } = require('../middleware/validation');
 
 const { isAdminRole } = require('../middleware/roleUtils');
 
+// Recomputes the user's profile.current_weight from their check-in history.
+// Always uses the check-in with the latest date, so create/update/delete all
+// stay consistent regardless of which record was touched.
+const syncProfileWeight = async (userId) => {
+    const all = await CheckInsModel.getByUserId(userId);
+    if (all.length === 0) {
+        await ProfilesModel.update(userId, { currentWeight: null });
+    } else {
+        const latest = all.reduce((a, b) =>
+            new Date(a.checkInDate) >= new Date(b.checkInDate) ? a : b
+        );
+        await ProfilesModel.update(userId, { currentWeight: latest.weight });
+    }
+};
+
 // GET /api/check-ins
 const getAllCheckIns = async (req, res) => {
     try {
-        const userRole = req.headers['x-user-role'];
         const requestUserId = Number(req.headers.userid);
-
-        if (isAdminRole(userRole)) {
-            return sendSuccess(res, 200, await CheckInsModel.getAll());
-        }
 
         if (!validateId(requestUserId)) {
             return sendValidationError(res, 'Missing or invalid user id in request headers', { field: 'userid', value: req.headers.userid || null });
@@ -85,12 +94,8 @@ const createCheckIn = async (req, res) => {
         }
 
         const newCheckIn = await CheckInsModel.create({ userId: requestUserId, weight, workoutsCompleted, feedback, checkInDate });
-        // Keep profile.currentWeight in sync so the dashboard reflects the latest weight
-        await ProfilesModel.update(requestUserId, { currentWeight: weight });
-        sendSuccess(res, 201, newCheckIn);
-        analyzeProgress(requestUserId).catch(err =>
-            console.error('AI analysis failed after check-in:', err.message)
-        );
+        await syncProfileWeight(requestUserId);
+        return sendSuccess(res, 201, newCheckIn);
     } catch (err) {
         return sendServerError(res);
     }
@@ -134,6 +139,7 @@ const updateCheckIn = async (req, res) => {
         }
 
         const updated = await CheckInsModel.update(id, { weight, workoutsCompleted, feedback, checkInDate });
+        await syncProfileWeight(checkIn.userId);
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
@@ -163,6 +169,7 @@ const deleteCheckIn = async (req, res) => {
         }
 
         const deleted = await CheckInsModel.remove(id);
+        await syncProfileWeight(checkIn.userId);
         return sendSuccess(res, 200, { checkInId: deleted.checkInId });
     } catch (err) {
         return sendServerError(res);

@@ -14,8 +14,7 @@ const mapUser = (u, updateDate) => ({
     height: u.profile ? u.profile.height_cm : null,
     weight: u.profile ? u.profile.current_weight : null,
     activityLevel: u.profile ? u.profile.activity_level : null,
-    fitnessGoal: u.profile ? u.profile.fitness_goal : null,
-    preferences: u.preferences
+    fitnessGoal: u.profile ? u.profile.fitness_goal : null
 });
 
 const getAll = async () => {
@@ -40,8 +39,7 @@ const create = async (data) => {
             last_name: data.lastName,
             email: data.email,
             password: data.password,
-            role: data.userRole,
-            preferences: data.preferences ?? null
+            role: data.userRole
         },
         include: { profile: true }
     });
@@ -53,7 +51,6 @@ const update = async (id, data) => {
     if (data.firstName !== undefined) userUpdate.first_name = data.firstName;
     if (data.lastName !== undefined) userUpdate.last_name = data.lastName;
     if (data.userRole !== undefined) userUpdate.role = data.userRole;
-    if (data.preferences !== undefined) userUpdate.preferences = data.preferences;
 
     const profileUpdate = {};
     if (data.age !== undefined) profileUpdate.age = data.age;

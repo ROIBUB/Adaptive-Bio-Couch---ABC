@@ -98,3 +98,94 @@
   .add-user-grid { grid-template-columns: 1fr; }
   .add-user-grid .form-group--full { grid-column: 1; }
 }
+
+/* ── Detail modals ──────────────────────────────────────────────────────── */
+.ap-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.ap-modal-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.22);
+  max-width: 720px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 2rem;
+}
+
+.ap-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.ap-modal-close:hover { color: var(--text); background: var(--bg); }
+
+.ap-modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  padding-right: 2rem;
+}
+
+.ap-modal-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.ap-modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.ap-modal-meta span { white-space: nowrap; }
+
+.ap-plan-day,
+.ap-meal-section {
+  border-left: 3px solid var(--purple);
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ap-section-title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.ap-meal-meta {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.ap-empty {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin: 0.5rem 0;
+}

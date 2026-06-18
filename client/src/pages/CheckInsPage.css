@@ -69,3 +69,233 @@
   background-color: var(--text-muted);
   cursor: not-allowed;
 }
+
+/* ── AI Coach Analysis section ─────────────────────────────────────────── */
+
+.ai-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.ai-section-header {
+  margin-bottom: 1.25rem;
+}
+
+.ai-section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ai-section-subtitle {
+  margin-top: 0.3rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.ai-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--purple-border);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.ai-error-banner {
+  margin-bottom: 1rem;
+}
+
+.ai-result {
+  margin-bottom: 1.5rem;
+}
+
+.ai-generated-at {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.ai-assessments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ai-assessment-card {
+  background: var(--card);
+  border: 1px solid var(--purple-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+
+.ai-assessment-card h3 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+
+.ai-assessment-card p {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.ai-recommendations-list {
+  background: var(--purple-bg);
+  border: 1px solid var(--purple-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.ai-recommendations-list h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+.ai-recommendations-list ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ai-recommendations-list li {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.ai-recommendations-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--purple);
+  font-weight: 700;
+}
+
+.ai-empty-state {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 0.75rem 0 1.25rem;
+  line-height: 1.55;
+}
+
+/* Recommendation item detail */
+.ai-rec-reason {
+  color: var(--text-secondary);
+  font-size: 0.85em;
+}
+
+/* Minimum check-in gate */
+.ai-gate {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.ai-gate-message {
+  font-size: 0.88rem;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.ai-gate-progress {
+  font-size: 0.85rem;
+  color: #78350f;
+  margin-top: 0.3rem;
+}
+
+/* Plan updates card */
+.ai-actions-applied {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.ai-actions-applied h3 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #15803d;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.65rem;
+}
+
+.ai-action-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #166534;
+  margin-bottom: 0.4rem;
+}
+
+.ai-action-item:last-child {
+  margin-bottom: 0;
+}
+
+.ai-action-check {
+  color: #16a34a;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ai-no-actions {
+  font-size: 0.88rem;
+  color: #4b5563;
+  font-style: italic;
+}
+
+.ai-btn {
+  background: var(--purple);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ai-btn:hover:not(:disabled) {
+  background: var(--purple-hover);
+}
+
+.ai-btn:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+}

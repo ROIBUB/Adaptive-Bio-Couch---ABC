@@ -4,12 +4,12 @@ const prisma = require('./prismaClient');
 // Users (ids 1-6)
 // ---------------------------------------------------------------------
 const users = [
-    { id: 1, first_name: 'John',  last_name: 'Doe',       email: 'john@fitwize.com',  password: 'password123', role: 'user',    preferences: 5 },
-    { id: 2, first_name: 'Noam',  last_name: 'Levi',      email: 'noam@fitwize.com',  password: 'password123', role: 'admin',   preferences: 4 },
-    { id: 3, first_name: 'Dana',  last_name: 'Cohen',     email: 'dana@fitwize.com',  password: 'password123', role: 'user',    preferences: 5 },
-    { id: 4, first_name: 'Roi',   last_name: 'Bublil',    email: 'roi@fitwize.com',   password: 'password123', role: 'manager', preferences: 3 },
-    { id: 5, first_name: 'Maya',  last_name: 'Ben-David', email: 'maya@fitwize.com',  password: 'password123', role: 'user',    preferences: 4 },
-    { id: 6, first_name: 'Eitan', last_name: 'Katz',      email: 'eitan@fitwize.com', password: 'password123', role: 'user',    preferences: 3 }
+    { id: 1, first_name: 'John',  last_name: 'Doe',       email: 'john@fitwize.com',  password: 'password123', role: 'user'    },
+    { id: 2, first_name: 'Noam',  last_name: 'Levi',      email: 'noam@fitwize.com',  password: 'password123', role: 'admin'   },
+    { id: 3, first_name: 'Dana',  last_name: 'Cohen',     email: 'dana@fitwize.com',  password: 'password123', role: 'user'    },
+    { id: 4, first_name: 'Roi',   last_name: 'Bublil',    email: 'roi@fitwize.com',   password: 'password123', role: 'manager' },
+    { id: 5, first_name: 'Maya',  last_name: 'Ben-David', email: 'maya@fitwize.com',  password: 'password123', role: 'user'    },
+    { id: 6, first_name: 'Eitan', last_name: 'Katz',      email: 'eitan@fitwize.com', password: 'password123', role: 'user'    }
 ];
 
 // ---------------------------------------------------------------------
@@ -22,7 +22,46 @@ const exercises = [
     { id: 4, name: 'Shoulder Press',   muscle_group: 'Shoulders', difficulty: 'Intermediate', equipment: 'Dumbbells',     description: 'An upper-body pushing exercise that mainly targets the shoulder muscles.' },
     { id: 5, name: 'Biceps Curl',      muscle_group: 'Biceps',    difficulty: 'Beginner',     equipment: 'Dumbbells',     description: 'An isolation exercise that targets the front upper-arm muscles.' },
     { id: 6, name: 'Triceps Pushdown', muscle_group: 'Triceps',   difficulty: 'Beginner',     equipment: 'Cable Machine', description: 'An isolation exercise that targets the back upper-arm muscles.' },
-    { id: 7, name: 'Plank',            muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'A core stability exercise that strengthens the abdominal and trunk muscles.' }
+    { id: 7, name: 'Plank',            muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'A core stability exercise that strengthens the abdominal and trunk muscles.' },
+    { id: 8,  name: 'Bench Press',                muscle_group: 'Chest',     difficulty: 'Intermediate', equipment: 'Barbell',        description: 'Classic compound chest exercise using a barbell.' },
+    { id: 9,  name: 'Incline Bench Press',        muscle_group: 'Chest',     difficulty: 'Intermediate', equipment: 'Barbell',        description: 'Upper chest focused pressing exercise.' },
+    { id: 10, name: 'Incline Dumbbell Press',     muscle_group: 'Chest',     difficulty: 'Intermediate', equipment: 'Dumbbells',      description: 'Upper chest pressing movement using dumbbells.' },
+    { id: 11, name: 'Cable Fly',                  muscle_group: 'Chest',     difficulty: 'Beginner',     equipment: 'Cable Machine', description: 'Isolation movement targeting the chest muscles.' },
+    { id: 12, name: 'Push Up',                    muscle_group: 'Chest',     difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'Bodyweight pushing exercise for chest and triceps.' },
+
+    { id: 13, name: 'Seated Cable Row',           muscle_group: 'Back',      difficulty: 'Beginner',     equipment: 'Cable Machine', description: 'Horizontal pulling exercise targeting the back.' },
+    { id: 14, name: 'Barbell Row',                muscle_group: 'Back',      difficulty: 'Intermediate', equipment: 'Barbell',        description: 'Compound rowing movement for back development.' },
+    { id: 15, name: 'Dumbbell Row',               muscle_group: 'Back',      difficulty: 'Beginner',     equipment: 'Dumbbells',      description: 'Single-arm rowing exercise for back strength.' },
+    { id: 16, name: 'Pull Up',                    muscle_group: 'Back',      difficulty: 'Advanced',     equipment: 'Bodyweight',    description: 'Bodyweight pulling exercise targeting lats.' },
+    { id: 17, name: 'Machine Row',                muscle_group: 'Back',      difficulty: 'Beginner',     equipment: 'Machine',       description: 'Machine-based rowing movement.' },
+
+    { id: 18, name: 'Lateral Raise',              muscle_group: 'Shoulders', difficulty: 'Beginner',     equipment: 'Dumbbells',      description: 'Isolation exercise targeting side deltoids.' },
+    { id: 19, name: 'Front Raise',                muscle_group: 'Shoulders', difficulty: 'Beginner',     equipment: 'Dumbbells',      description: 'Isolation exercise targeting front deltoids.' },
+    { id: 20, name: 'Rear Delt Fly',              muscle_group: 'Shoulders', difficulty: 'Intermediate', equipment: 'Dumbbells',      description: 'Targets rear shoulder muscles.' },
+    { id: 21, name: 'Arnold Press',               muscle_group: 'Shoulders', difficulty: 'Intermediate', equipment: 'Dumbbells',      description: 'Rotational shoulder press exercise.' },
+    { id: 22, name: 'Face Pull',                  muscle_group: 'Shoulders', difficulty: 'Beginner',     equipment: 'Cable Machine', description: 'Targets rear delts and upper back.' },
+
+    { id: 23, name: 'Squat',                      muscle_group: 'Legs',      difficulty: 'Intermediate', equipment: 'Barbell',        description: 'Fundamental lower-body compound exercise.' },
+    { id: 24, name: 'Hack Squat',                 muscle_group: 'Legs',      difficulty: 'Intermediate', equipment: 'Machine',       description: 'Machine squat variation.' },
+    { id: 25, name: 'Bulgarian Split Squat',      muscle_group: 'Legs',      difficulty: 'Intermediate', equipment: 'Dumbbells',      description: 'Single-leg lower body exercise.' },
+    { id: 26, name: 'Walking Lunges',             muscle_group: 'Legs',      difficulty: 'Beginner',     equipment: 'Dumbbells',      description: 'Dynamic lower body movement.' },
+    { id: 27, name: 'Leg Extension',              muscle_group: 'Legs',      difficulty: 'Beginner',     equipment: 'Machine',       description: 'Isolation exercise for quadriceps.' },
+    { id: 28, name: 'Leg Curl',                   muscle_group: 'Legs',      difficulty: 'Beginner',     equipment: 'Machine',       description: 'Isolation exercise for hamstrings.' },
+    { id: 29, name: 'Romanian Deadlift',          muscle_group: 'Legs',      difficulty: 'Intermediate', equipment: 'Barbell',        description: 'Posterior chain exercise.' },
+    { id: 30, name: 'Standing Calf Raise',        muscle_group: 'Calves',    difficulty: 'Beginner',     equipment: 'Machine',       description: 'Targets calf muscles.' },
+
+    { id: 31, name: 'Hammer Curl',                muscle_group: 'Biceps',    difficulty: 'Beginner',     equipment: 'Dumbbells',      description: 'Biceps exercise with neutral grip.' },
+    { id: 32, name: 'Preacher Curl',              muscle_group: 'Biceps',    difficulty: 'Intermediate', equipment: 'Machine',       description: 'Isolation curl exercise.' },
+    { id: 33, name: 'Cable Curl',                 muscle_group: 'Biceps',    difficulty: 'Beginner',     equipment: 'Cable Machine', description: 'Cable-based curl variation.' },
+
+    { id: 34, name: 'Overhead Triceps Extension', muscle_group: 'Triceps',   difficulty: 'Beginner',     equipment: 'Dumbbells',      description: 'Targets the long head of the triceps.' },
+    { id: 35, name: 'Skull Crusher',              muscle_group: 'Triceps',   difficulty: 'Intermediate', equipment: 'Barbell',        description: 'Lying triceps extension exercise.' },
+    { id: 36, name: 'Bench Dips',                 muscle_group: 'Triceps',   difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'Bodyweight triceps exercise.' },
+
+    { id: 37, name: 'Crunch',                     muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'Basic abdominal exercise.' },
+    { id: 38, name: 'Leg Raises',                 muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'Lower abdominal exercise.' },
+    { id: 39, name: 'Russian Twist',              muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'Rotational core exercise.' },
+    { id: 40, name: 'Mountain Climbers',          muscle_group: 'Core',      difficulty: 'Beginner',     equipment: 'Bodyweight',    description: 'Core and conditioning exercise.' }
 ];
 
 // ---------------------------------------------------------------------
@@ -38,12 +77,45 @@ const foodItems = [
     { id: 7,  name: 'Avocado',        category: 'fat',       calories_per_100g: 160, protein_per_100g: 2,    carbs_per_100g: 8.5,  fat_per_100g: 14.7 },
     { id: 8,  name: 'Sweet Potato',   category: 'carb',      calories_per_100g: 86,  protein_per_100g: 1.6,  carbs_per_100g: 20,   fat_per_100g: 0.1 },
     { id: 9,  name: 'Cottage Cheese', category: 'dairy',     calories_per_100g: 98,  protein_per_100g: 11,   carbs_per_100g: 3.4,  fat_per_100g: 4.3 },
-    { id: 10, name: 'Broccoli',       category: 'vegetable', calories_per_100g: 34,  protein_per_100g: 2.8,  carbs_per_100g: 6.6,  fat_per_100g: 0.4 }
+    { id: 10, name: 'Broccoli',       category: 'vegetable', calories_per_100g: 34,  protein_per_100g: 2.8,  carbs_per_100g: 6.6,  fat_per_100g: 0.4 },
+    { id: 11, name: 'Lean Beef',          category: 'protein',   calories_per_100g: 217, protein_per_100g: 26, carbs_per_100g: 0,   fat_per_100g: 12 },
+    { id: 12, name: 'Turkey Breast',      category: 'protein',   calories_per_100g: 135, protein_per_100g: 30, carbs_per_100g: 0,   fat_per_100g: 1 },
+    { id: 13, name: 'Tuna',               category: 'protein',   calories_per_100g: 132, protein_per_100g: 29, carbs_per_100g: 0,   fat_per_100g: 1 },
+    { id: 14, name: 'Cod',                category: 'protein',   calories_per_100g: 82,  protein_per_100g: 18, carbs_per_100g: 0,   fat_per_100g: 0.7 },
+    { id: 15, name: 'Shrimp',             category: 'protein',   calories_per_100g: 99,  protein_per_100g: 24, carbs_per_100g: 0.2, fat_per_100g: 0.3 },
+    { id: 16, name: 'Tofu',               category: 'protein',   calories_per_100g: 76,  protein_per_100g: 8,  carbs_per_100g: 1.9, fat_per_100g: 4.8 },
+
+    { id: 17, name: 'Brown Rice',         category: 'carb',      calories_per_100g: 123, protein_per_100g: 2.7, carbs_per_100g: 25.6, fat_per_100g: 1 },
+    { id: 18, name: 'Jasmine Rice',       category: 'carb',      calories_per_100g: 130, protein_per_100g: 2.5, carbs_per_100g: 28,   fat_per_100g: 0.3 },
+    { id: 19, name: 'Basmati Rice',       category: 'carb',      calories_per_100g: 121, protein_per_100g: 3.5, carbs_per_100g: 25,   fat_per_100g: 0.4 },
+    { id: 20, name: 'Whole Wheat Pasta',  category: 'carb',      calories_per_100g: 124, protein_per_100g: 5,   carbs_per_100g: 26,   fat_per_100g: 0.8 },
+    { id: 21, name: 'Potato',             category: 'carb',      calories_per_100g: 77,  protein_per_100g: 2,   carbs_per_100g: 17,   fat_per_100g: 0.1 },
+    { id: 22, name: 'Quinoa',             category: 'carb',      calories_per_100g: 120, protein_per_100g: 4.4, carbs_per_100g: 21.3, fat_per_100g: 1.9 },
+
+    { id: 23, name: 'Almonds',            category: 'fat',       calories_per_100g: 579, protein_per_100g: 21,  carbs_per_100g: 22,   fat_per_100g: 50 },
+    { id: 24, name: 'Walnuts',            category: 'fat',       calories_per_100g: 654, protein_per_100g: 15,  carbs_per_100g: 14,   fat_per_100g: 65 },
+    { id: 25, name: 'Peanut Butter',      category: 'fat',       calories_per_100g: 588, protein_per_100g: 25,  carbs_per_100g: 20,   fat_per_100g: 50 },
+    { id: 26, name: 'Olive Oil',          category: 'fat',       calories_per_100g: 884, protein_per_100g: 0,   carbs_per_100g: 0,    fat_per_100g: 100 },
+
+    { id: 27, name: 'Spinach',            category: 'vegetable', calories_per_100g: 23,  protein_per_100g: 2.9, carbs_per_100g: 3.6, fat_per_100g: 0.4 },
+    { id: 28, name: 'Cucumber',           category: 'vegetable', calories_per_100g: 15,  protein_per_100g: 0.7, carbs_per_100g: 3.6, fat_per_100g: 0.1 },
+    { id: 29, name: 'Tomato',             category: 'vegetable', calories_per_100g: 18,  protein_per_100g: 0.9, carbs_per_100g: 3.9, fat_per_100g: 0.2 },
+    { id: 30, name: 'Bell Pepper',        category: 'vegetable', calories_per_100g: 31,  protein_per_100g: 1,   carbs_per_100g: 6,   fat_per_100g: 0.3 },
+
+    { id: 31, name: 'Banana',             category: 'fruit',     calories_per_100g: 89,  protein_per_100g: 1.1, carbs_per_100g: 23,  fat_per_100g: 0.3 },
+    { id: 32, name: 'Apple',              category: 'fruit',     calories_per_100g: 52,  protein_per_100g: 0.3, carbs_per_100g: 14,  fat_per_100g: 0.2 },
+    { id: 33, name: 'Orange',             category: 'fruit',     calories_per_100g: 47,  protein_per_100g: 0.9, carbs_per_100g: 12,  fat_per_100g: 0.1 },
+    { id: 34, name: 'Blueberries',        category: 'fruit',     calories_per_100g: 57,  protein_per_100g: 0.7, carbs_per_100g: 14,  fat_per_100g: 0.3 },
+
+    { id: 35, name: 'Milk',               category: 'dairy',     calories_per_100g: 61,  protein_per_100g: 3.2, carbs_per_100g: 4.8, fat_per_100g: 3.3 },
+    { id: 36, name: 'Mozzarella Cheese',  category: 'dairy',     calories_per_100g: 280, protein_per_100g: 28,  carbs_per_100g: 3,   fat_per_100g: 17 },
+    { id: 37, name: 'Feta Cheese',        category: 'dairy',     calories_per_100g: 264, protein_per_100g: 14,  carbs_per_100g: 4,   fat_per_100g: 21 },
+    
 ];
 
 // ---------------------------------------------------------------------
-// Workout plan templates (ids 1-6) - looked up by planGenerator.js via
-// templateWorkoutId (1-6), based on fitnessGoal + workoutsPerWeek
+// Workout plans (ids 1-7) — one per user; ids 1-6 are the original templates,
+// id 7 is Eitan Katz's plan added to fix the cross-user assignment
 // ---------------------------------------------------------------------
 const workoutPlans = [
     { id: 1, user_id: 1, plan_name: 'John Doe - 3 Day Muscle Gain Plan',       fitness_goal: 'muscle_gain', is_active: true, created_at: new Date('2026-05-05') },
@@ -51,7 +123,8 @@ const workoutPlans = [
     { id: 3, user_id: 4, plan_name: 'Roi Bublil - 3 Day Weight Loss Plan',     fitness_goal: 'weight_loss', is_active: true, created_at: new Date('2026-05-05') },
     { id: 4, user_id: 2, plan_name: 'Noam Levi - 4 Day Weight Loss Plan',      fitness_goal: 'weight_loss', is_active: true, created_at: new Date('2026-05-05') },
     { id: 5, user_id: 5, plan_name: 'Maya Ben-David - 3 Day Maintenance Plan', fitness_goal: 'maintenance', is_active: true, created_at: new Date('2026-05-05') },
-    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - 5 Day Maintenance Plan', fitness_goal: 'maintenance', is_active: true, created_at: new Date('2026-05-05') }
+    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - 5 Day Maintenance Plan', fitness_goal: 'maintenance', is_active: true, created_at: new Date('2026-05-05') },
+    { id: 7, user_id: 6, plan_name: 'Eitan Katz - 3 Day Weight Loss Plan',     fitness_goal: 'weight_loss', is_active: true, created_at: new Date('2026-05-05') }
 ];
 
 // ---------------------------------------------------------------------
@@ -83,7 +156,11 @@ const workoutPlanDays = [
     { id: 18, workout_plan_id: 6, day: 'Tuesday',   workout_title: 'Back And Biceps' },
     { id: 19, workout_plan_id: 6, day: 'Wednesday', workout_title: 'Legs And Core' },
     { id: 20, workout_plan_id: 6, day: 'Thursday',  workout_title: 'Shoulders And Arms' },
-    { id: 21, workout_plan_id: 6, day: 'Friday',    workout_title: 'Full Body' }
+    { id: 21, workout_plan_id: 6, day: 'Friday',    workout_title: 'Full Body' },
+
+    { id: 22, workout_plan_id: 7, day: 'Monday',    workout_title: 'Full Body Circuit A' },
+    { id: 23, workout_plan_id: 7, day: 'Wednesday', workout_title: 'Full Body Circuit B' },
+    { id: 24, workout_plan_id: 7, day: 'Friday',    workout_title: 'Full Body Circuit C' }
 ];
 
 // ---------------------------------------------------------------------
@@ -172,12 +249,24 @@ const planExercises = [
     { id: 60, day_id: 21, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 12, target_weight: 90 },
     { id: 61, day_id: 21, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 12, target_weight: 35 },
     { id: 62, day_id: 21, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 12, target_weight: 45 },
-    { id: 63, day_id: 21, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 60, target_weight: 0 }
+    { id: 63, day_id: 21, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 60, target_weight: 0  },
+
+    { id: 64, day_id: 22, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 15, target_weight: 55 },
+    { id: 65, day_id: 22, exercise_id: 2, exercise_name: 'Chest Press',      target_sets: 3, target_reps: 15, target_weight: 20 },
+    { id: 66, day_id: 22, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 30, target_weight: 0  },
+
+    { id: 67, day_id: 23, exercise_id: 3, exercise_name: 'Lat Pulldown',     target_sets: 3, target_reps: 15, target_weight: 25 },
+    { id: 68, day_id: 23, exercise_id: 5, exercise_name: 'Biceps Curl',      target_sets: 3, target_reps: 15, target_weight: 8  },
+    { id: 69, day_id: 23, exercise_id: 7, exercise_name: 'Plank',            target_sets: 3, target_reps: 30, target_weight: 0  },
+
+    { id: 70, day_id: 24, exercise_id: 1, exercise_name: 'Leg Press',        target_sets: 3, target_reps: 15, target_weight: 60 },
+    { id: 71, day_id: 24, exercise_id: 4, exercise_name: 'Shoulder Press',   target_sets: 3, target_reps: 15, target_weight: 8  },
+    { id: 72, day_id: 24, exercise_id: 6, exercise_name: 'Triceps Pushdown', target_sets: 3, target_reps: 15, target_weight: 15 }
 ];
 
 // ---------------------------------------------------------------------
-// Daily meal plan templates (ids 1-6) - looked up by planGenerator.js via
-// templateMealId (1-6), based on fitnessGoal + caloricTarget
+// Daily meal plans (ids 1-7) — one per user; ids 1-6 are the original templates,
+// id 7 is Eitan Katz's plan added to fix the cross-user assignment
 // ---------------------------------------------------------------------
 const dailyMealPlans = [
     { id: 1, user_id: 1, plan_name: 'John Doe - Muscle Gain Daily Meal Plan',              fitness_goal: 'muscle_gain', target_calories: 2972, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') },
@@ -185,7 +274,8 @@ const dailyMealPlans = [
     { id: 3, user_id: 4, plan_name: 'Roi Bublil - Weight Loss Daily Meal Plan',            fitness_goal: 'weight_loss', target_calories: 2008, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
     { id: 4, user_id: 2, plan_name: 'Noam Levi - Weight Loss Daily Meal Plan',             fitness_goal: 'weight_loss', target_calories: 2622, target_protein: 110, is_active: true, created_at: new Date('2026-05-05') },
     { id: 5, user_id: 5, plan_name: 'Maya Ben-David - Maintenance Daily Meal Plan',        fitness_goal: 'maintenance', target_calories: 2366, target_protein: 130, is_active: true, created_at: new Date('2026-05-05') },
-    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - Active Maintenance Daily Meal Plan', fitness_goal: 'maintenance', target_calories: 2366, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') }
+    { id: 6, user_id: 5, plan_name: 'Maya Ben-David - Active Maintenance Daily Meal Plan', fitness_goal: 'maintenance', target_calories: 2366, target_protein: 150, is_active: true, created_at: new Date('2026-05-05') },
+    { id: 7, user_id: 6, plan_name: 'Eitan Katz - Weight Loss Daily Meal Plan',           fitness_goal: 'weight_loss', target_calories: 1999, target_protein: 120, is_active: true, created_at: new Date('2026-05-05') }
 ];
 
 // ---------------------------------------------------------------------
@@ -220,7 +310,11 @@ const meals = [
     { id: 21, daily_meal_plan_id: 6, meal_type: 'Breakfast', title: 'Oats Greek Yogurt And Egg',      estimated_calories: 568, estimated_protein: 35 },
     { id: 22, daily_meal_plan_id: 6, meal_type: 'Lunch',     title: 'Chicken Rice Bowl With Avocado', estimated_calories: 757, estimated_protein: 65 },
     { id: 23, daily_meal_plan_id: 6, meal_type: 'Dinner',    title: 'Salmon With Rice And Broccoli',  estimated_calories: 710, estimated_protein: 55 },
-    { id: 24, daily_meal_plan_id: 6, meal_type: 'Snack',     title: 'Cottage Cheese With Oats',       estimated_calories: 331, estimated_protein: 28 }
+    { id: 24, daily_meal_plan_id: 6, meal_type: 'Snack',     title: 'Cottage Cheese With Oats',       estimated_calories: 331, estimated_protein: 28 },
+
+    { id: 25, daily_meal_plan_id: 7, meal_type: 'Breakfast', title: 'Greek Yogurt With Oats',         estimated_calories: 540, estimated_protein: 28 },
+    { id: 26, daily_meal_plan_id: 7, meal_type: 'Lunch',     title: 'Chicken Rice And Broccoli',      estimated_calories: 810, estimated_protein: 60 },
+    { id: 27, daily_meal_plan_id: 7, meal_type: 'Dinner',    title: 'Salmon With Sweet Potato',       estimated_calories: 649, estimated_protein: 40 }
 ];
 
 // ---------------------------------------------------------------------
@@ -305,32 +399,42 @@ const mealFoodItems = [
     { id: 54, meal_id: 23, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 189.3 },
 
     { id: 55, meal_id: 24, food_item_id: 9,  food_name: 'Cottage Cheese', quantity_grams: 236.6 },
-    { id: 56, meal_id: 24, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 28.4 }
+    { id: 56, meal_id: 24, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 28.4  },
+
+    { id: 57, meal_id: 25, food_item_id: 2,  food_name: 'Greek Yogurt',   quantity_grams: 200.0 },
+    { id: 58, meal_id: 25, food_item_id: 6,  food_name: 'Oats',           quantity_grams: 87.0  },
+
+    { id: 59, meal_id: 26, food_item_id: 1,  food_name: 'Chicken Breast', quantity_grams: 275.0 },
+    { id: 60, meal_id: 26, food_item_id: 3,  food_name: 'White Rice',     quantity_grams: 220.0 },
+    { id: 61, meal_id: 26, food_item_id: 10, food_name: 'Broccoli',       quantity_grams: 150.0 },
+
+    { id: 62, meal_id: 27, food_item_id: 4,  food_name: 'Salmon',         quantity_grams: 210.0 },
+    { id: 63, meal_id: 27, food_item_id: 8,  food_name: 'Sweet Potato',   quantity_grams: 280.0 }
 ];
 
 // ---------------------------------------------------------------------
-// Profiles (ids 1-6) - assigned_workout_plan_id / assigned_meal_plan_id
-// reference the WorkoutPlan / DailyMealPlan templates (ids 1-6) above
+// Profiles (ids 1-6) - each assigned_workout_plan_id / assigned_meal_plan_id
+// references a plan owned by the same user (ids 1-7)
 // ---------------------------------------------------------------------
 const profiles = [
-    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 80, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 2, assigned_meal_plan_id: 1 },
-    { id: 2, user_id: 2, age: 28, gender: 'male',   height_cm: 180, current_weight: 82, target_weight: 78, fitness_goal: 'weight_loss', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 4, onboarding_completed: true, caloric_target: 2622, assigned_workout_plan_id: 4, assigned_meal_plan_id: 3 },
-    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 65, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 1, assigned_meal_plan_id: 2 },
+    { id: 1, user_id: 1, age: 25, gender: 'male',   height_cm: 175, current_weight: 75, target_weight: 80, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 4, onboarding_completed: true, caloric_target: 2972, assigned_workout_plan_id: 1, assigned_meal_plan_id: 1 },
+    { id: 2, user_id: 2, age: 28, gender: 'male',   height_cm: 180, current_weight: 82, target_weight: 78, fitness_goal: 'weight_loss', activity_level: 'advanced',     workouts_per_week: 4, meals_per_day: 4, onboarding_completed: true, caloric_target: 2622, assigned_workout_plan_id: 4, assigned_meal_plan_id: 4 },
+    { id: 3, user_id: 3, age: 24, gender: 'female', height_cm: 165, current_weight: 60, target_weight: 65, fitness_goal: 'muscle_gain', activity_level: 'intermediate', workouts_per_week: 3, meals_per_day: 5, onboarding_completed: true, caloric_target: 2393, assigned_workout_plan_id: 2, assigned_meal_plan_id: 2 },
     { id: 4, user_id: 4, age: 35, gender: 'male',   height_cm: 175, current_weight: 90, target_weight: 82, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 2008, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 },
     { id: 5, user_id: 5, age: 22, gender: 'female', height_cm: 170, current_weight: 58, target_weight: 58, fitness_goal: 'maintenance', activity_level: 'advanced',     workouts_per_week: 5, meals_per_day: 5, onboarding_completed: true, caloric_target: 2366, assigned_workout_plan_id: 6, assigned_meal_plan_id: 5 },
-    { id: 6, user_id: 6, age: 30, gender: 'male',   height_cm: 178, current_weight: 85, target_weight: 80, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 1999, assigned_workout_plan_id: 3, assigned_meal_plan_id: 3 }
+    { id: 6, user_id: 6, age: 30, gender: 'male',   height_cm: 178, current_weight: 85, target_weight: 80, fitness_goal: 'weight_loss', activity_level: 'beginner',     workouts_per_week: 3, meals_per_day: 3, onboarding_completed: true, caloric_target: 1999, assigned_workout_plan_id: 7, assigned_meal_plan_id: 7 }
 ];
 
 // ---------------------------------------------------------------------
 // Settings (ids 1-6)
 // ---------------------------------------------------------------------
 const settings = [
-    { id: 1, user_id: 1, display_name: 'John Doe',      email: 'john@fitwize.com',  theme: 'light', fitness_goal: 'muscle gain', activity_level: 1 },
-    { id: 2, user_id: 2, display_name: 'Noam Levi',      email: 'noam@fitwize.com',  theme: 'dark',  fitness_goal: 'fat loss',    activity_level: 4 },
-    { id: 3, user_id: 3, display_name: 'Dana Cohen',     email: 'dana@fitwize.com',  theme: 'light', fitness_goal: 'muscle gain', activity_level: 3 },
-    { id: 4, user_id: 4, display_name: 'Roi Bublil',     email: 'roi@fitwize.com',   theme: 'light', fitness_goal: 'weight loss', activity_level: 2 },
-    { id: 5, user_id: 5, display_name: 'Maya Ben-David', email: 'maya@fitwize.com',  theme: 'light', fitness_goal: 'maintenance', activity_level: 5 },
-    { id: 6, user_id: 6, display_name: 'Eitan Katz',     email: 'eitan@fitwize.com', theme: 'dark',  fitness_goal: 'fat loss',    activity_level: 1 }
+    { id: 1, user_id: 1, display_name: 'John Doe',       email: 'john@fitwize.com',  theme: 'light' },
+    { id: 2, user_id: 2, display_name: 'Noam Levi',      email: 'noam@fitwize.com',  theme: 'dark'  },
+    { id: 3, user_id: 3, display_name: 'Dana Cohen',     email: 'dana@fitwize.com',  theme: 'light' },
+    { id: 4, user_id: 4, display_name: 'Roi Bublil',     email: 'roi@fitwize.com',   theme: 'light' },
+    { id: 5, user_id: 5, display_name: 'Maya Ben-David', email: 'maya@fitwize.com',  theme: 'light' },
+    { id: 6, user_id: 6, display_name: 'Eitan Katz',     email: 'eitan@fitwize.com', theme: 'dark'  }
 ];
 
 // ---------------------------------------------------------------------
@@ -420,7 +524,7 @@ async function main() {
     console.log(`Seeded ${foodItems.length} food items`);
 
     await prisma.workoutPlan.createMany({ data: workoutPlans });
-    console.log(`Seeded ${workoutPlans.length} workout plans (templates 1-6)`);
+    console.log(`Seeded ${workoutPlans.length} workout plans (ids 1-7)`);
 
     await prisma.workoutPlanDay.createMany({ data: workoutPlanDays });
     console.log(`Seeded ${workoutPlanDays.length} workout plan days`);
@@ -429,7 +533,7 @@ async function main() {
     console.log(`Seeded ${planExercises.length} plan exercises`);
 
     await prisma.dailyMealPlan.createMany({ data: dailyMealPlans });
-    console.log(`Seeded ${dailyMealPlans.length} daily meal plans (templates 1-6)`);
+    console.log(`Seeded ${dailyMealPlans.length} daily meal plans (ids 1-7)`);
 
     await prisma.meal.createMany({ data: meals });
     console.log(`Seeded ${meals.length} meals`);
@@ -445,6 +549,21 @@ async function main() {
 
     await prisma.checkIn.createMany({ data: checkIns });
     console.log(`Seeded ${checkIns.length} check-ins`);
+
+    // Sync profile.current_weight to each user's latest seeded check-in.
+    // createMany bypasses the controller sync logic, so we do it explicitly here.
+    const userIds = [...new Set(checkIns.map(ci => ci.user_id))];
+    for (const userId of userIds) {
+        const userCheckIns = checkIns.filter(ci => ci.user_id === userId);
+        const latest = userCheckIns.reduce((a, b) =>
+            new Date(a.check_in_date) >= new Date(b.check_in_date) ? a : b
+        );
+        await prisma.profile.update({
+            where: { user_id: userId },
+            data: { current_weight: latest.weight }
+        });
+    }
+    console.log('Synced profile.current_weight to latest check-in weights');
 
     console.log('Seeding complete.');
 }

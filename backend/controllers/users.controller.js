@@ -79,7 +79,7 @@ const getMe = async (req, res) => {
 // POST /api/users
 const createUser = async (req, res) => {
     try {
-        const { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences } = req.body;
+        const { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal } = req.body;
 
         const missingFields = getMissingFields(req.body, ['firstName', 'lastName', 'userRole', 'age', 'gender', 'height', 'weight', 'activityLevel', 'fitnessGoal']);
         if (missingFields.length > 0) {
@@ -107,7 +107,7 @@ const createUser = async (req, res) => {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
-        const newUser = await UsersModel.create({ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
+        const newUser = await UsersModel.create({ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal });
         return sendSuccess(res, 201, newUser);
     } catch (err) {
         return sendServerError(res);
@@ -127,7 +127,7 @@ const updateUser = async (req, res) => {
             return sendNotFound(res, 'User not found', {});
         }
 
-        const { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences } = req.body;
+        const { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal } = req.body;
 
         const missingFields = getMissingFields(req.body, ['firstName', 'lastName', 'userRole', 'age', 'gender', 'height', 'weight', 'activityLevel', 'fitnessGoal']);
         if (missingFields.length > 0) {
@@ -155,7 +155,7 @@ const updateUser = async (req, res) => {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
-        const updated = await UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal, preferences });
+        const updated = await UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal });
         return sendSuccess(res, 200, updated);
     } catch (err) {
         return sendServerError(res);
