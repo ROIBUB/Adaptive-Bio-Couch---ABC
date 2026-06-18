@@ -1,0 +1,55 @@
+.empty-state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  gap: 0.4rem;
+}
+
+.empty-state-icon {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 0.5rem;
+  border-radius: 50%;
+  background: var(--brand-50, #f5f3ff);
+  color: var(--brand, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.empty-state-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.empty-state-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  max-width: 320px;
+  margin: 0;
+}
+
+.empty-state-cta {
+  margin-top: 0.75rem;
+  background: var(--brand, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.55rem 1.25rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.empty-state-cta:hover {
+  background: var(--brand-hover, #6d28d9);
+}

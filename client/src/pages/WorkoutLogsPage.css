@@ -37,7 +37,7 @@
 }
 
 .new-workout-btn {
-  background: var(--purple);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -45,12 +45,15 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+  box-shadow: var(--shadow-brand);
 }
 
 .new-workout-btn:hover {
-  background: var(--purple-hover);
+  opacity: 0.92;
+  box-shadow: 0 6px 18px rgba(124,58,237,0.35);
 }
+.new-workout-btn:active { transform: scale(0.97); }
 
 .log-form {
   background: var(--card);
@@ -106,13 +109,13 @@
 .logs-table th {
   padding: 0.85rem 1rem;
   text-align: left;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--purple);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: var(--purple-bg);
-  border-bottom: 2px solid var(--purple-border);
+  letter-spacing: 0.08em;
+  background: var(--surface-inset, #f1f5f9);
+  border-bottom: 1px solid var(--border);
 }
 
 .logs-table td {

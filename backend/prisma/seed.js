@@ -511,6 +511,9 @@ async function main() {
     await prisma.workoutPlan.deleteMany();
     await prisma.foodItem.deleteMany();
     await prisma.exercise.deleteMany();
+    await prisma.supportMessage.deleteMany();
+    await prisma.supportConversation.deleteMany();
+    await prisma.userPresence.deleteMany();
     await prisma.user.deleteMany();
 
     // Recreate, parent before child, with explicit ids preserved.
@@ -564,6 +567,49 @@ async function main() {
         });
     }
     console.log('Synced profile.current_weight to latest check-in weights');
+
+    // -----------------------------------------------------------------------
+    // Support conversations, messages, and presence
+    // -----------------------------------------------------------------------
+
+    // Create presence records for all users (offline by default)
+    await prisma.userPresence.createMany({
+        data: users.map(u => ({
+            user_id:  u.id,
+            is_online: false,
+            last_seen: new Date(),
+        }))
+    });
+    console.log(`Seeded ${users.length} user presence records`);
+
+    // Create conversations for regular users only (ids 1, 3, 5, 6)
+    const regularUserIds = users.filter(u => u.role === 'user').map(u => u.id);
+    await prisma.supportConversation.createMany({
+        data: regularUserIds.map((uid, i) => ({
+            id:      i + 1,
+            user_id: uid,
+        }))
+    });
+    console.log(`Seeded ${regularUserIds.length} support conversations`);
+
+    // Sample messages — John (user 1) conv id 1, Dana (user 3) conv id 2
+    await prisma.supportMessage.createMany({
+        data: [
+            // John's conversation with support
+            { conversation_id: 1, sender_id: 1, sender_role: 'user',    message: 'Hi, I need help adjusting my workout plan.' },
+            { conversation_id: 1, sender_id: 4, sender_role: 'manager', message: 'Of course! What would you like to change?' },
+            { conversation_id: 1, sender_id: 1, sender_role: 'user',    message: 'Can I add more cardio days?' },
+            { conversation_id: 1, sender_id: 4, sender_role: 'manager', message: 'Absolutely, I\'ve updated your plan. Refresh the page to see the changes.' },
+            // Dana's question
+            { conversation_id: 2, sender_id: 3, sender_role: 'user',    message: 'Hello, I have a question about my meal plan.' },
+            { conversation_id: 2, sender_id: 2, sender_role: 'admin',   message: 'Hi Dana! Happy to help. What\'s the question?' },
+        ]
+    });
+    console.log('Seeded sample support messages');
+
+    // Update conversation timestamps to match the last message
+    await prisma.supportConversation.update({ where: { id: 1 }, data: { updated_at: new Date() } });
+    await prisma.supportConversation.update({ where: { id: 2 }, data: { updated_at: new Date() } });
 
     console.log('Seeding complete.');
 }

@@ -21,14 +21,16 @@
 }
 
 .data-table th {
-  background: var(--purple);
-  color: white;
+  background: var(--surface-inset, #f1f5f9);
+  color: var(--text-secondary);
   padding: 0.8rem 1rem;
   text-align: left;
   font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   white-space: nowrap;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
 }
 
 .data-table td {
@@ -41,12 +43,17 @@
   border-bottom: none;
 }
 
+.data-table tbody tr {
+  transition: background 0.15s ease;
+}
+
 .data-table tbody tr:nth-child(even) {
   background: #fafafa;
 }
 
 .data-table tbody tr:hover {
-  background: var(--purple-bg);
+  background: var(--brand-50, #f5f3ff);
+  cursor: default;
 }
 
 .table-empty {

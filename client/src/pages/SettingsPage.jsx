@@ -88,8 +88,21 @@ function SettingsPage() {
     }
   };
 
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const initials = (
+    `${(storedUser.firstName || '')[0] || ''}${(storedUser.lastName || '')[0] || ''}`.toUpperCase() || '?'
+  );
+
   return (
     <div className="settings-page">
+      <div className="settings-avatar">
+        <div className="settings-avatar-circle">{initials}</div>
+        <div>
+          <div className="settings-avatar-name">{storedUser.firstName} {storedUser.lastName}</div>
+          <div className="settings-avatar-role">{storedUser.userRole}</div>
+        </div>
+      </div>
+
       <div className="settings-header">
         <h1>Settings</h1>
         <p>Manage your profile and preferences</p>

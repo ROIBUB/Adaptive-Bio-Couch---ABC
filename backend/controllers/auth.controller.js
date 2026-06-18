@@ -1,7 +1,9 @@
-const UsersModel    = require('../models/users.model');
-const ProfilesModel = require('../models/profiles.model');
-const SettingsModel = require('../models/settings.model');
-const { generatePlan } = require('../services/planGenerator');
+const UsersModel                = require('../models/users.model');
+const ProfilesModel             = require('../models/profiles.model');
+const SettingsModel             = require('../models/settings.model');
+const SupportConversationModel  = require('../models/supportConversation.model');
+const UserPresenceModel         = require('../models/userPresence.model');
+const { generatePlan }          = require('../services/planGenerator');
 const { sendSuccess, sendValidationError, sendServerError } = require('../middleware/errorHandlers');
 
 // POST /api/auth/login
@@ -93,6 +95,10 @@ const register = async (req, res) => {
 
         const plan = await generatePlan({...newProfile, userId: newUser.userid, firstName: newUser.firstName });
         await ProfilesModel.update(newProfile.userId, plan);
+
+        // Bootstrap support conversation and presence for new users
+        await SupportConversationModel.getOrCreate(newUser.userid);
+        await UserPresenceModel.upsert(newUser.userid, { isOnline: false, lastSeen: new Date() });
 
         return sendSuccess(res, 201, {
             userId: newUser.userid,

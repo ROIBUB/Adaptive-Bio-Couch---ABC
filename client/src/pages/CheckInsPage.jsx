@@ -4,15 +4,25 @@ import { getCheckIns, createCheckIn } from '../services/checkInService';
 import { getAIRecommendations, generateAIRecommendations } from '../services/aiService';
 import './CheckInsPage.css';
 
-const CHECK_IN_COLUMNS = [
-  { key: 'checkInDate',       label: 'Date' },
-  { key: 'weight',            label: 'Weight (kg)' },
-  { key: 'workoutsCompleted', label: 'Workouts Done' },
-  { key: 'feedback',          label: 'Feedback' },
-];
-
 const EMPTY_FORM = { weight: '', workoutsCompleted: '', feedback: '', checkInDate: '' };
 const AI_MIN_CHECKINS = 3;
+
+const CHECK_IN_DETAIL_COLUMNS = [
+  { key: 'checkInDate',       label: 'Date' },
+  { key: 'weight',            label: 'Weight (kg)' },
+  {
+    key: 'weightChange',
+    label: 'Change',
+    render: (v) => {
+      if (v === null) return <span className="badge badge-neutral">First entry</span>;
+      if (v < 0)  return <span className="badge badge-success">{v.toFixed(1)} kg</span>;
+      if (v > 0)  return <span className="badge badge-danger">+{v.toFixed(1)} kg</span>;
+      return <span className="badge badge-neutral">±0.0 kg</span>;
+    },
+  },
+  { key: 'workoutsCompleted', label: 'Workouts' },
+  { key: 'feedback',          label: 'Feedback' },
+];
 
 function CheckInsPage() {
   const [checkIns,     setCheckIns]      = useState([]);
@@ -165,6 +175,18 @@ function CheckInsPage() {
   const hasExerciseAdjustments = actionsApplied !== null &&
     actionsApplied.exerciseAdjustmentsCount > 0;
 
+  const sortedDesc = [...checkIns].sort(
+    (a, b) => new Date(b.checkInDate) - new Date(a.checkInDate)
+  );
+
+  const detailTableData = sortedDesc.map((ci, i) => {
+    const prev = sortedDesc[i + 1];
+    return {
+      ...ci,
+      weightChange: prev != null ? parseFloat((ci.weight - prev.weight).toFixed(2)) : null,
+    };
+  });
+
   return (
     <div className="check-ins-page">
       <div className="page-header">
@@ -244,20 +266,77 @@ function CheckInsPage() {
             </form>
           )}
 
-          {/* Check-ins table */}
-          <DataTable
-            columns={CHECK_IN_COLUMNS}
-            data={checkIns}
-            caption="Your weekly check-in history"
-          />
+          {/* Weight Journey Timeline */}
+          {sortedDesc.length > 0 && (
+            <div className="ci-timeline-section">
+              <div className="ci-journey-header">
+                <h2 className="ci-journey-title">Weight Journey</h2>
+                <span className="badge badge-brand">
+                  {checkIns.length} check-in{checkIns.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="ci-timeline">
+                {sortedDesc.map((ci, i) => {
+                  const prev     = sortedDesc[i + 1];
+                  const delta    = prev != null ? ci.weight - prev.weight : null;
+                  const deltaCls = delta === null ? '' : delta < 0 ? 'badge-success' : delta > 0 ? 'badge-warning' : 'badge-neutral';
+                  return (
+                    <div key={i} className="ci-node">
+                      <div className="ci-node-line">
+                        <div className="ci-node-dot" />
+                        {i < sortedDesc.length - 1 && <div className="ci-node-track" />}
+                      </div>
+                      <div className="ci-node-body">
+                        <div className="ci-node-head">
+                          <span className="ci-node-date">{ci.checkInDate}</span>
+                          <span className="ci-node-weight">{ci.weight} kg</span>
+                          {delta !== null && (
+                            <span className={`badge ${deltaCls}`} style={{ fontSize: '0.65rem' }}>
+                              {delta >= 0 ? '+' : ''}{delta.toFixed(1)} kg
+                            </span>
+                          )}
+                        </div>
+                        <div className="ci-node-meta">
+                          <span className="ci-node-workouts">
+                            💪 {ci.workoutsCompleted} workout{ci.workoutsCompleted !== 1 ? 's' : ''}
+                          </span>
+                          {ci.feedback && (
+                            <span className="ci-node-feedback">"{ci.feedback}"</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Detailed History Table */}
+          {detailTableData.length > 0 && (
+            <div className="ci-detail-section">
+              <div className="ci-detail-header">
+                <h3 className="ci-detail-title">📊 Detailed History</h3>
+                <span className="badge badge-neutral">{detailTableData.length} entries</span>
+              </div>
+              <DataTable
+                columns={CHECK_IN_DETAIL_COLUMNS}
+                data={detailTableData}
+                caption="Full check-in record — newest first"
+              />
+            </div>
+          )}
 
           {/* AI Coach Analysis */}
           <section className="ai-section">
-            <div className="ai-section-header">
-              <h2>AI Coach Analysis</h2>
-              <p className="ai-section-subtitle">
-                Reviews your accumulated check-in data and may update your workout and meal plans based on your progress trends.
-              </p>
+            <div className="ai-section-banner">
+              <div className="ai-section-banner-icon">✨</div>
+              <div>
+                <h2 className="ai-section-banner-title">AI Coach Analysis</h2>
+                <p className="ai-section-banner-subtitle">
+                  Reviews your accumulated check-in data and may update your workout and meal plans based on your progress trends.
+                </p>
+              </div>
             </div>
 
             {aiLoading && (

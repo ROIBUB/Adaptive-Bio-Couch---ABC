@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   getAllUsers, deleteUser, updateUser,
@@ -7,6 +7,8 @@ import {
   getUsersWithStats, getUserCheckIns,
   createUserFull,
 } from '../services/adminService';
+import { getAllUsersConversations, getUserConversation } from '../services/supportService';
+import supportSocket from '../services/supportSocket';
 import './AdminPage.css';
 
 const TABS = [
@@ -14,6 +16,7 @@ const TABS = [
   { key: 'workouts', label: 'Workout Plans' },
   { key: 'meals',    label: 'Meal Plans' },
   { key: 'checkins', label: 'Check-Ins' },
+  { key: 'chat',     label: 'Chat Center' },
 ];
 
 const DAY_ORDER  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -57,6 +60,20 @@ function AdminPage() {
   // null = closed; { loading, user, checkIns, error } = open
   const [checkInsModal, setCheckInsModal] = useState(null);
 
+  // ── Chat Center ────────────────────────────────────────────────────────────
+  const [chatConvList,      setChatConvList]      = useState([]);  // all user conversations for sidebar
+  const [selectedChatUid,   setSelectedChatUid]   = useState(null);
+  const [chatMessages,      setChatMessages]       = useState([]);
+  const [chatInput,         setChatInput]          = useState('');
+  const [chatLoading,       setChatLoading]        = useState(false);
+  const [chatConnected,     setChatConnected]      = useState(false);
+  const [chatOtherTyping,   setChatOtherTyping]    = useState(false);
+  const chatBottomRef   = useRef(null);
+  const chatTypingTimer = useRef(null);
+
+  // ── Admin stats strip ─────────────────────────────────────────────────────
+  const [adminStats, setAdminStats] = useState(null);
+
   // ── Data fetching ─────────────────────────────────────────────────────────
   const fetchActiveTab = useCallback(async () => {
     setLoading(true);
@@ -70,6 +87,8 @@ function AdminPage() {
         setMealPlans((await getAllMealPlans()) || []);
       } else if (activeTab === 'checkins') {
         setCheckInUsers((await getUsersWithStats()) || []);
+      } else if (activeTab === 'chat') {
+        setChatConvList((await getAllUsersConversations()) || []);
       }
     } catch (err) {
       setError(err.message || 'Failed to load data. Make sure the backend is running on port 3000.');
@@ -84,11 +103,99 @@ function AdminPage() {
     fetchActiveTab();
   }, [fetchActiveTab, canAccess]);
 
+  // Populate admin stats strip (one-time on mount)
+  useEffect(() => {
+    if (!canAccess) return;
+    let cancelled = false;
+    Promise.allSettled([
+      getAllUsers(),
+      getAllWorkoutPlans(),
+      getAllMealPlans(),
+      getUsersWithStats(),
+    ]).then(([u, w, m, c]) => {
+      if (cancelled) return;
+      setAdminStats({
+        users:    u.status === 'fulfilled' ? (u.value || []).length : '—',
+        workouts: w.status === 'fulfilled' ? (w.value || []).length : '—',
+        meals:    m.status === 'fulfilled' ? (m.value || []).length : '—',
+        checkIns: c.status === 'fulfilled'
+          ? (c.value || []).reduce((s, u) => s + (u.checkInCount || 0), 0)
+          : '—',
+      });
+    });
+    return () => { cancelled = true; };
+  }, [canAccess]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Chat Center socket lifecycle ──────────────────────────────────────────
+  useEffect(() => {
+    if (activeTab !== 'chat' || !canAccess) return;
+
+    supportSocket.connect();
+    supportSocket.emit('support:join', { userId: user.userId, role: userRole });
+
+    const onConnect    = () => setChatConnected(true);
+    const onDisconnect = () => setChatConnected(false);
+
+    const onNewMessage = ({ conversationUserId, message }) => {
+      // Update sidebar last-message preview
+      setChatConvList(prev => prev.map(c =>
+        c.userId === conversationUserId
+          ? { ...c, lastMessage: message, updatedAt: message.createdAt }
+          : c
+      ));
+      // If this conversation is currently open, append message
+      if (Number(conversationUserId) === Number(selectedChatUid)) {
+        setChatMessages(prev => [...prev, message]);
+      }
+    };
+
+    const onTyping = ({ conversationUserId, senderId, isTyping: typing }) => {
+      if (
+        Number(conversationUserId) === Number(selectedChatUid) &&
+        Number(senderId) !== Number(user.userId)
+      ) {
+        setChatOtherTyping(typing);
+      }
+    };
+
+    const onPresence = ({ userId: uid, isOnline }) => {
+      setChatConvList(prev => prev.map(c =>
+        c.userId === uid ? { ...c, isOnline } : c
+      ));
+    };
+
+    supportSocket.on('connect',                 onConnect);
+    supportSocket.on('disconnect',              onDisconnect);
+    supportSocket.on('support:new_message',     onNewMessage);
+    supportSocket.on('support:typing',          onTyping);
+    supportSocket.on('support:presence_update', onPresence);
+
+    return () => {
+      supportSocket.off('connect',                 onConnect);
+      supportSocket.off('disconnect',              onDisconnect);
+      supportSocket.off('support:new_message',     onNewMessage);
+      supportSocket.off('support:typing',          onTyping);
+      supportSocket.off('support:presence_update', onPresence);
+      supportSocket.disconnect();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, canAccess]);
+
+  // Auto-scroll chat when messages change
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, chatOtherTyping]);
+
   if (!canAccess) return <Navigate to="/dashboard" replace />;
 
   const switchTab = (key) => {
     if (key === activeTab) return;
     setEditingUserId(null);
+    // Disconnect support socket when leaving chat tab
+    if (activeTab === 'chat') {
+      supportSocket.disconnect();
+      setChatConnected(false);
+    }
     setActiveTab(key);
   };
 
@@ -252,6 +359,46 @@ function AdminPage() {
     }
   };
 
+  // ── Chat Center handlers ───────────────────────────────────────────────────
+  const openUserChat = async (convUserId) => {
+    setSelectedChatUid(convUserId);
+    setChatLoading(true);
+    setChatMessages([]);
+    try {
+      const conv = await getUserConversation(convUserId);
+      setChatMessages(conv?.messages ?? []);
+    } catch {
+      setChatMessages([]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const sendChatMessage = () => {
+    const text = chatInput.trim();
+    if (!text || !selectedChatUid) return;
+    supportSocket.emit('support:message', { conversationUserId: selectedChatUid, message: text });
+    setChatInput('');
+    supportSocket.emit('support:typing', { conversationUserId: selectedChatUid, isTyping: false });
+  };
+
+  const handleChatKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChatMessage();
+      return;
+    }
+    supportSocket.emit('support:typing', { conversationUserId: selectedChatUid, isTyping: true });
+    clearTimeout(chatTypingTimer.current);
+    chatTypingTimer.current = setTimeout(() => {
+      supportSocket.emit('support:typing', { conversationUserId: selectedChatUid, isTyping: false });
+    }, 1500);
+  };
+
+  const formatChatTime = (ts) => ts
+    ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : '';
+
   // ── Tab renderers ──────────────────────────────────────────────────────────
   const renderUsers = () => (
     <>
@@ -397,7 +544,11 @@ function AdminPage() {
                   <td>{u.userid}</td>
                   <td>{u.firstName}</td>
                   <td>{u.lastName}</td>
-                  <td>{u.userRole}</td>
+                  <td>
+                    <span className={`badge ${u.userRole === 'admin' ? 'badge-danger' : u.userRole === 'manager' ? 'badge-warning' : 'badge-neutral'}`}>
+                      {u.userRole}
+                    </span>
+                  </td>
                   <td>{u.createDate ? String(u.createDate).split('T')[0] : '—'}</td>
                   <td>
                     <button className="action-btn edit" onClick={() => startEdit(u)}>Edit</button>
@@ -530,7 +681,11 @@ function AdminPage() {
             <tr key={u.userId}>
               <td>{u.userId}</td>
               <td>{u.firstName} {u.lastName}</td>
-              <td>{u.userRole}</td>
+              <td>
+                <span className={`badge ${u.userRole === 'admin' ? 'badge-danger' : u.userRole === 'manager' ? 'badge-warning' : 'badge-neutral'}`}>
+                  {u.userRole}
+                </span>
+              </td>
               <td>{u.currentWeight != null ? u.currentWeight : '—'}</td>
               <td>{u.checkInCount}</td>
               <td>
@@ -713,12 +868,112 @@ function AdminPage() {
     );
   };
 
+  const renderChatCenter = () => (
+    <div className="cc-layout">
+      {/* Left sidebar — conversation list */}
+      <div className="cc-sidebar">
+        <div className="cc-sidebar-header">
+          <span>Users</span>
+          {!chatConnected && <span className="cc-offline-pill">Connecting…</span>}
+        </div>
+        {chatConvList.length === 0 && (
+          <p className="cc-empty-list">No conversations yet.</p>
+        )}
+        {chatConvList.map(c => (
+          <div
+            key={c.userId}
+            className={`cc-conv-item${selectedChatUid === c.userId ? ' active' : ''}`}
+            onClick={() => openUserChat(c.userId)}
+          >
+            <div className="cc-conv-top">
+              <span className="cc-conv-name">
+                <span className={`cc-presence-dot ${c.isOnline ? 'online' : 'offline'}`} />
+                {c.userName}
+              </span>
+              <span className="cc-conv-time">
+                {c.lastMessage ? formatChatTime(c.lastMessage.createdAt) : ''}
+              </span>
+            </div>
+            <div className="cc-conv-preview">
+              {c.lastMessage ? c.lastMessage.message : 'No messages yet'}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Right panel — open conversation */}
+      <div className="cc-chat-panel">
+        {!selectedChatUid ? (
+          <div className="cc-no-selection">Select a user conversation to start chatting</div>
+        ) : (
+          <>
+            {/* Chat header */}
+            <div className="cc-chat-header">
+              {chatConvList.find(c => c.userId === selectedChatUid)?.userName ?? `User #${selectedChatUid}`}
+              <span className={`cc-presence-dot ${chatConvList.find(c => c.userId === selectedChatUid)?.isOnline ? 'online' : 'offline'}`} style={{ marginLeft: 8 }} />
+            </div>
+
+            {/* Messages */}
+            <div className="cc-messages">
+              {chatLoading && <p className="loading">Loading…</p>}
+              {!chatLoading && chatMessages.length === 0 && (
+                <p className="cc-empty-list">No messages yet.</p>
+              )}
+              {chatMessages.map(msg => {
+                const isOwn = Number(msg.senderId) === Number(user.userId);
+                return (
+                  <div key={msg.id} className={`cc-bubble-row ${isOwn ? 'own' : 'other'}`}>
+                    {!isOwn && (
+                      <div className="cc-sender-name">{msg.senderName || 'User'}</div>
+                    )}
+                    <div className={`cc-bubble ${isOwn ? 'own' : 'other'}`}>{msg.message}</div>
+                    <div className="cc-time">{formatChatTime(msg.createdAt)}</div>
+                  </div>
+                );
+              })}
+              {chatOtherTyping && (
+                <div className="cc-bubble-row other">
+                  <div className="cc-bubble other cc-typing">
+                    <span /><span /><span />
+                  </div>
+                </div>
+              )}
+              <div ref={chatBottomRef} />
+            </div>
+
+            {/* Input */}
+            <div className="cc-input-area">
+              <textarea
+                className="cc-input"
+                placeholder="Type a reply…"
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyDown={handleChatKeyDown}
+                rows={1}
+              />
+              <button
+                className="cc-send-btn"
+                onClick={sendChatMessage}
+                disabled={!chatInput.trim()}
+              >
+                Send
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
   // ── Render ─────────────────────────────────────────────────────────────────
+  const isChatTab = activeTab === 'chat';
+
   const tabHasData =
     (activeTab === 'users'    && users.length        > 0) ||
     (activeTab === 'workouts' && workoutPlans.length > 0) ||
     (activeTab === 'meals'    && mealPlans.length    > 0) ||
-    (activeTab === 'checkins' && checkInUsers.length > 0);
+    (activeTab === 'checkins' && checkInUsers.length > 0) ||
+    (activeTab === 'chat'     && chatConvList.length >= 0); // chat center always "has data"
 
   return (
     <div className="admin-page">
@@ -726,6 +981,27 @@ function AdminPage() {
         <h1>Admin Panel</h1>
         <p>Manage users, workout plans, and meal plans</p>
       </div>
+
+      {adminStats && (
+        <div className="admin-stats-strip">
+          <div className="admin-stat-pill">
+            <span className="admin-stat-value">{adminStats.users}</span>
+            <span className="admin-stat-label">Users</span>
+          </div>
+          <div className="admin-stat-pill">
+            <span className="admin-stat-value">{adminStats.workouts}</span>
+            <span className="admin-stat-label">Workout Plans</span>
+          </div>
+          <div className="admin-stat-pill">
+            <span className="admin-stat-value">{adminStats.meals}</span>
+            <span className="admin-stat-label">Meal Plans</span>
+          </div>
+          <div className="admin-stat-pill">
+            <span className="admin-stat-value">{adminStats.checkIns}</span>
+            <span className="admin-stat-label">Total Check-ins</span>
+          </div>
+        </div>
+      )}
 
       <div className="admin-tabs">
         {TABS.map(t => (
@@ -739,15 +1015,15 @@ function AdminPage() {
         ))}
       </div>
 
-      <div className="admin-table-section">
-        {loading && <p className="loading">Loading…</p>}
-        {error   && <div className="error-banner">{error}</div>}
+      <div className={`admin-table-section${isChatTab ? ' no-padding' : ''}`}>
+        {!isChatTab && loading && <p className="loading">Loading…</p>}
+        {!isChatTab && error   && <div className="error-banner">{error}</div>}
 
-        {!loading && !error && !tabHasData && (
+        {!isChatTab && !loading && !error && !tabHasData && (
           <p className="table-empty">No data to display.</p>
         )}
 
-        {!loading && !error && tabHasData && (
+        {(!isChatTab && !loading && !error && tabHasData) && (
           <>
             {activeTab === 'users'    && renderUsers()}
             {activeTab === 'workouts' && renderWorkoutPlans()}
@@ -755,6 +1031,8 @@ function AdminPage() {
             {activeTab === 'checkins' && renderCheckIns()}
           </>
         )}
+
+        {isChatTab && renderChatCenter()}
       </div>
 
       {planModal     && renderPlanModal()}

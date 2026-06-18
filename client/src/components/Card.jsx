@@ -9,10 +9,11 @@ import './Card.css';
 //   stats       (array)   — [{ label: string, value: string|number }]
 //   accentColor (string)  — CSS color for the left border stripe
 function Card({ title, subtitle, badge, stats = [], accentColor }) {
-  const borderStyle = accentColor ? { borderLeftColor: accentColor } : {};
+  const accentStyle = accentColor ? { borderTopColor: accentColor, borderTopWidth: '3px', borderTopStyle: 'solid' } : {};
+  const cls = `card${accentColor ? ' card--accent' : ''}`;
 
   return (
-    <div className="card" style={borderStyle}>
+    <div className={cls} style={accentStyle}>
       <div className="card-header">
         <h3 className="card-title">{title}</h3>
         {badge && <span className="card-badge">{badge}</span>}

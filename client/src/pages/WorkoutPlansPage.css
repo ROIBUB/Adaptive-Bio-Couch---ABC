@@ -2,6 +2,29 @@
   /* Layout.jsx already provides padding and max-width */
 }
 
+/* ── Skeleton ── */
+.wpp-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.wpp-skel-card {
+  height: 110px;
+  border-radius: var(--radius);
+}
+
+.wpp-skel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.wpp-skel-day {
+  height: 60px;
+  border-radius: var(--radius);
+}
+
 .page-header {
   margin-bottom: 2rem;
 }
@@ -34,92 +57,177 @@
   margin-bottom: 1.5rem;
 }
 
-/* Training days grid */
-.days-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+/* ── Days Accordion ── */
+.days-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
 .day-card {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 1rem 1.2rem;
-  box-shadow: var(--shadow-md);
-  border-top: 3px solid var(--purple);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--purple);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
 }
 
-.day-header {
+.day-card--open {
+  box-shadow: var(--shadow-md);
+}
+
+.day-card-header {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  margin-bottom: 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 0.75rem;
+  transition: background 0.15s;
+}
+
+.day-card-header:hover {
+  background: var(--brand-50);
+}
+
+.day-card--open .day-card-header {
+  background: var(--brand-50);
+}
+
+.day-header-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .day-name {
+  display: block;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--purple);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .day-title {
+  display: block;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
 }
 
-.exercise-list {
-  list-style: none;
+.day-header-right {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.exercise-item {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 0.88rem;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid var(--border);
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
-.exercise-item:last-child {
-  border-bottom: none;
-}
-
-.ex-name {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.ex-detail {
-  color: var(--text-secondary);
-  font-size: 0.82rem;
+.day-ex-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-inset);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
   white-space: nowrap;
 }
 
-.plan-table {
-  margin-top: 1rem;
+.day-chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
-.table-heading {
+.day-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* ── Expanded exercise area ── */
+.day-exercises {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.ex-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+}
+
+.ex-card-icon {
   font-size: 1rem;
-  font-weight: 600;
-  color: #2d3436;
-  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
+.ex-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ex-card-name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ex-card-detail {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+
+.ex-card-weight {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brand);
+  background: white;
+  border: 1px solid var(--brand-100);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ex-card-bw {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--success, #059669);
+  background: var(--success-bg, #ecfdf5);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.day-empty {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+}
+
+/* ── Action buttons ── */
 .day-card-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.85rem;
+  margin-top: 0.75rem;
 }
 
 .day-card-actions .start-workout-btn,
@@ -132,24 +240,25 @@
   display: block;
   width: 100%;
   padding: 0.55rem 0;
-  background: var(--purple);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-brand);
 }
 
 .view-logs-btn:hover {
-  background: var(--purple-hover);
+  opacity: 0.9;
+  box-shadow: 0 4px 14px rgba(124,58,237,0.35);
 }
 
 .start-workout-btn {
   display: block;
   width: 100%;
-  margin-top: 0.85rem;
   padding: 0.55rem 0;
   background: #059669;
   color: white;
@@ -163,4 +272,38 @@
 
 .start-workout-btn:hover {
   background: #047857;
+}
+
+/* ── Exercise Library (premium secondary table) ── */
+.exercise-library {
+  margin-top: 2rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--brand-100, #ede9fe);
+}
+
+.exercise-library-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, var(--brand-50, #f5f3ff) 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--brand-100, #ede9fe);
+}
+
+.exercise-library-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.exercise-library .table-wrapper {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.exercise-library .data-table tbody tr:hover {
+  background: var(--brand-50, #f5f3ff);
+  transform: none;
 }

@@ -23,7 +23,7 @@
 }
 
 .toggle-btn {
-  background: var(--purple);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -31,12 +31,15 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+  box-shadow: var(--shadow-brand);
 }
 
 .toggle-btn:hover {
-  background: var(--purple-hover);
+  opacity: 0.92;
+  box-shadow: 0 6px 18px rgba(124,58,237,0.35);
 }
+.toggle-btn:active { transform: scale(0.97); }
 
 .checkin-form {
   background: var(--card);
@@ -92,6 +95,44 @@
   margin-top: 0.3rem;
   font-size: 0.88rem;
   color: var(--text-secondary);
+}
+
+/* ── Dark gradient AI banner ── */
+.ai-section-banner {
+  background: linear-gradient(135deg, #1a0533 0%, #2d1052 60%, #1e0b3a 100%);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
+}
+
+.ai-section-banner-icon {
+  font-size: 1.75rem;
+  width: 50px;
+  height: 50px;
+  background: rgba(139, 92, 246, 0.18);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-section-banner-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.ai-section-banner-subtitle {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.45;
 }
 
 .ai-loading {
@@ -280,7 +321,7 @@
 }
 
 .ai-btn {
-  background: var(--purple);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -288,14 +329,155 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
+  box-shadow: var(--shadow-brand);
 }
 
 .ai-btn:hover:not(:disabled) {
-  background: var(--purple-hover);
+  opacity: 0.92;
+  box-shadow: 0 6px 18px rgba(124,58,237,0.35);
 }
+.ai-btn:active:not(:disabled) { transform: scale(0.97); }
 
 .ai-btn:disabled {
   background: var(--text-muted);
   cursor: not-allowed;
+}
+
+/* ── Weight Journey Timeline ── */
+.ci-timeline-section {
+  margin: 1.5rem 0;
+}
+
+.ci-journey-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.ci-journey-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ci-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.ci-node {
+  display: flex;
+  gap: 1rem;
+  min-height: 60px;
+}
+
+.ci-node-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.ci-node-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--brand);
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px var(--brand);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.ci-node-track {
+  flex: 1;
+  width: 2px;
+  background: var(--brand-100);
+  margin: 5px 0 0;
+}
+
+.ci-node-body {
+  flex: 1;
+  padding-bottom: 1.25rem;
+}
+
+.ci-node:last-child .ci-node-body {
+  padding-bottom: 0;
+}
+
+.ci-node-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.3rem;
+}
+
+.ci-node-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.ci-node-weight {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.ci-node-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ci-node-workouts {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.ci-node-feedback {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Detailed History (premium secondary table) ── */
+.ci-detail-section {
+  margin-top: 2rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--brand-100, #ede9fe);
+}
+
+.ci-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, var(--brand-50, #f5f3ff) 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--brand-100, #ede9fe);
+}
+
+.ci-detail-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ci-detail-section .table-wrapper {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.ci-detail-section .data-table tbody tr:hover {
+  background: var(--brand-50, #f5f3ff);
 }

@@ -14,6 +14,7 @@ import WorkoutLoggerPage  from './pages/WorkoutLoggerPage';
 import MealPlansPage    from './pages/MealPlansPage';
 import CheckInsPage     from './pages/CheckInsPage';
 import AdminPage        from './pages/AdminPage';
+import SupportChatPage  from './pages/SupportChatPage';
 
 const isLoggedIn = () => !!localStorage.getItem('user');
 
@@ -91,6 +92,10 @@ function App() {
         <Route
           path="/admin"
           element={<ProtectedRoute><AdminPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/support"
+          element={<ProtectedRoute><SupportChatPage /></ProtectedRoute>}
         />
 
         {/* Any unknown URL → login */}

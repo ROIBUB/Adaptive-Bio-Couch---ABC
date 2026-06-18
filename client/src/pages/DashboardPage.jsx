@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import DataTable from '../components/DataTable';
 import AIChatWidget from '../components/AIChatWidget';
+import DataTable from '../components/DataTable';
+import EmptyState from '../components/EmptyState';
 import { getProfile } from '../services/profileService';
-import { getWorkoutLogs } from '../services/workoutService';
+import { getWorkoutLogs, getWorkoutPlans } from '../services/workoutService';
 import { getCheckIns } from '../services/checkInService';
 import { getProgressData } from '../services/progressService';
 import { getDailyMealPlans } from '../services/mealService';
@@ -16,14 +17,48 @@ const GOAL_LABELS = {
 };
 
 const ACTIVITY_COLUMNS = [
-  { key: 'date',   label: 'Date' },
-  { key: 'type',   label: 'Activity' },
-  { key: 'detail', label: 'Detail' },
+  { key: 'date',        label: 'Date' },
+  {
+    key: 'type',
+    label: 'Activity',
+    render: (v) => v === 'Workout'
+      ? <span className="badge badge-brand">💪 Workout</span>
+      : <span className="badge badge-success">📊 Check-In</span>,
+  },
+  { key: 'description', label: 'Description' },
+  { key: 'value',       label: 'Value' },
 ];
 
 const VIEWBOX_W = 600;
 const VIEWBOX_H = 200;
 const GM = { top: 15, right: 20, bottom: 35, left: 45 };
+
+function ic(size, children) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="dash-skeleton">
+      <div className="skel dash-skel-hero" />
+      <div className="dash-skel-cards">
+        {[0, 1, 2].map(i => <div key={i} className="skel dash-skel-card" />)}
+      </div>
+      <div className="dash-skel-nav">
+        {[0, 1, 2, 3].map(i => <div key={i} className="skel dash-skel-nav-tile" />)}
+      </div>
+      <div className="skel dash-skel-graph" />
+      <div className="dash-skel-timeline">
+        {[0, 1, 2].map(i => <div key={i} className="skel dash-skel-row" />)}
+      </div>
+    </div>
+  );
+}
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -32,37 +67,37 @@ function DashboardPage() {
 
   const [planSuccess, setPlanSuccess] = useState(!!location.state?.planCreated);
 
-  // Clear the navigation state so the banner doesn't reappear on refresh
   useEffect(() => {
     if (location.state?.planCreated) {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [loading,        setLoading]        = useState(true);
-  const [profile,        setProfile]        = useState(null);
-  const [profileFailed,  setProfileFailed]  = useState(false);
+  const [loading,          setLoading]          = useState(true);
+  const [profile,          setProfile]          = useState(null);
+  const [profileFailed,    setProfileFailed]    = useState(false);
   const [assignedMealPlan, setAssignedMealPlan] = useState(null);
-  const [workoutLogs,    setWorkoutLogs]    = useState([]);
-  const [logsFailed,     setLogsFailed]     = useState(false);
-  const [checkIns,       setCheckIns]       = useState([]);
-  const [checkInsFailed, setCheckInsFailed] = useState(false);
-  const [progressData,   setProgressData]   = useState([]);
-  const [progressFailed, setProgressFailed] = useState(false);
+  const [workoutLogs,      setWorkoutLogs]      = useState([]);
+  const [logsFailed,       setLogsFailed]       = useState(false);
+  const [checkIns,         setCheckIns]         = useState([]);
+  const [checkInsFailed,   setCheckInsFailed]   = useState(false);
+  const [progressData,     setProgressData]     = useState([]);
+  const [progressFailed,   setProgressFailed]   = useState(false);
+  const [workoutPlans,     setWorkoutPlans]     = useState([]);
 
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
-      const [profileRes, logsRes, checkInsRes, progressRes] = await Promise.allSettled([
+      const [profileRes, logsRes, checkInsRes, progressRes, plansRes] = await Promise.allSettled([
         getProfile(user.userId),
         getWorkoutLogs(),
         getCheckIns(),
         getProgressData(),
+        getWorkoutPlans(),
       ]);
 
-      if (profileRes.status  === 'fulfilled') {
+      if (profileRes.status === 'fulfilled') {
         setProfile(profileRes.value);
-        // Fetch the assigned meal plan so the calories target matches the meal plan page
         try {
           const mealPlans = await getDailyMealPlans();
           const assigned = (mealPlans || []).find(
@@ -70,7 +105,7 @@ function DashboardPage() {
           );
           setAssignedMealPlan(assigned || null);
         } catch {
-          // Could not load the meal plan — fall back to profile.caloricTarget
+          // fall back to profile.caloricTarget
         }
       } else {
         setProfileFailed(true);
@@ -85,6 +120,8 @@ function DashboardPage() {
       if (progressRes.status === 'fulfilled') setProgressData(progressRes.value || []);
       else                                    setProgressFailed(true);
 
+      if (plansRes.status === 'fulfilled') setWorkoutPlans(plansRes.value || []);
+
       setLoading(false);
     };
     fetchAll();
@@ -92,14 +129,14 @@ function DashboardPage() {
 
   // ── Derived values ──────────────────────────────────────────────────────────
 
-  const today = new Date().toISOString().split('T')[0];
+  const today            = new Date().toISOString().split('T')[0];
   const todayRecord      = progressData.find(p => p.date === today);
   const caloriesConsumed = todayRecord ? todayRecord.caloriesConsumed : 0;
   const caloriesTarget   = assignedMealPlan?.targetCalories ?? profile?.caloricTarget ?? 0;
 
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const monday = new Date(now);
+  const now        = new Date();
+  const dayOfWeek  = now.getDay();
+  const monday     = new Date(now);
   monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   monday.setHours(0, 0, 0, 0);
   const workoutsThisWeek = workoutLogs.filter(log => new Date(log.date) >= monday).length;
@@ -114,32 +151,50 @@ function DashboardPage() {
     : null;
 
   const weightDiffColor = (() => {
-    if (weightDiff === null) return '#636e72';
+    if (weightDiff === null) return 'var(--text-secondary)';
     const goal = profile?.fitnessGoal;
-    if (goal === 'maintenance') return '#636e72';
-    if (goal === 'weight_loss') return weightDiff < 0 ? '#00b894' : '#e17055';
-    if (goal === 'muscle_gain') return weightDiff > 0 ? '#00b894' : '#e17055';
-    return '#636e72';
+    if (goal === 'maintenance') return 'var(--text-secondary)';
+    if (goal === 'weight_loss') return weightDiff < 0 ? 'var(--success)' : 'var(--danger)';
+    if (goal === 'muscle_gain') return weightDiff > 0 ? 'var(--success)' : 'var(--danger)';
+    return 'var(--text-secondary)';
+  })();
+
+  const weightDiffBadgeClass = (() => {
+    if (weightDiff === null) return 'badge-neutral';
+    const goal = profile?.fitnessGoal;
+    if (goal === 'maintenance') return 'badge-neutral';
+    if (goal === 'weight_loss') return weightDiff < 0 ? 'badge-success' : 'badge-warning';
+    if (goal === 'muscle_gain') return weightDiff > 0 ? 'badge-success' : 'badge-warning';
+    return 'badge-neutral';
+  })();
+
+  const insightLine = (() => {
+    if (!profile) return 'Loading your personalised plan…';
+    const wpw = profile.workoutsPerWeek || 0;
+    if (wpw > 0 && workoutsThisWeek >= wpw) {
+      return `Weekly workout goal complete — ${workoutsThisWeek} session${workoutsThisWeek !== 1 ? 's' : ''} logged!`;
+    }
+    if (workoutsThisWeek > 0) {
+      return `${workoutsThisWeek} of ${wpw} workouts done this week. Keep the momentum going!`;
+    }
+    return `Your goal is ${wpw} workout${wpw !== 1 ? 's' : ''} this week — start your first session!`;
   })();
 
   const svgData = (() => {
     if (!hasWeightTrend) return null;
-    const plotW = VIEWBOX_W - GM.left - GM.right;
-    const plotH = VIEWBOX_H - GM.top - GM.bottom;
+    const plotW   = VIEWBOX_W - GM.left - GM.right;
+    const plotH   = VIEWBOX_H - GM.top  - GM.bottom;
     const weights = sortedCheckIns.map(ci => ci.weight);
-    const minW = Math.min(...weights);
-    const maxW = Math.max(...weights);
-    const yMin = minW - 2;
-    const yMax = maxW + 2;
-    const yRange = yMax - yMin;
-    const toX = (i) => GM.left + (i / (sortedCheckIns.length - 1)) * plotW;
-    const toY = (w) => GM.top + (1 - (w - yMin) / yRange) * plotH;
+    const minW    = Math.min(...weights);
+    const maxW    = Math.max(...weights);
+    const yMin    = minW - 2;
+    const yMax    = maxW + 2;
+    const yRange  = yMax - yMin;
+    const toX     = (i) => GM.left + (i / (sortedCheckIns.length - 1)) * plotW;
+    const toY     = (w) => GM.top  + (1 - (w - yMin) / yRange) * plotH;
     return {
       points: sortedCheckIns.map((ci, i) => ({
-        x: toX(i),
-        y: toY(ci.weight),
-        weight: ci.weight,
-        date: ci.checkInDate,
+        x: toX(i), y: toY(ci.weight), weight: ci.weight, date: ci.checkInDate,
       })),
       minW,
       maxW,
@@ -148,29 +203,35 @@ function DashboardPage() {
 
   const activities = [
     ...workoutLogs.map(log => ({
-      date:   log.date,
-      type:   'Workout Completed',
-      detail: log.workoutTitle || '—',
+      date:        log.date,
+      type:        'Workout',
+      description: 'Workout Completed',
+      value:       log.workoutTitle || '—',
     })),
     ...checkIns.map(ci => ({
-      date:   ci.checkInDate,
-      type:   'Check-In Submitted',
-      detail: `Weight: ${ci.weight} kg`,
+      date:        ci.checkInDate,
+      type:        'Check-In',
+      description: 'Check-In Submitted',
+      value:       `${ci.weight} kg`,
     })),
   ];
   activities.sort((a, b) => new Date(b.date) - new Date(a.date));
   const recentActivity = activities.slice(0, 5);
 
+  const DAY_NAMES  = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayDayName = DAY_NAMES[new Date().getDay()];
+  const activePlan   = workoutPlans.find(p => p.isActive);
+  const todayDayObj  = activePlan?.days?.find(d => d.day === todayDayName) ?? null;
+
   return (
     <div className="dashboard">
-
-      {loading && <p className="loading">Loading your dashboard…</p>}
-
-      {!loading && (
+      {loading ? <DashboardSkeleton /> : (
         <>
           {planSuccess && (
             <div className="plan-success-banner">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{ flexShrink: 0 }}>
                 <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
               </svg>
               <span>Your new plan has been created successfully!</span>
@@ -178,28 +239,27 @@ function DashboardPage() {
             </div>
           )}
 
-          {/* ── Welcome ── */}
-          <div className="welcome-section">
-            <h1>Welcome back, {user.firstName} 👋</h1>
-            <div className="welcome-pills">
-              <span className="pill">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'middle',marginRight:'4px'}}>
-                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-                </svg>
-                {GOAL_LABELS[profile?.fitnessGoal] || '—'}
-              </span>
-              <span className="pill">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'middle',marginRight:'4px'}}>
-                  <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-                {profile ? `${profile.currentWeight} kg` : '—'}
-              </span>
-              <span className="pill">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:'middle',marginRight:'4px'}}>
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                {profile ? `${profile.workoutsPerWeek} workouts/week` : '—'}
-              </span>
+          {/* ── Hero ── */}
+          <div className="hero">
+            <div className="hero-content">
+              <h1 className="hero-title">
+                Welcome back, {user.firstName} <span className="hero-wave">👋</span>
+              </h1>
+              <p className="hero-subtitle">{insightLine}</p>
+              <div className="hero-chips">
+                <span className="hero-chip">
+                  {ic(13, <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>)}
+                  {GOAL_LABELS[profile?.fitnessGoal] || '—'}
+                </span>
+                <span className="hero-chip">
+                  {ic(13, <><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></>)}
+                  {profile ? `${profile.currentWeight} kg` : '—'}
+                </span>
+                <span className="hero-chip">
+                  {ic(13, <><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>)}
+                  {profile ? `${profile.workoutsPerWeek} workouts/week` : '—'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -207,23 +267,27 @@ function DashboardPage() {
           <div className="summary-cards">
 
             {/* Calories Today */}
-            <div className="summary-card" style={{ borderLeftColor: '#00b894' }}>
+            <div className="summary-card">
+              <div className="summary-card-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
+                {ic(18, <><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>)}
+              </div>
               <div className="summary-card-title">Calories Today</div>
               {progressFailed ? (
-                <div className="summary-card-value" style={{ fontSize: '1rem', color: '#e17055' }}>
-                  Could not load calorie data
+                <div className="summary-card-value" style={{ fontSize: '1rem', color: 'var(--danger)' }}>
+                  Could not load
                 </div>
               ) : (
                 <>
                   <div className="summary-card-value">
-                    {caloriesConsumed} / {caloriesTarget || '—'} kcal
+                    {caloriesConsumed}
+                    <span className="summary-card-target"> / {caloriesTarget || '—'} kcal</span>
                   </div>
                   <div className="summary-card-subtitle">
                     {caloriesTarget
                       ? caloriesConsumed >= caloriesTarget
                         ? 'Target reached! 🎉'
                         : `${caloriesTarget - caloriesConsumed} kcal remaining`
-                      : '—'}
+                      : 'No target set'}
                   </div>
                   <div className="progress-bar-container">
                     <div
@@ -232,7 +296,7 @@ function DashboardPage() {
                         width: caloriesTarget
                           ? `${Math.min((caloriesConsumed / caloriesTarget) * 100, 100)}%`
                           : '0%',
-                        background: '#00b894',
+                        background: 'linear-gradient(90deg, #10b981, #34d399)',
                       }}
                     />
                   </div>
@@ -241,16 +305,20 @@ function DashboardPage() {
             </div>
 
             {/* Workouts This Week */}
-            <div className="summary-card" style={{ borderLeftColor: '#6c5ce7' }}>
+            <div className="summary-card">
+              <div className="summary-card-icon" style={{ background: 'var(--brand-50)', color: 'var(--brand)' }}>
+                {ic(18, <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>)}
+              </div>
               <div className="summary-card-title">Workouts This Week</div>
               {logsFailed ? (
-                <div className="summary-card-value" style={{ fontSize: '1rem', color: '#e17055' }}>
+                <div className="summary-card-value" style={{ fontSize: '1rem', color: 'var(--danger)' }}>
                   Could not load
                 </div>
               ) : (
                 <>
                   <div className="summary-card-value">
-                    {workoutsThisWeek} / {profile?.workoutsPerWeek ?? '—'} this week
+                    {workoutsThisWeek}
+                    <span className="summary-card-target"> / {profile?.workoutsPerWeek ?? '—'}</span>
                   </div>
                   <div className="summary-card-subtitle">since Monday</div>
                   <div className="progress-bar-container">
@@ -260,7 +328,7 @@ function DashboardPage() {
                         width: profile?.workoutsPerWeek
                           ? `${Math.min((workoutsThisWeek / profile.workoutsPerWeek) * 100, 100)}%`
                           : '0%',
-                        background: '#6c5ce7',
+                        background: 'linear-gradient(90deg, var(--brand), var(--brand-light))',
                       }}
                     />
                   </div>
@@ -269,16 +337,22 @@ function DashboardPage() {
             </div>
 
             {/* Weight Progress */}
-            <div className="summary-card" style={{ borderLeftColor: '#e17055' }}>
+            <div className="summary-card">
+              <div className="summary-card-icon" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                {ic(18, <><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></>)}
+              </div>
               <div className="summary-card-title">Weight Progress</div>
               {checkInsFailed ? (
-                <div className="summary-card-value" style={{ fontSize: '1rem', color: '#e17055' }}>
+                <div className="summary-card-value" style={{ fontSize: '1rem', color: 'var(--danger)' }}>
                   Could not load
                 </div>
               ) : hasWeightTrend ? (
                 <>
                   <div className="summary-card-value" style={{ color: weightDiffColor }}>
                     {weightDiff >= 0 ? '+' : ''}{weightDiff.toFixed(1)} kg
+                    <span className={`badge ${weightDiffBadgeClass}`} style={{ marginLeft: '0.5rem', fontSize: '0.6rem' }}>
+                      {weightDiff >= 0 ? '↑' : '↓'}
+                    </span>
                   </div>
                   <div className="summary-card-subtitle">
                     since first check-in ({sortedCheckIns[0].checkInDate})
@@ -286,11 +360,37 @@ function DashboardPage() {
                 </>
               ) : (
                 <div className="summary-card-subtitle" style={{ marginTop: '0.5rem' }}>
-                  No trend yet — complete your first check-in
+                  Complete at least 2 check-ins to see your weight trend
                 </div>
               )}
             </div>
           </div>
+
+          {/* ── Today's Focus ── */}
+          {activePlan && (
+            <div className={`today-focus-card${todayDayObj ? ' today-focus-card--active' : ''}`}>
+              <div className="today-focus-label">Today's Focus · {todayDayName}</div>
+              {todayDayObj ? (
+                <>
+                  <div className="today-focus-title">{todayDayObj.title}</div>
+                  <div className="today-focus-exercises">
+                    {(todayDayObj.exercises || []).slice(0, 4).map((ex, i) => (
+                      <span key={i} className="today-focus-ex">{ex.exerciseName}</span>
+                    ))}
+                    {(todayDayObj.exercises || []).length > 4 && (
+                      <span className="today-focus-ex today-focus-more">
+                        +{todayDayObj.exercises.length - 4} more
+                      </span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="today-focus-rest">
+                  Rest Day — Recovery is part of the plan. 🧘
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ── Quick Navigation ── */}
           <div className="quick-nav">
@@ -311,9 +411,16 @@ function DashboardPage() {
 
           {/* ── Weight Trend Graph ── */}
           <div className="graph-section">
-            <h2 className="section-title">Weight Trend</h2>
+            <div className="section-header">
+              <h2 className="section-title">Weight Trend</h2>
+              {hasWeightTrend && weightDiff !== null && (
+                <span className={`badge ${weightDiffBadgeClass}`}>
+                  {weightDiff >= 0 ? '+' : ''}{weightDiff.toFixed(1)} kg total
+                </span>
+              )}
+            </div>
             {checkInsFailed ? (
-              <p className="graph-placeholder">Could not load</p>
+              <p className="graph-placeholder">Could not load weight data</p>
             ) : !hasWeightTrend ? (
               <p className="graph-placeholder">
                 Complete at least 2 check-ins to see your weight trend
@@ -327,43 +434,24 @@ function DashboardPage() {
               >
                 <polyline
                   points={svgData.points.map(p => `${p.x},${p.y}`).join(' ')}
-                  stroke="#6c5ce7"
-                  strokeWidth="2"
+                  stroke="#a78bfa"
+                  strokeWidth="2.5"
                   fill="none"
                 />
                 {svgData.points.map((p, i) => (
                   <g key={i}>
-                    <circle cx={p.x} cy={p.y} r="5" fill="#6c5ce7">
+                    <circle cx={p.x} cy={p.y} r="5" fill="#a78bfa">
                       <title>{p.date}: {p.weight} kg</title>
                     </circle>
-                    <text
-                      x={p.x}
-                      y={VIEWBOX_H - GM.bottom + 15}
-                      fontSize="10"
-                      textAnchor="middle"
-                      fill="#636e72"
-                    >
+                    <text x={p.x} y={VIEWBOX_H - GM.bottom + 15} fontSize="10" textAnchor="middle" fill="rgba(255,255,255,0.45)">
                       {p.date.slice(5)}
                     </text>
                   </g>
                 ))}
-                <text
-                  x={GM.left - 5}
-                  y={GM.top}
-                  fontSize="10"
-                  textAnchor="end"
-                  dominantBaseline="hanging"
-                  fill="#636e72"
-                >
+                <text x={GM.left - 5} y={GM.top} fontSize="10" textAnchor="end" dominantBaseline="hanging" fill="rgba(255,255,255,0.45)">
                   {svgData.maxW} kg
                 </text>
-                <text
-                  x={GM.left - 5}
-                  y={VIEWBOX_H - GM.bottom}
-                  fontSize="10"
-                  textAnchor="end"
-                  fill="#636e72"
-                >
+                <text x={GM.left - 5} y={VIEWBOX_H - GM.bottom} fontSize="10" textAnchor="end" fill="rgba(255,255,255,0.45)">
                   {svgData.minW} kg
                 </text>
               </svg>
@@ -372,11 +460,24 @@ function DashboardPage() {
 
           {/* ── Recent Activity ── */}
           <div className="activity-section">
-            <h2 className="section-title">Recent Activity</h2>
+            <div className="activity-table-header">
+              <h2 className="section-title">Recent Activity</h2>
+              <span className="badge badge-neutral">{recentActivity.length} entries</span>
+            </div>
             {recentActivity.length === 0 ? (
-              <p className="empty-state">No recent activity yet.</p>
+              <div style={{ padding: '1.5rem' }}>
+                <EmptyState
+                  icon={ic(22, <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>)}
+                  title="No recent activity yet"
+                  description="Complete a workout or submit a check-in to see your activity here."
+                />
+              </div>
             ) : (
-              <DataTable columns={ACTIVITY_COLUMNS} data={recentActivity} />
+              <DataTable
+                columns={ACTIVITY_COLUMNS}
+                data={recentActivity}
+                caption="Your 5 most recent fitness activities"
+              />
             )}
           </div>
 

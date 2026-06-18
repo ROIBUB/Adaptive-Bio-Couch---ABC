@@ -197,23 +197,61 @@ model Setting {
 }
 
 model User {
-  id                Int                @id @default(autoincrement())
-  first_name        String             @db.VarChar(50)
-  last_name         String             @db.VarChar(50)
-  email             String             @unique(map: "email") @db.VarChar(255)
-  password          String             @db.VarChar(255)
-  role              users_role         @default(user)
-  created_at        DateTime?          @default(now()) @db.DateTime(0)
-  aiRecommendations AiRecommendation[]
-  checkIns          CheckIn[]
-  dailyMealPlans    DailyMealPlan[]
-  profile           Profile?
-  progress          Progress[]
-  setting           Setting?
-  workoutLogs       WorkoutLog[]
-  workoutPlans      WorkoutPlan[]
+  id                  Int                   @id @default(autoincrement())
+  first_name          String                @db.VarChar(50)
+  last_name           String                @db.VarChar(50)
+  email               String                @unique(map: "email") @db.VarChar(255)
+  password            String                @db.VarChar(255)
+  role                users_role            @default(user)
+  created_at          DateTime?             @default(now()) @db.DateTime(0)
+  aiRecommendations   AiRecommendation[]
+  checkIns            CheckIn[]
+  dailyMealPlans      DailyMealPlan[]
+  profile             Profile?
+  progress            Progress[]
+  setting             Setting?
+  workoutLogs         WorkoutLog[]
+  workoutPlans        WorkoutPlan[]
+  supportConversation SupportConversation?
+  sentSupportMessages SupportMessage[]      @relation("SentSupportMessages")
+  presence            UserPresence?
 
   @@map("users")
+}
+
+model SupportConversation {
+  id         Int              @id @default(autoincrement())
+  user_id    Int              @unique
+  created_at DateTime         @default(now()) @db.DateTime(0)
+  updated_at DateTime         @default(now()) @db.DateTime(0)
+  user       User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  messages   SupportMessage[]
+
+  @@map("support_conversations")
+}
+
+model SupportMessage {
+  id              Int                 @id @default(autoincrement())
+  conversation_id Int
+  sender_id       Int
+  sender_role     String              @db.VarChar(20)
+  message         String              @db.Text
+  created_at      DateTime            @default(now()) @db.DateTime(0)
+  conversation    SupportConversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender          User                @relation("SentSupportMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@index([conversation_id])
+  @@index([sender_id])
+  @@map("support_messages")
+}
+
+model UserPresence {
+  user_id   Int      @id
+  is_online Boolean  @default(false)
+  last_seen DateTime @default(now()) @db.DateTime(0)
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("user_presence")
 }
 
 model WorkoutLog {

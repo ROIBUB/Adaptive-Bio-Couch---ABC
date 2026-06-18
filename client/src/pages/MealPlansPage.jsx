@@ -6,6 +6,13 @@ import './MealPlansPage.css';
 
 const MEAL_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
+const MEAL_META = {
+  Breakfast: { icon: '🌅' },
+  Lunch:     { icon: '🌿' },
+  Dinner:    { icon: '🌙' },
+  Snack:     { icon: '🍎' },
+};
+
 // "Eaten" marks are persisted per user + day so the button state survives
 // navigation. The date in the key means a new day automatically starts fresh.
 const eatenStorageKey = (userId, date) => `fitwise_eaten_${userId}_${date}`;
@@ -203,9 +210,12 @@ function MealPlansPage() {
               const saving = markingMealId === meal.mealId;
               return (
                 <div key={i} className={`meal-card meal-type-${meal.mealType.toLowerCase()}`}>
-                  <div className="meal-header">
-                    <span className="meal-type-badge">{meal.mealType}</span>
-                    <span className="meal-title">{meal.title}</span>
+                  <div className="meal-type-strip">
+                    <span className="meal-strip-icon">{MEAL_META[meal.mealType]?.icon || '🍽️'}</span>
+                    <div className="meal-header">
+                      <span className="meal-type-badge">{meal.mealType}</span>
+                      <span className="meal-title">{meal.title}</span>
+                    </div>
                   </div>
 
                   <div className="meal-macros">

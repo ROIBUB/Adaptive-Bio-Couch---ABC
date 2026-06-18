@@ -47,6 +47,12 @@
   background-color: var(--purple-bg);
 }
 
+.navbar-links a.active {
+  color: var(--purple);
+  background-color: var(--purple-bg);
+  font-weight: 600;
+}
+
 /* Right side — user name + logout */
 .navbar-user {
   display: flex;
@@ -62,7 +68,7 @@
 }
 
 .navbar-logout-btn {
-  background-color: var(--purple);
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
   color: white;
   border: none;
   padding: 0.4rem 1rem;
@@ -70,10 +76,13 @@
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: opacity 0.15s, box-shadow 0.15s, transform 0.12s;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.2);
 }
 
 .navbar-logout-btn:hover {
-  background-color: var(--purple-hover);
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.35);
 }
+.navbar-logout-btn:active { transform: scale(0.97); }

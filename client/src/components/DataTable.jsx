@@ -33,9 +33,11 @@ function DataTable({ columns, data, caption }) {
               {/* For each column definition, pick that field from the row */}
               {columns.map(col => (
                 <td key={col.key}>
-                  {row[col.key] !== undefined && row[col.key] !== null
-                    ? String(row[col.key])
-                    : '—'}
+                  {col.render
+                    ? col.render(row[col.key] !== undefined ? row[col.key] : null, row)
+                    : row[col.key] !== undefined && row[col.key] !== null
+                      ? String(row[col.key])
+                      : '—'}
                 </td>
               ))}
             </tr>

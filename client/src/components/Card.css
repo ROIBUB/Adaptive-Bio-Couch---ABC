@@ -2,14 +2,20 @@
   background: var(--card);
   border-radius: var(--radius);
   padding: 1.2rem 1.5rem;
-  box-shadow: var(--shadow-md);
-  border-left: 4px solid var(--purple);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light, #f1f5f9);
+  transition: transform 0.15s, box-shadow 0.2s;
+  animation: fadeSlideUp 0.3s ease-out both;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Coloured top accent (replaces left border) */
+.card--accent {
+  border-top: 3px solid var(--brand);
 }
 
 .card-header {
@@ -27,11 +33,11 @@
 }
 
 .card-badge {
-  background: var(--purple-bg);
-  color: var(--purple);
+  background: var(--brand-50, #f5f3ff);
+  color: var(--brand, #7c3aed);
   font-size: 0.7rem;
   padding: 0.2rem 0.6rem;
-  border-radius: 20px;
+  border-radius: var(--radius-full, 9999px);
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
