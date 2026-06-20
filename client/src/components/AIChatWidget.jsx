@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import socket from '../services/socket';
+import { apiFetch } from '../services/api';
 import './AIChatWidget.css';
 
 function AIChatWidget() {
-  const { userId: USER_ID } = JSON.parse(localStorage.getItem('user') || '{}');
   const [isOpen, setIsOpen]     = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput]       = useState('');
@@ -11,50 +10,37 @@ function AIChatWidget() {
   const messagesEndRef           = useRef(null);
 
   useEffect(() => {
-    socket.connect();
-    socket.emit('chat:join', { userId: USER_ID });
-
-    socket.on('chat:joined', ({ message }) => {
-      setMessages(prev => [
-        ...prev,
-        { id: Date.now(), role: 'assistant', text: message, timestamp: new Date().toISOString() },
-      ]);
-    });
-
-    socket.on('chat:typing', ({ isTyping }) => {
-      setIsTyping(isTyping);
-    });
-
-    socket.on('chat:response', ({ message, timestamp }) => {
-      setMessages(prev => [
-        ...prev,
-        { id: Date.now(), role: 'assistant', text: message, timestamp },
-      ]);
-    });
-
-    return () => {
-      socket.off('chat:joined');
-      socket.off('chat:typing');
-      socket.off('chat:response');
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = input.trim();
     if (!text) return;
     setMessages(prev => [
       ...prev,
       { id: Date.now(), role: 'user', text, timestamp: new Date().toISOString() },
     ]);
-    socket.emit('chat:message', { userId: USER_ID, message: text });
     setInput('');
+    setIsTyping(true);
+    try {
+      const data = await apiFetch('/api/ai/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message: text }),
+      });
+      setMessages(prev => [
+        ...prev,
+        { id: Date.now(), role: 'assistant', text: data.message, timestamp: data.timestamp },
+      ]);
+    } catch (err) {
+      setMessages(prev => [
+        ...prev,
+        { id: Date.now(), role: 'assistant', text: "Sorry, I couldn't reach the AI coach. Please try again.", timestamp: new Date().toISOString() },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyDown = (e) => {
