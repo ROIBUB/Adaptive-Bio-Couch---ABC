@@ -68,8 +68,9 @@ function AdminPage() {
   const [chatLoading,       setChatLoading]        = useState(false);
   const [chatConnected,     setChatConnected]      = useState(false);
   const [chatOtherTyping,   setChatOtherTyping]    = useState(false);
-  const chatBottomRef   = useRef(null);
-  const chatTypingTimer = useRef(null);
+  const chatBottomRef      = useRef(null);
+  const chatTypingTimer    = useRef(null);
+  const selectedChatUidRef = useRef(null);
 
   // ── Admin stats strip ─────────────────────────────────────────────────────
   const [adminStats, setAdminStats] = useState(null);
@@ -144,7 +145,7 @@ function AdminPage() {
           : c
       ));
       // If this conversation is currently open, append message
-      if (Number(conversationUserId) === Number(selectedChatUid)) {
+      if (Number(conversationUserId) === Number(selectedChatUidRef.current)) {
         setChatMessages(prev => [...prev, message]);
       }
     };
@@ -362,6 +363,7 @@ function AdminPage() {
   // ── Chat Center handlers ───────────────────────────────────────────────────
   const openUserChat = async (convUserId) => {
     setSelectedChatUid(convUserId);
+    selectedChatUidRef.current = convUserId;
     setChatLoading(true);
     setChatMessages([]);
     try {
