@@ -23,7 +23,8 @@
       "Bash(node --check prisma/seed.js)",
       "Bash(timeout 30 node prisma/seed.js)",
       "Bash(timeout 30 node _validate_seed_tmp.js)",
-      "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, @{N='CMD';E={\\(Get-WmiObject Win32_Process -Filter \"ProcessId=$\\($_.Id\\)\"\\).CommandLine}} 2>&1)"
+      "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, @{N='CMD';E={\\(Get-WmiObject Win32_Process -Filter \"ProcessId=$\\($_.Id\\)\"\\).CommandLine}} 2>&1)",
+      "Bash(python3 -c ' *)"
     ]
   }
 }
