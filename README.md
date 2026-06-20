@@ -128,10 +128,6 @@ cd backend
 npx prisma migrate deploy
 ```
 
-This runs the three migrations in `backend/prisma/migrations/` in order:
-- `20260614000000_init` — Initial schema
-- `20260614000001_schema_v2_redesign` — Schema redesign
-- `20260614000002_add_denormalized_name_columns` — Name denormalization
 
 ### 3. Seed demo data
 
