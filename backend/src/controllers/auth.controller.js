@@ -36,6 +36,7 @@ const login = async (req, res) => {
         });
 
     } catch (err) {
+        console.error('[Auth]', err);
         return sendServerError(res);
     }
 };
@@ -110,6 +111,7 @@ const register = async (req, res) => {
         });
 
     } catch (err) {
+        console.error('[Auth]', err);
         return sendServerError(res);
     }
 };

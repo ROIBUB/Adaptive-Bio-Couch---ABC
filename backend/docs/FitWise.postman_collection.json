@@ -2,14 +2,14 @@
   "info": {
     "_postman_id": "fitwise-assignment4-2026",
     "name": "FitWise API — Assignment 4",
-    "description": "Complete FitWise API collection for Assignment 4.\n\nAll responses follow the envelope:\n  SUCCESS: { \"success\": true,  \"data\": <any>,  \"error\": null }\n  ERROR:   { \"success\": false, \"data\": null,   \"error\": { \"code\": \"...\", \"message\": \"...\", \"details\": {} } }\n\nSeeded accounts (all passwords: password123):\n  john@fitwize.com   id=1  role=user\n  noam@fitwize.com   id=2  role=user\n  dana@fitwize.com   id=3  role=user\n  roi@fitwize.com    id=4  role=admin\n  maya@fitwize.com   id=5  role=manager\n  eitan@fitwize.com  id=6  role=user\n\nRequired headers for most requests:\n  userid       : numeric user id\n  x-user-id    : numeric user id (alias used by some routes)\n  x-user-role  : user | admin | manager\n\nUpdate collection variables with real IDs after running Create requests.",
+    "description": "Complete FitWise API collection for Assignment 4.\n\nAll responses follow the envelope:\n  SUCCESS: { \"success\": true,  \"data\": <any>,  \"error\": null }\n  ERROR:   { \"success\": false, \"data\": null,   \"error\": { \"code\": \"...\", \"message\": \"...\", \"details\": {} } }\n\nSeeded accounts (all passwords: password123):\n  john@fitwize.com   id=1  role=user\n  noam@fitwize.com   id=2  role=admin\n  dana@fitwize.com   id=3  role=user\n  roi@fitwize.com    id=4  role=manager\n  maya@fitwize.com   id=5  role=user\n  eitan@fitwize.com  id=6  role=user\n\nRequired headers for most requests:\n  userid       : numeric user id\n  x-user-id    : numeric user id (alias used by some routes)\n  x-user-role  : user | admin | manager\n\nUpdate collection variables with real IDs after running Create requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "base_url",           "value": "http://localhost:3000", "type": "string" },
     { "key": "user_id",            "value": "1",  "type": "string", "description": "Regular user John (seed id=1)" },
-    { "key": "admin_id",           "value": "4",  "type": "string", "description": "Admin Roi (seed id=4)" },
-    { "key": "manager_id",         "value": "5",  "type": "string", "description": "Manager Maya (seed id=5)" },
+    { "key": "admin_id",           "value": "2",  "type": "string", "description": "Admin Noam (seed id=2)" },
+    { "key": "manager_id",         "value": "4",  "type": "string", "description": "Manager Roi (seed id=4)" },
     { "key": "workout_plan_id",    "value": "1",  "type": "string", "description": "Update after Get All Workout Plans" },
     { "key": "workout_log_id",     "value": "1",  "type": "string", "description": "Update after Create Workout Log" },
     { "key": "daily_meal_plan_id", "value": "1",  "type": "string", "description": "Update after Get All Daily Meal Plans" },
@@ -196,7 +196,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"firstName\": \"Demo\",\n    \"lastName\": \"Admin\",\n    \"userRole\": \"user\",\n    \"age\": 28,\n    \"gender\": \"female\",\n    \"height\": 165,\n    \"weight\": 60,\n    \"activityLevel\": \"beginner\",\n    \"fitnessGoal\": \"weight_loss\"\n}",
+              "raw": "{\n    \"firstName\": \"Demo\",\n    \"lastName\": \"Admin\",\n    \"email\": \"demo.admin@fitwize.com\",\n    \"password\": \"password123\",\n    \"userRole\": \"user\",\n    \"age\": 28,\n    \"gender\": \"female\",\n    \"height\": 165,\n    \"weight\": 60,\n    \"activityLevel\": \"beginner\",\n    \"fitnessGoal\": \"weight_loss\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {
@@ -204,7 +204,7 @@
               "host": ["{{base_url}}"],
               "path": ["api", "users"]
             },
-            "description": "Creates a user record (no profile/plans generated). For full registration with AI plans use POST /api/auth/register.\nuserRole: user | admin | manager\ngender: male | female\nactivityLevel: beginner | intermediate | advanced"
+            "description": "Creates a user record with profile. Requires email and password in body. For full registration with AI-generated plans use POST /api/auth/register.\nuserRole: user | admin | manager\ngender: male | female\nactivityLevel: beginner | intermediate | advanced\nfitnessGoal: weight_loss | muscle_gain | maintenance"
           },
           "response": []
         },

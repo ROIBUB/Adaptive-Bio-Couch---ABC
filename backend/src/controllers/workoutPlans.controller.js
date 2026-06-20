@@ -22,6 +22,7 @@ const getAllWorkoutPlans = async (req, res) => {
 
         return sendSuccess(res, 200, await WorkoutPlansModel.getByUserId(requestUserId));
     } catch (err) {
+        console.error('[WorkoutPlans]', err);
         return sendServerError(res);
     }
 };
@@ -50,6 +51,7 @@ const getWorkoutPlanById = async (req, res) => {
 
         return sendSuccess(res, 200, plan);
     } catch (err) {
+        console.error('[WorkoutPlans]', err);
         return sendServerError(res);
     }
 };
@@ -76,6 +78,7 @@ const createWorkoutPlan = async (req, res) => {
         const newPlan = await WorkoutPlansModel.create({ userId, name, goal, isActive });
         return sendSuccess(res, 201, newPlan);
     } catch (err) {
+        console.error('[WorkoutPlans]', err);
         return sendServerError(res);
     }
 };
@@ -116,6 +119,7 @@ const updateWorkoutPlan = async (req, res) => {
         const updated = await WorkoutPlansModel.update(id, { name, goal, isActive });
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[WorkoutPlans]', err);
         return sendServerError(res);
     }
 };
@@ -145,6 +149,7 @@ const deleteWorkoutPlan = async (req, res) => {
         const deleted = await WorkoutPlansModel.remove(id);
         return sendSuccess(res, 200, { workoutPlanId: deleted.workoutPlanId });
     } catch (err) {
+        console.error('[WorkoutPlans]', err);
         return sendServerError(res);
     }
 };

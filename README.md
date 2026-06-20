@@ -25,7 +25,7 @@ A full-stack fitness and nutrition coaching web application. Users register, rec
 
 ## Project Purpose
 
-FitWise is a personalized fitness coach web app. On registration, the system uses the Gemini AI API to generate a complete, calorie-targeted workout plan and meal plan based on the user's height, weight, age, goal, and activity level. As the user logs workouts, meals, and weekly weigh-ins, an AI analysis engine tracks trends and surfaces actionable recommendations. A real-time chat widget lets users ask their AI coach questions at any time.
+FitWise is a personalized fitness coach web app. On registration, the system uses the Gemini AI API to generate a complete, calorie-targeted workout plan and meal plan based on the user's height, weight, age, goal, and activity level. As the user logs workouts and weekly weigh-ins, an AI analysis engine tracks trends and surfaces actionable recommendations. A real-time support chat lets users contact an admin or manager at any time. A floating AI coach widget allows users to ask fitness questions via a stateless AI chat endpoint.
 
 ---
 
@@ -105,7 +105,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 cp client/.env.example client/.env
 ```
 
-The frontend `.env` only controls the dev server port (default `5173`). No other values are needed — the backend URL is hardcoded to `http://localhost:3000` in `client/src/services/api.js`.
+The frontend `.env` sets the dev server port to `5173`. No other values are needed — the backend URL is hardcoded to `http://localhost:3000` in `client/src/services/api.js`.
 
 ---
 
@@ -128,7 +128,6 @@ cd backend
 npx prisma migrate deploy
 ```
 
-
 ### 3. Seed demo data
 
 Populate the database with exercises, food items, and six demo user accounts:
@@ -137,13 +136,13 @@ Populate the database with exercises, food items, and six demo user accounts:
 npx prisma db seed
 ```
 
-The seed script is at `backend/prisma/seed.js`. It inserts the exercise library, food database, and the demo accounts listed in [Demo Accounts](#demo-accounts) below.
+The seed script is at `backend/prisma/seed.js`. It inserts the exercise library, food database, demo accounts, seeded workout and meal plans, check-in history, and support conversations.
 
 ---
 
 ## ORM Setup (Prisma)
 
-The project uses **Prisma 6** as its ORM, targeting MySQL with the MariaDB adapter.
+The project uses **Prisma 6** as its ORM, targeting MySQL via the `mysql` provider.
 
 ### Schema location
 
@@ -164,18 +163,21 @@ backend/prisma/
 | `Settings` | Display preferences per user |
 | `Progress` | Daily aggregated metrics (calories, workouts, active minutes) |
 | `WorkoutPlan` | A named workout plan assigned to a user |
-| `WorkoutPlanDay` | Individual days within a plan (day number, name) |
-| `PlanExercise` | Exercises scheduled for a plan day (sets, reps, duration) |
+| `WorkoutPlanDay` | Individual days within a plan (day name, workout title) |
+| `PlanExercise` | Junction: exercises scheduled for a plan day (sets, reps, weight) |
 | `Exercise` | Exercise library (muscle group, difficulty, equipment type) |
 | `WorkoutLog` | A completed workout session |
 | `LogExercise` | Exercises performed within a log |
 | `LogSet` | Individual sets within a logged exercise |
 | `DailyMealPlan` | A meal plan assigned to a user (caloric target, macros) |
 | `Meal` | A named meal within a plan (breakfast, lunch, etc.) |
-| `MealFoodItem` | Food items in a meal with portion weights |
+| `MealFoodItem` | Junction: food items in a meal with portion weights |
 | `FoodItem` | Food database (nutrition per 100 g) |
 | `CheckIn` | Weekly weigh-in records |
 | `AiRecommendation` | Stored AI analysis results |
+| `SupportConversation` | One conversation thread per user for support chat |
+| `SupportMessage` | Individual messages within a support conversation |
+| `UserPresence` | Online/offline status and last-seen timestamp per user |
 
 ### Regenerate the Prisma client (after schema changes)
 
@@ -225,19 +227,19 @@ After login, the server returns the user's `id` and `role`. The React frontend s
 
 | Header | Value | Purpose |
 |---|---|---|
-| `userid` | User's numeric ID | Identifies the caller |
-| `x-user-id` | User's numeric ID | Alias used by some routes |
+| `userid` | User's numeric ID | Identifies the caller (used by most routes) |
+| `x-user-id` | User's numeric ID | Alias used by `/api/users/me` and `/api/settings` |
 | `x-user-role` | `user` / `admin` / `manager` | Role-based access control |
 
-The backend's `authorize` middleware reads these headers directly. **There is no signature verification** — any client that knows a user's ID and role can impersonate them.
+The backend's `authorize` middleware reads `x-user-role` directly. **There is no signature verification** — any client that knows a user's ID and role can impersonate them.
 
 ### Roles
 
 | Role | Permissions |
 |---|---|
-| `user` | Own data only |
-| `manager` | Read all users, manage exercises and food items |
-| `admin` | Full access including user management |
+| `user` | Own data only (workout logs, check-ins, progress) |
+| `manager` | Read all users, create/update exercises and food items, access admin panel |
+| `admin` | Full access including user management, delete operations, and admin panel |
 
 ---
 
@@ -245,14 +247,14 @@ The backend's `authorize` middleware reads these headers directly. **There is no
 
 These accounts are inserted by the seed script. All passwords are `password123`.
 
-| Email | Role | Display Name |
+| Email | Role | Name |
 |---|---|---|
-| john@example.com | user | John Doe |
-| noam@example.com | user | Noam |
-| dana@example.com | user | Dana |
-| roi@example.com | admin | Roi |
-| maya@example.com | manager | Maya |
-| eitan@example.com | user | Eitan |
+| john@fitwize.com | user | John Doe |
+| noam@fitwize.com | admin | Noam Levi |
+| dana@fitwize.com | user | Dana Cohen |
+| roi@fitwize.com | manager | Roi Bublil |
+| maya@fitwize.com | user | Maya Ben-David |
+| eitan@fitwize.com | user | Eitan Katz |
 
 ---
 
@@ -268,168 +270,263 @@ All endpoints are prefixed with `/api`. Every response follows this envelope:
 }
 ```
 
-On failure `success` is `false`, `data` is `null`, and `error` contains a message string.
+On failure, `success` is `false`, `data` is `null`, and `error` contains `{ code, message, details }`.
 
 ---
 
 ### Auth — `/api/auth`
 
-| Method | Path | Auth | Body | Description |
-|---|---|---|---|---|
-| POST | `/api/auth/register` | None | `{ email, password, firstName, lastName, role? }` | Create account; triggers AI plan generation |
-| POST | `/api/auth/login` | None | `{ email, password }` | Returns `{ id, role, email, firstName, lastName }` |
-| POST | `/api/auth/logout` | User | — | Clears session (no-op server-side) |
+| Method | Path | Auth | Body / Notes |
+|---|---|---|---|
+| POST | `/api/auth/register` | None | `{ firstName, lastName, email, password, age, gender, height, weight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay }` — triggers AI plan generation |
+| POST | `/api/auth/login` | None | `{ email, password }` — returns `{ userId, firstName, lastName, userRole, email }` |
+| POST | `/api/auth/logout` | Any | No body — client clears localStorage |
+
+**Register field details:**
+
+| Field | Type | Values |
+|---|---|---|
+| `gender` | string | `"male"` \| `"female"` |
+| `activityLevel` | string | `"beginner"` \| `"intermediate"` \| `"advanced"` |
+| `fitnessGoal` | string | e.g. `"muscle_gain"`, `"weight_loss"`, `"maintenance"` |
+| `age`, `height`, `weight`, `workoutsPerWeek`, `mealsPerDay` | number | Positive numbers |
 
 ---
 
 ### Users — `/api/users`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/users` | Admin/Manager | List all users |
-| GET | `/api/users/:id` | Admin/Manager | Get one user |
-| POST | `/api/users` | Admin | Create user |
-| PUT | `/api/users/:id` | Admin | Update user |
+| GET | `/api/users` | Admin / Manager | List all users |
+| GET | `/api/users/me` | Any | Returns caller's user record; reads userId from `x-user-id` header |
+| GET | `/api/users/:id` | Any | Get one user; admins see all fields, users see limited data |
+| POST | `/api/users` | Admin / Manager | Create user (no email/password — body: `{ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal }`) |
+| PUT | `/api/users/:id` | Admin / Manager | Update user |
 | DELETE | `/api/users/:id` | Admin | Delete user |
 
 ---
 
 ### Exercises — `/api/exercises`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/exercises` | User | List all exercises (supports `?muscleGroup=`, `?difficulty=`, `?equipment=`) |
-| GET | `/api/exercises/:id` | User | Get one exercise |
-| POST | `/api/exercises` | Admin/Manager | Create exercise |
-| PUT | `/api/exercises/:id` | Admin/Manager | Update exercise |
-| DELETE | `/api/exercises/:id` | Admin/Manager | Delete exercise |
+| GET | `/api/exercises` | None | List all exercises |
+| GET | `/api/exercises/:id` | None | Get one exercise |
+| POST | `/api/exercises` | Admin / Manager | Body: `{ name, muscleGroup, difficultyLevel, equipment?, description? }` |
+| PUT | `/api/exercises/:id` | Admin / Manager | Update exercise |
+| DELETE | `/api/exercises/:id` | Admin | Delete exercise |
 
 ---
 
 ### Food Items — `/api/food-items`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/food-items` | User | List all food items |
-| GET | `/api/food-items/:id` | User | Get one food item |
-| GET | `/api/food-items/:id/alternatives` | User | Get 3 similar-calorie alternatives |
-| POST | `/api/food-items` | Admin/Manager | Create food item |
-| PUT | `/api/food-items/:id` | Admin/Manager | Update food item |
-| DELETE | `/api/food-items/:id` | Admin/Manager | Delete food item |
+| GET | `/api/food-items` | None | List all food items |
+| GET | `/api/food-items/:id` | None | Get one food item |
+| GET | `/api/food-items/alternatives/:foodItemId` | None | Returns calorie-equivalent alternatives in the same category. **Requires `?grams=<positive number>` query param.** |
+| POST | `/api/food-items` | Admin / Manager | Body: `{ name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g }` — all numeric fields required |
+| PUT | `/api/food-items/:id` | Admin / Manager | Update food item |
+| DELETE | `/api/food-items/:id` | Admin | Delete food item |
 
 ---
 
 ### Workout Plans — `/api/workout-plans`
 
-| Method | Path | Auth | Description |
+Plans are created by admins/managers (manually or automatically on user registration via AI). Days and exercises are embedded in the plan data returned by GET and submitted atomically in POST/PUT bodies.
+
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/workout-plans` | User | Get current user's plans |
-| GET | `/api/workout-plans/:id` | User | Get plan with days and exercises |
-| POST | `/api/workout-plans` | User | Create a plan |
-| PUT | `/api/workout-plans/:id` | User | Update plan metadata |
-| DELETE | `/api/workout-plans/:id` | User | Delete plan |
-| GET | `/api/workout-plans/:id/days` | User | List days for a plan |
-| POST | `/api/workout-plans/:id/days` | User | Add a day to a plan |
-| PUT | `/api/workout-plans/:id/days/:dayId` | User | Update a plan day |
-| DELETE | `/api/workout-plans/:id/days/:dayId` | User | Remove a plan day |
-| GET | `/api/workout-plans/:id/days/:dayId/exercises` | User | List exercises for a day |
-| POST | `/api/workout-plans/:id/days/:dayId/exercises` | User | Add exercise to a day |
-| PUT | `/api/workout-plans/:id/days/:dayId/exercises/:exId` | User | Update plan exercise |
-| DELETE | `/api/workout-plans/:id/days/:dayId/exercises/:exId` | User | Remove exercise from day |
+| GET | `/api/workout-plans` | User / Admin / Manager | Returns active plans for the requesting user (reads from `userid` header) |
+| GET | `/api/workout-plans/:id` | User / Admin / Manager | Returns plan with nested `days[]` and `exercises[]` (JOIN proof) |
+| POST | `/api/workout-plans` | Admin / Manager | Body: `{ name, goal, isActive }` |
+| PUT | `/api/workout-plans/:id` | Admin / Manager | Body: `{ name, goal, isActive }` |
+| DELETE | `/api/workout-plans/:id` | Admin | Cascades to days and plan exercises |
 
 ---
 
 ### Workout Logs — `/api/workout-logs`
 
-| Method | Path | Auth | Description |
+Exercises and their sets are submitted as nested arrays in the POST/PUT body. There are no separate sub-routes for adding individual exercises or sets.
+
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/workout-logs` | User | List current user's logs |
-| GET | `/api/workout-logs/:id` | User | Get log with exercises and sets |
-| POST | `/api/workout-logs` | User | Start a workout log session |
-| PUT | `/api/workout-logs/:id` | User | Update log (e.g. mark complete) |
-| DELETE | `/api/workout-logs/:id` | User | Delete a log |
-| POST | `/api/workout-logs/:id/exercises` | User | Add exercise to log |
-| POST | `/api/workout-logs/:id/exercises/:exId/sets` | User | Add a set to a logged exercise |
+| GET | `/api/workout-logs` | User / Admin / Manager | Optional filters: `?workoutPlanId=N`, `?workoutDayId=N` |
+| GET | `/api/workout-logs/:id` | User / Admin / Manager | Returns log with nested exercises and sets |
+| POST | `/api/workout-logs` | User / Admin / Manager | See body structure below |
+| PUT | `/api/workout-logs/:id` | User / Admin / Manager | Same body as POST; replaces all exercises |
+| DELETE | `/api/workout-logs/:id` | User / Admin | Returns `{ workoutLogId: N }` |
+
+**POST / PUT body:**
+
+```json
+{
+  "workoutPlanId": 1,
+  "date": "2026-06-20",
+  "workoutTitle": "Monday Push Day",
+  "durationMinutes": 60,
+  "difficultyRating": 7,
+  "notes": "optional",
+  "exercises": [
+    {
+      "exerciseId": 1,
+      "exerciseName": "Bench Press",
+      "sets": [
+        { "setNumber": 1, "reps": 8, "weight": 60 },
+        { "setNumber": 2, "reps": 8, "weight": 62.5 }
+      ]
+    }
+  ]
+}
+```
+
+Field rules: `durationMinutes` > 0, `difficultyRating` 1–10, `exercises` non-empty, each set `reps` ≥ 0, `weight` ≥ 0.
 
 ---
 
 ### Daily Meal Plans — `/api/daily-meal-plans`
 
-| Method | Path | Auth | Description |
+Meals and food items are submitted as nested arrays. There are no separate sub-routes for adding individual meals or food items.
+
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/daily-meal-plans` | User | Get current user's meal plans |
-| GET | `/api/daily-meal-plans/:id` | User | Get plan with meals and food items |
-| POST | `/api/daily-meal-plans` | User | Create meal plan |
-| PUT | `/api/daily-meal-plans/:id` | User | Update meal plan |
-| DELETE | `/api/daily-meal-plans/:id` | User | Delete meal plan |
-| GET | `/api/daily-meal-plans/:id/meals` | User | List meals in a plan |
-| POST | `/api/daily-meal-plans/:id/meals` | User | Add meal to plan |
-| PUT | `/api/daily-meal-plans/:id/meals/:mealId` | User | Update a meal |
-| DELETE | `/api/daily-meal-plans/:id/meals/:mealId` | User | Remove a meal |
-| POST | `/api/daily-meal-plans/:id/meals/:mealId/food-items` | User | Add food item to meal |
-| DELETE | `/api/daily-meal-plans/:id/meals/:mealId/food-items/:fiId` | User | Remove food item from meal |
+| GET | `/api/daily-meal-plans` | User / Admin / Manager | Returns plans for the requesting user |
+| GET | `/api/daily-meal-plans/:id` | User / Admin / Manager | Returns plan with nested meals and food items (JOIN proof) |
+| POST | `/api/daily-meal-plans` | Admin / Manager | See body structure below |
+| PUT | `/api/daily-meal-plans/:id` | Admin / Manager | Same body as POST; replaces all meals |
+| DELETE | `/api/daily-meal-plans/:id` | Admin | Cascades to meals and food item entries |
+
+**POST / PUT body:**
+
+```json
+{
+  "name": "Muscle Gain Plan",
+  "goal": "muscle_gain",
+  "targetCalories": 2800,
+  "targetProtein": 180,
+  "isActive": false,
+  "meals": [
+    {
+      "mealType": "breakfast",
+      "title": "Oats and Eggs",
+      "estimatedCalories": 600,
+      "estimatedProtein": 40,
+      "foodItems": [
+        { "foodItemId": 6, "foodName": "Oats", "quantityGrams": 100 },
+        { "foodItemId": 5, "foodName": "Egg",  "quantityGrams": 150 }
+      ]
+    }
+  ]
+}
+```
+
+Field rules: `targetCalories` > 0, `targetProtein` ≥ 0, `meals` non-empty, each `foodItemId` must reference an existing food item.
 
 ---
 
 ### Check-Ins — `/api/check-ins`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/check-ins` | User | List all check-ins for current user |
-| GET | `/api/check-ins/:id` | User | Get one check-in |
-| POST | `/api/check-ins` | User | Submit weekly weigh-in `{ weight, notes? }` |
-| PUT | `/api/check-ins/:id` | User | Update a check-in |
-| DELETE | `/api/check-ins/:id` | User | Delete a check-in |
+| GET | `/api/check-ins` | User / Admin / Manager | List all check-ins for the user identified by `userid` header |
+| GET | `/api/check-ins/:id` | User / Admin / Manager | Get one check-in |
+| POST | `/api/check-ins` | User / Admin / Manager | Body: `{ checkInDate, weight, workoutsCompleted, feedback? }` — creating a check-in syncs `profile.currentWeight` to this value |
+| PUT | `/api/check-ins/:id` | User / Admin / Manager | Same body as POST |
+| DELETE | `/api/check-ins/:id` | User / Admin | Returns `{ checkInId: N }` |
+
+**POST field rules:** `weight` > 0 (number), `workoutsCompleted` ≥ 0 (number), `feedback` optional string.
 
 ---
 
 ### Profiles — `/api/profiles`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/profiles/:userId` | User | Get profile for a user |
-| POST | `/api/profiles` | User | Create profile |
-| PUT | `/api/profiles/:userId` | User | Update profile |
-| POST | `/api/profiles/:userId/replan` | User | Trigger AI to regenerate workout and meal plans |
+| GET | `/api/profiles/:userId` | Any | Get profile for a specific user |
+| POST | `/api/profiles` | Any | Creates profile; userId from `userid` header. Body: `{ fitnessGoal, workoutsPerWeek, mealsPerDay, ... }` |
+| PUT | `/api/profiles/:userId` | Any | All fields optional (patch-style update) |
+| POST | `/api/profiles/:userId/replan` | Any | Triggers AI to deactivate current plans and generate new ones. Body: `{ fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay, height?, currentWeight? }` |
 
 ---
 
 ### Progress Data — `/api/progress`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/progress` | User | Get all daily progress records for current user |
-| GET | `/api/progress/:date` | User | Get progress for a specific date (`YYYY-MM-DD`) |
-| POST | `/api/progress` | User | Create or update a daily progress record |
-| PUT | `/api/progress/:date` | User | Update specific date progress |
+| GET | `/api/progress` | Any | Get all daily progress records for the user identified by `userid` header |
+| GET | `/api/progress/:date` | Any | Get progress for a specific date (`YYYY-MM-DD`) |
+| POST | `/api/progress` | Any | Body: `{ date, caloriesConsumed, workoutsCompleted, activeMinutes }` — all numeric values ≥ 0 |
+| PUT | `/api/progress/:id` | Any | Update a progress record by its numeric database **id** (not date) |
 
 ---
 
 ### Settings — `/api/settings`
 
-| Method | Path | Auth | Description |
+Settings userId is read from the `x-user-id` header, not the URL.
+
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/api/settings/:userId` | User | Get display settings |
-| PUT | `/api/settings/:userId` | User | Update display settings (theme, display name) |
+| GET | `/api/settings` | Any | Get display settings for the user identified by `x-user-id` header |
+| PUT | `/api/settings` | Any | Body: `{ displayName, email, theme }` — all three fields required. `theme`: `"light"` \| `"dark"` |
 
 ---
 
-### AI Recommendations — `/api/ai`
+### AI — `/api/ai`
 
-| Method | Path | Auth | Description |
+| Method | Path | Auth | Notes |
 |---|---|---|---|
-| POST | `/api/ai/recommendations` | User | Run AI analysis; stores result in DB |
-| GET | `/api/ai/recommendations` | User | Fetch the most recent stored recommendation |
+| POST | `/api/ai/recommendations` | User / Admin / Manager | Run AI progress analysis; stores result in `AiRecommendation` table; may adjust caloric target and exercise weights. Reads userId from `userid` header. |
+| GET | `/api/ai/recommendations` | User / Admin / Manager | Fetch all stored AI recommendations for the current user |
+| POST | `/api/ai/chat` | None | Body: `{ message }` — sends a single question to the AI coach; returns `{ message, timestamp }`. Stateless — no conversation history is maintained. |
+
+---
+
+### Support Chat (HTTP) — `/api/support`
+
+These HTTP endpoints read and write the same data that the Socket.IO support namespace populates. See [WebSocket Feature](#websocket-feature) for the real-time layer.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| GET | `/api/support/my-conversation` | User / Admin / Manager | Returns the current user's support conversation and all its messages. Creates the conversation if none exists yet. |
+| GET | `/api/support/admins-presence` | User / Admin / Manager | Returns online/offline status for all admins and managers, merging DB state with live Socket.IO socket state. |
+| GET | `/api/support/admin/users` | Admin / Manager | Returns all user conversations with presence data (`isOnline`, `lastSeen`). Used in the Admin Panel chat centre. |
+| GET | `/api/support/admin/conversation/:userId` | Admin / Manager | Returns the full conversation and messages for a specific user. Creates the conversation if none exists yet. |
+
+---
+
+### Admin Panel — `/api/admin`
+
+All routes require `x-user-role: admin` or `x-user-role: manager`.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| GET | `/api/admin/workout-plans` | Admin / Manager | Returns workout plans for **all** users |
+| GET | `/api/admin/daily-meal-plans` | Admin / Manager | Returns meal plans for **all** users |
+| GET | `/api/admin/users/stats` | Admin / Manager | Returns all users with `currentWeight` (from profile) and `checkInCount` |
+| GET | `/api/admin/check-ins/user/:userId` | Admin / Manager | Returns the full check-in history for a specific user |
 
 ---
 
 ## WebSocket Feature
 
-FitWise includes a real-time AI chat widget powered by **Socket.IO 4** and **Gemini 2.5 Flash**. The chat is available on every page as a floating button in the bottom-right corner.
+FitWise uses **Socket.IO 4** for a real-time **support chat** between regular users and admins/managers. The AI coach chat widget is a separate HTTP feature (see [AI Features](#ai-features)).
+
+**File:** `backend/src/sockets/support.socket.js`
 
 ### Connection
 
-The frontend connects to `http://localhost:3000` (same origin as the REST API) after login. Connection uses manual connect (`autoConnect: false`) so it only activates when the chat widget is opened.
+```js
+const socket = io('http://localhost:3000/support');
+```
+
+The client connects to the `/support` namespace (not the default `/` namespace). The frontend uses `autoConnect: false` and initiates the connection after login.
+
+### Rooms
+
+| Room | Who joins |
+|---|---|
+| `user_support_<userId>` | Every user on connection |
+| `support_admins` | Admins and managers only |
 
 ### Events
 
@@ -437,24 +534,23 @@ The frontend connects to `http://localhost:3000` (same origin as the REST API) a
 
 | Event | Payload | Description |
 |---|---|---|
-| `chat:join` | `{ userId }` | Join the user's private chat room |
-| `chat:message` | `{ userId, message }` | Send a message to the AI coach |
+| `support:join` | `{ userId, role }` | Register the socket with the server. Must be emitted immediately after connecting. |
+| `support:message` | `{ conversationUserId, message }` | Send a chat message. `conversationUserId` is the user who owns the conversation thread. Only the conversation owner or an admin/manager may send to a thread. |
+| `support:typing` | `{ conversationUserId, isTyping }` | Broadcast a typing indicator to the other participants. |
 
 **Server → Client**
 
 | Event | Payload | Description |
 |---|---|---|
-| `chat:joined` | `{ message }` | Confirms the user has joined their room |
-| `chat:typing` | `true / false` | Typing indicator while AI is generating a response |
-| `chat:response` | `{ message, timestamp }` | The AI coach's reply |
+| `support:joined` | `{ userId, role }` | Confirms the socket has been registered. |
+| `support:new_message` | `{ conversationUserId, message }` | Broadcast to `user_support_<userId>` and `support_admins` when a message is saved. |
+| `support:typing` | `{ conversationUserId, senderId, isTyping }` | Forwarded to other participants (not echoed back to sender). |
+| `support:presence_update` | `{ userId, isOnline, lastSeen? }` | Emitted when a user connects or disconnects. Admin/manager presence is broadcast to all sockets; user presence is sent only to `support_admins`. |
+| `support:error` | `{ message }` | Sent to the sender if a message fails authorization or persistence. |
 
-### Isolation
+### Persistence
 
-Each user is placed in a Socket.IO room named `chat_${userId}`, so messages are never sent to other users' sessions.
-
-### AI Persona
-
-The AI coach is instructed to respond in 2–4 sentences, use metric units, and act as an expert fitness coach. It maintains conversation history within a single chat session.
+Messages are written to the `SupportMessage` table. Presence state is stored in `UserPresence`. The HTTP endpoint `GET /api/support/my-conversation` reads the same persisted data, so conversations survive page refreshes.
 
 ---
 
@@ -464,35 +560,40 @@ FitWise has three distinct AI integration points, all using **Google Gemini 2.5 
 
 ### 1. Plan Generation on Registration
 
-**File:** `backend/services/planGenerator.js`
+**File:** `backend/src/services/planGenerator.js`
 
 When a user completes registration:
 
 1. BMR is calculated using the Mifflin-St Jeor equation based on the user's profile.
 2. A caloric target is derived from BMR × activity multiplier ± goal adjustment.
-3. A prompt is sent to Gemini asking it to produce a structured workout plan (days with exercises pulled from the existing exercise library IDs) and a meal plan (meals with food items pulled from the existing food item IDs).
+3. A prompt is sent to Gemini asking it to produce a structured workout plan (days with exercises drawn from the existing exercise library IDs) and a meal plan (meals with food items drawn from the existing food item IDs).
 4. The AI output is validated against real database IDs.
 5. All records are written to the database.
 
-This also runs when the user triggers `/api/profiles/:userId/replan`.
+This also runs when the user triggers `POST /api/profiles/:userId/replan`.
 
 ### 2. Progress Analysis
 
-**File:** `backend/services/aiAnalysisService.js`  
+**File:** `backend/src/services/aiAnalysisService.js`
 **Endpoint:** `POST /api/ai/recommendations`
 
 When triggered (manually from the Settings page):
 
-1. The service collects the user's profile, last 8 check-ins, recent workout logs, and current plans.
-2. A structured prompt is built that includes weight trend, workout performance, and current nutrition.
-3. Gemini returns a JSON object with three assessment fields (`weightAssessment`, `nutritionAssessment`, `workoutAssessment`) and an array of `recommendations`.
-4. The result is stored in the `AiRecommendation` table and returned to the client.
+1. The service collects in parallel: the user's profile, all check-ins, recent workout logs (last 21 days), and active workout and meal plans.
+2. A structured prompt is built that includes the weight trend (last 6 check-ins), workout performance, and current plan details.
+3. Gemini returns a JSON object with three assessment fields (`weightAssessment`, `nutritionAssessment`, `workoutAssessment`), a `recommendations` array, and an `actions` object.
+4. If `actions.caloricTargetAdjustment` is non-null, the profile's caloric target and all food quantities in the active meal plan are scaled proportionally.
+5. If `actions.exerciseAdjustments` is non-empty, `targetSets`, `targetReps`, and/or `targetWeight` are updated on the specified plan exercises.
+6. The result is stored in the `AiRecommendation` table and returned to the client.
 
-### 3. Real-Time Chat
+### 3. AI Coach Chat
 
-**File:** `backend/sockets/chat.socket.js`
+**File:** `backend/src/services/ai.service.js`
+**Endpoint:** `POST /api/ai/chat`
 
-Described in the [WebSocket Feature](#websocket-feature) section above. The chat service maintains an in-process conversation history per socket connection, and each `chat:message` event appends to that history before calling Gemini.
+The floating AI coach widget in the bottom-right corner of every page sends plain HTTP POST requests to this endpoint. Each request is independent — no conversation history is maintained server-side. The Gemini model is instructed to give concise 2–4 sentence responses focused on fitness and nutrition.
+
+> **Note:** This is **not** the WebSocket feature. The WebSocket (`/support` namespace) is the user↔admin support chat. The AI coach chat is a standard REST endpoint.
 
 ---
 
@@ -508,6 +609,7 @@ These are intentional simplifications for a university project context.
 | **Frontend API URL is hardcoded** | `client/src/services/api.js` points to `http://localhost:3000`. If you change the backend port, update this file manually. |
 | **Gemini API rate limits** | The free tier of the Gemini API has per-minute request limits. Rapid registrations or repeated `/replan` calls may hit these limits. |
 | **No input sanitization** | There is minimal server-side validation on request bodies. |
-| **Chat history is in-memory** | Restarting the backend clears all active chat histories. Conversation context does not persist across page refreshes. |
+| **AI chat is stateless** | The AI coach widget (`POST /api/ai/chat`) sends one question at a time with no server-side conversation history. Each message is a fresh request. |
+| **Support chat history requires socket connection** | Chat messages are only persisted when sent through the Socket.IO `support:message` event. Messages sent through the HTTP support endpoints are not supported. |
 | **No file uploads** | Profile photos and similar media are not supported. |
 | **No email verification** | Registration accepts any email format without sending a confirmation email. |

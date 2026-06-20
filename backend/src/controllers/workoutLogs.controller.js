@@ -28,6 +28,7 @@ const getAllWorkoutLogs = async (req, res) => {
 
         return sendSuccess(res, 200, logs);
     } catch (err) {
+        console.error('[WorkoutLogs]', err);
         return sendServerError(res);
     }
 };
@@ -56,6 +57,7 @@ const getWorkoutLogById = async (req, res) => {
 
         return sendSuccess(res, 200, log);
     } catch (err) {
+        console.error('[WorkoutLogs]', err);
         return sendServerError(res);
     }
 };
@@ -149,6 +151,7 @@ const createWorkoutLog = async (req, res) => {
 
         return sendSuccess(res, 201, await WorkoutLogsModel.getById(newLog.workoutLogId));
     } catch (err) {
+        console.error('[WorkoutLogs]', err);
         return sendServerError(res);
     }
 };
@@ -261,6 +264,7 @@ const updateWorkoutLog = async (req, res) => {
 
         return sendSuccess(res, 200, await WorkoutLogsModel.getById(id));
     } catch (err) {
+        console.error('[WorkoutLogs]', err);
         return sendServerError(res);
     }
 };
@@ -290,6 +294,7 @@ const deleteWorkoutLog = async (req, res) => {
         const deleted = await WorkoutLogsModel.remove(id);
         return sendSuccess(res, 200, { workoutLogId: deleted.workoutLogId });
     } catch (err) {
+        console.error('[WorkoutLogs]', err);
         return sendServerError(res);
     }
 };

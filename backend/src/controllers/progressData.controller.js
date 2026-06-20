@@ -22,6 +22,7 @@ const getAllProgress = async (req, res) => {
 
         return sendSuccess(res, 200, await ProgressDataModel.getByUserId(requestUserId));
     } catch (err) {
+        console.error('[ProgressData]', err);
         return sendServerError(res);
     }
 };
@@ -48,6 +49,7 @@ const getProgressByDate = async (req, res) => {
 
         return sendSuccess(res, 200, record);
     } catch (err) {
+        console.error('[ProgressData]', err);
         return sendServerError(res);
     }
 };
@@ -82,6 +84,7 @@ const createProgress = async (req, res) => {
         const newRecord = await ProgressDataModel.create({ userId: requestUserId, date, caloriesConsumed, workoutsCompleted, activeMinutes });
         return sendSuccess(res, 201, newRecord);
     } catch (err) {
+        console.error('[ProgressData]', err);
         return sendServerError(res);
     }
 };
@@ -129,6 +132,7 @@ const updateProgress = async (req, res) => {
         const updated = await ProgressDataModel.update(id, { date, caloriesConsumed, workoutsCompleted, activeMinutes });
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[ProgressData]', err);
         return sendServerError(res);
     }
 };

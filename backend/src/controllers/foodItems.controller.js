@@ -14,6 +14,7 @@ const getAllFoodItems = async (req, res) => {
     try {
         return sendSuccess(res, 200, await FoodItemsModel.getAll());
     } catch (err) {
+        console.error('[FoodItems]', err);
         return sendServerError(res);
     }
 };
@@ -35,6 +36,7 @@ const getFoodItemById = async (req, res) => {
 
         return sendSuccess(res, 200, foodItem);
     } catch (err) {
+        console.error('[FoodItems]', err);
         return sendServerError(res);
     }
 };
@@ -57,6 +59,7 @@ const createFoodItem = async (req, res) => {
         const newItem = await FoodItemsModel.create({ name, category, caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g });
         return sendSuccess(res, 201, newItem);
     } catch (err) {
+        console.error('[FoodItems]', err);
         return sendServerError(res);
     }
 };
@@ -90,6 +93,7 @@ const updateFoodItem = async (req, res) => {
 
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[FoodItems]', err);
         return sendServerError(res);
     }
 };
@@ -111,6 +115,7 @@ const deleteFoodItem = async (req, res) => {
 
         return sendSuccess(res, 200, { foodItemId: deleted.foodItemId });
     } catch (err) {
+        console.error('[FoodItems]', err);
         return sendServerError(res);
     }
 };
@@ -155,6 +160,7 @@ const getAlternatives = async (req, res) => {
 
         return sendSuccess(res, 200, alternatives);
     } catch (err) {
+        console.error('[FoodItems]', err);
         return sendServerError(res);
     }
 };

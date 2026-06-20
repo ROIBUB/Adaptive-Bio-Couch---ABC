@@ -17,6 +17,7 @@ const getAllDailyMealPlans = async (req, res) => {
 
         return sendSuccess(res, 200, await DailyMealPlansModel.getByUserId(requestUserId));
     } catch (err) {
+        console.error('[DailyMealPlans]', err);
         return sendServerError(res);
     }
 };
@@ -45,6 +46,7 @@ const getDailyMealPlanById = async (req, res) => {
 
         return sendSuccess(res, 200, plan);
     } catch (err) {
+        console.error('[DailyMealPlans]', err);
         return sendServerError(res);
     }
 };
@@ -142,6 +144,7 @@ const createDailyMealPlan = async (req, res) => {
 
         return sendSuccess(res, 201, await DailyMealPlansModel.getById(newPlan.dailyMealPlanId));
     } catch (err) {
+        console.error('[DailyMealPlans]', err);
         return sendServerError(res);
     }
 };
@@ -258,6 +261,7 @@ const updateDailyMealPlan = async (req, res) => {
 
         return sendSuccess(res, 200, await DailyMealPlansModel.getById(id));
     } catch (err) {
+        console.error('[DailyMealPlans]', err);
         return sendServerError(res);
     }
 };
@@ -287,6 +291,7 @@ const deleteDailyMealPlan = async (req, res) => {
         const deleted = await DailyMealPlansModel.remove(id);
         return sendSuccess(res, 200, { dailyMealPlanId: deleted.dailyMealPlanId });
     } catch (err) {
+        console.error('[DailyMealPlans]', err);
         return sendServerError(res);
     }
 };

@@ -40,6 +40,7 @@ const getProfileByUserId = async (req, res) => {
 
         return sendSuccess(res, 200, profile);
     } catch (err) {
+        console.error('[Profiles]', err);
         return sendServerError(res);
     }
 };
@@ -79,6 +80,7 @@ const createProfile = async (req, res) => {
 
         return sendSuccess(res, 201, newProfile);
     } catch (err) {
+        console.error('[Profiles]', err);
         return sendServerError(res);
     }
 };
@@ -123,6 +125,7 @@ const updateProfile = async (req, res) => {
         const updated = await ProfilesModel.update(userId, updates);
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[Profiles]', err);
         return sendServerError(res);
     }
 };

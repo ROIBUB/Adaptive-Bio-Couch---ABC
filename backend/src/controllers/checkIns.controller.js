@@ -38,6 +38,7 @@ const getAllCheckIns = async (req, res) => {
 
         return sendSuccess(res, 200, await CheckInsModel.getByUserId(requestUserId));
     } catch (err) {
+        console.error('[CheckIns]', err);
         return sendServerError(res);
     }
 };
@@ -66,6 +67,7 @@ const getCheckInById = async (req, res) => {
 
         return sendSuccess(res, 200, checkIn);
     } catch (err) {
+        console.error('[CheckIns]', err);
         return sendServerError(res);
     }
 };
@@ -97,6 +99,7 @@ const createCheckIn = async (req, res) => {
         await syncProfileWeight(requestUserId);
         return sendSuccess(res, 201, newCheckIn);
     } catch (err) {
+        console.error('[CheckIns]', err);
         return sendServerError(res);
     }
 };
@@ -142,6 +145,7 @@ const updateCheckIn = async (req, res) => {
         await syncProfileWeight(checkIn.userId);
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[CheckIns]', err);
         return sendServerError(res);
     }
 };
@@ -172,6 +176,7 @@ const deleteCheckIn = async (req, res) => {
         await syncProfileWeight(checkIn.userId);
         return sendSuccess(res, 200, { checkInId: deleted.checkInId });
     } catch (err) {
+        console.error('[CheckIns]', err);
         return sendServerError(res);
     }
 };

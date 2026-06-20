@@ -14,6 +14,7 @@ const getAllExercises = async (req, res) => {
     try {
         return sendSuccess(res, 200, await ExercisesModel.getAll());
     } catch (err) {
+        console.error('[Exercises]', err);
         return sendServerError(res);
     }
 };
@@ -35,6 +36,7 @@ const getExerciseById = async (req, res) => {
 
         return sendSuccess(res, 200, exercise);
     } catch (err) {
+        console.error('[Exercises]', err);
         return sendServerError(res);
     }
 };
@@ -52,6 +54,7 @@ const createExercise = async (req, res) => {
         const newExercise = await ExercisesModel.create({ name, muscleGroup, difficultyLevel, equipment, description });
         return sendSuccess(res, 201, newExercise);
     } catch (err) {
+        console.error('[Exercises]', err);
         return sendServerError(res);
     }
 };
@@ -80,6 +83,7 @@ const updateExercise = async (req, res) => {
 
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[Exercises]', err);
         return sendServerError(res);
     }
 };
@@ -101,6 +105,7 @@ const deleteExercise = async (req, res) => {
 
         return sendSuccess(res, 200, { exerciseId: deleted.exerciseId });
     } catch (err) {
+        console.error('[Exercises]', err);
         return sendServerError(res);
     }
 };

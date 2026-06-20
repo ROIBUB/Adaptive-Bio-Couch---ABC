@@ -1,4 +1,5 @@
-﻿const UsersModel = require('../../models/users.model');
+﻿const UsersModel    = require('../../models/users.model');
+const ProfilesModel = require('../../models/profiles.model');
 
 const {
     sendSuccess,
@@ -21,6 +22,7 @@ const getAllUsers = async (req, res) => {
     try {
         return sendSuccess(res, 200, await UsersModel.getAll());
     } catch (err) {
+        console.error('[Users]', err);
         return sendServerError(res);
     }
 };
@@ -50,6 +52,7 @@ const getUserById = async (req, res) => {
         const { password, ...safeUser } = user;
         return sendSuccess(res, 200, safeUser);
     } catch (err) {
+        console.error('[Users]', err);
         return sendServerError(res);
     }
 };
@@ -72,6 +75,7 @@ const getMe = async (req, res) => {
         const { password, ...safeUser } = user;
         return sendSuccess(res, 200, safeUser);
     } catch (err) {
+        console.error('[Users]', err);
         return sendServerError(res);
     }
 };
@@ -79,9 +83,9 @@ const getMe = async (req, res) => {
 // POST /api/users
 const createUser = async (req, res) => {
     try {
-        const { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal } = req.body;
+        const { firstName, lastName, email, password, userRole, age, gender, height, weight, activityLevel, fitnessGoal } = req.body;
 
-        const missingFields = getMissingFields(req.body, ['firstName', 'lastName', 'userRole', 'age', 'gender', 'height', 'weight', 'activityLevel', 'fitnessGoal']);
+        const missingFields = getMissingFields(req.body, ['firstName', 'lastName', 'email', 'password', 'userRole', 'age', 'gender', 'height', 'weight', 'activityLevel', 'fitnessGoal']);
         if (missingFields.length > 0) {
             return sendValidationError(res, 'Missing required user fields', { missingFields });
         }
@@ -107,9 +111,18 @@ const createUser = async (req, res) => {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
-        const newUser = await UsersModel.create({ firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal });
-        return sendSuccess(res, 201, newUser);
+        const newUser = await UsersModel.create({ firstName, lastName, email, password, userRole });
+        await ProfilesModel.create({
+            userId: newUser.userid,
+            age, gender, height,
+            currentWeight: weight,
+            targetWeight: weight,
+            fitnessGoal, activityLevel,
+            onboardingCompleted: false
+        });
+        return sendSuccess(res, 201, await UsersModel.getById(newUser.userid));
     } catch (err) {
+        console.error('[Users] createUser', err);
         return sendServerError(res);
     }
 };
@@ -158,6 +171,7 @@ const updateUser = async (req, res) => {
         const updated = await UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal });
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[Users]', err);
         return sendServerError(res);
     }
 };
@@ -179,6 +193,7 @@ const deleteUser = async (req, res) => {
 
         return sendSuccess(res, 200, deleted);
     } catch (err) {
+        console.error('[Users]', err);
         return sendServerError(res);
     }
 };

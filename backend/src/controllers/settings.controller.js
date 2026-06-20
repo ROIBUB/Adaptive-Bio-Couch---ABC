@@ -26,6 +26,7 @@ const getSettings = async (req, res) => {
 
         return sendSuccess(res, 200, settings);
     } catch (err) {
+        console.error('[Settings]', err);
         return sendServerError(res);
     }
 };
@@ -55,6 +56,7 @@ const updateSettings = async (req, res) => {
         const updated = await SettingsModel.update(userId, updates);
         return sendSuccess(res, 200, updated);
     } catch (err) {
+        console.error('[Settings]', err);
         return sendServerError(res);
     }
 };
