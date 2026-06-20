@@ -1,6 +1,7 @@
 ﻿const SupportConversationModel = require('../../models/supportConversation.model');
 const UserPresenceModel        = require('../../models/userPresence.model');
 const prisma                   = require('../../prisma/prismaClient');
+const { isOnline }             = require('../sockets/support.socket');
 const { isAdminRole }          = require('../middleware/roleUtils');
 const {
     sendSuccess,
@@ -35,7 +36,9 @@ const getMyConversation = async (req, res) => {
 const getAdminsPresence = async (req, res) => {
     try {
         const admins = await UserPresenceModel.getAdminsPresence();
-        return sendSuccess(res, 200, admins);
+        // Use live in-memory socket state so stale DB values from server restarts
+        // never cause the indicator to show online when no admin is connected.
+        return sendSuccess(res, 200, admins.map(a => ({ ...a, isOnline: isOnline(a.userId) })));
     } catch {
         return sendServerError(res);
     }

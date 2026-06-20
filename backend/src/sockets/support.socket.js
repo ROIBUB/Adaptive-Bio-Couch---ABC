@@ -52,11 +52,13 @@ function initSupportSocket(io) {
             // Mark online in DB
             await UserPresenceModel.upsert(uid, { isOnline: true, lastSeen: new Date() }).catch(() => {});
 
-            // Tell admins this user came online
-            support.to('support_admins').emit('support:presence_update', {
-                userId: uid,
-                isOnline: true,
-            });
+            // Admin/manager presence must reach regular users (who are not in support_admins).
+            // Regular user presence only needs to reach admins.
+            if (role === 'admin' || role === 'manager') {
+                support.emit('support:presence_update', { userId: uid, isOnline: true });
+            } else {
+                support.to('support_admins').emit('support:presence_update', { userId: uid, isOnline: true });
+            }
 
             socket.emit('support:joined', { userId: uid, role });
         });
@@ -130,14 +132,15 @@ function initSupportSocket(io) {
                 const now = new Date();
                 await UserPresenceModel.upsert(uid, { isOnline: false, lastSeen: now }).catch(() => {});
 
-                support.to('support_admins').emit('support:presence_update', {
-                    userId:   uid,
-                    isOnline: false,
-                    lastSeen: now.toISOString(),
-                });
+                const payload = { userId: uid, isOnline: false, lastSeen: now.toISOString() };
+                if (socket.data.role === 'admin' || socket.data.role === 'manager') {
+                    support.emit('support:presence_update', payload);
+                } else {
+                    support.to('support_admins').emit('support:presence_update', payload);
+                }
             }
         });
     });
 }
 
-module.exports = { initSupportSocket };
+module.exports = { initSupportSocket, isOnline };
