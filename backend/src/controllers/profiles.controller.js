@@ -64,6 +64,30 @@ const createProfile = async (req, res) => {
 
         const { age, gender, height, currentWeight, targetWeight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay } = req.body;
 
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {
+            return sendValidationError(res, 'Invalid fitness goal', {
+                field: 'fitnessGoal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: fitnessGoal
+            });
+        }
+
+        if (activityLevel != null && !['beginner', 'intermediate', 'advanced'].includes(activityLevel)) {
+            return sendValidationError(res, 'Invalid activity level', {
+                field: 'activityLevel',
+                allowedValues: ['beginner', 'intermediate', 'advanced'],
+                value: activityLevel
+            });
+        }
+
+        if (gender != null && !['male', 'female', 'other'].includes(gender)) {
+            return sendValidationError(res, 'Invalid gender', {
+                field: 'gender',
+                allowedValues: ['male', 'female', 'other'],
+                value: gender
+            });
+        }
+
         const newProfile = await ProfilesModel.create({
             userId,
             age: age ?? null,
@@ -109,6 +133,30 @@ const updateProfile = async (req, res) => {
             age, gender, height, currentWeight, targetWeight,
             fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay, onboardingCompleted
         } = req.body;
+
+        if (fitnessGoal !== undefined && !['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {
+            return sendValidationError(res, 'Invalid fitness goal', {
+                field: 'fitnessGoal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: fitnessGoal
+            });
+        }
+
+        if (activityLevel !== undefined && !['beginner', 'intermediate', 'advanced'].includes(activityLevel)) {
+            return sendValidationError(res, 'Invalid activity level', {
+                field: 'activityLevel',
+                allowedValues: ['beginner', 'intermediate', 'advanced'],
+                value: activityLevel
+            });
+        }
+
+        if (gender !== undefined && !['male', 'female', 'other'].includes(gender)) {
+            return sendValidationError(res, 'Invalid gender', {
+                field: 'gender',
+                allowedValues: ['male', 'female', 'other'],
+                value: gender
+            });
+        }
 
         const updates = {};
         if (age !== undefined)                updates.age = age;
@@ -157,6 +205,22 @@ const replanProfile = async (req, res) => {
         }
 
         const { height, currentWeight, fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay } = req.body;
+
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {
+            return sendValidationError(res, 'Invalid fitness goal', {
+                field: 'fitnessGoal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: fitnessGoal
+            });
+        }
+
+        if (!['beginner', 'intermediate', 'advanced'].includes(activityLevel)) {
+            return sendValidationError(res, 'Invalid activity level', {
+                field: 'activityLevel',
+                allowedValues: ['beginner', 'intermediate', 'advanced'],
+                value: activityLevel
+            });
+        }
 
         const profileUpdates = { fitnessGoal, activityLevel, workoutsPerWeek, mealsPerDay };
         if (height !== undefined)        profileUpdates.height = Number(height);

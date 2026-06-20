@@ -75,6 +75,14 @@ const createWorkoutPlan = async (req, res) => {
             return sendValidationError(res, 'Invalid isActive value', { field: 'isActive', value: isActive });
         }
 
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(goal)) {
+            return sendValidationError(res, 'Invalid goal value', {
+                field: 'goal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: goal
+            });
+        }
+
         const newPlan = await WorkoutPlansModel.create({ userId, name, goal, isActive });
         return sendSuccess(res, 201, newPlan);
     } catch (err) {
@@ -114,6 +122,14 @@ const updateWorkoutPlan = async (req, res) => {
 
         if (typeof isActive !== 'boolean') {
             return sendValidationError(res, 'Invalid isActive value', { field: 'isActive', value: isActive });
+        }
+
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(goal)) {
+            return sendValidationError(res, 'Invalid goal value', {
+                field: 'goal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: goal
+            });
         }
 
         const updated = await WorkoutPlansModel.update(id, { name, goal, isActive });

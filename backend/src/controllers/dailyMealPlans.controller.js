@@ -78,13 +78,23 @@ const createDailyMealPlan = async (req, res) => {
             return sendValidationError(res, 'Invalid isActive value', { field: 'isActive', value: isActive });
         }
 
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(goal)) {
+            return sendValidationError(res, 'Invalid goal value', {
+                field: 'goal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: goal
+            });
+        }
+
         if (!Array.isArray(meals) || meals.length === 0) {
             return sendValidationError(res, 'Meals must be a non-empty array', { field: 'meals' });
         }
 
         const invalidMeals = [];
         meals.forEach((meal, mealIndex) => {
-            if (!meal.mealType) invalidMeals.push({ mealIndex, field: 'mealType' });
+            if (!['Breakfast', 'Lunch', 'Dinner', 'Snack'].includes(meal.mealType)) {
+                invalidMeals.push({ mealIndex, field: 'mealType', allowedValues: ['Breakfast', 'Lunch', 'Dinner', 'Snack'], value: meal.mealType });
+            }
             if (!meal.title) invalidMeals.push({ mealIndex, field: 'title' });
             if (typeof meal.estimatedCalories !== 'number' || meal.estimatedCalories <= 0) {
                 invalidMeals.push({ mealIndex, field: 'estimatedCalories', value: meal.estimatedCalories });
@@ -190,13 +200,23 @@ const updateDailyMealPlan = async (req, res) => {
             return sendValidationError(res, 'Invalid isActive value', { field: 'isActive', value: isActive });
         }
 
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(goal)) {
+            return sendValidationError(res, 'Invalid goal value', {
+                field: 'goal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: goal
+            });
+        }
+
         if (!Array.isArray(meals) || meals.length === 0) {
             return sendValidationError(res, 'Meals must be a non-empty array', { field: 'meals' });
         }
 
         const invalidMeals = [];
         meals.forEach((meal, mealIndex) => {
-            if (!meal.mealType) invalidMeals.push({ mealIndex, field: 'mealType' });
+            if (!['Breakfast', 'Lunch', 'Dinner', 'Snack'].includes(meal.mealType)) {
+                invalidMeals.push({ mealIndex, field: 'mealType', allowedValues: ['Breakfast', 'Lunch', 'Dinner', 'Snack'], value: meal.mealType });
+            }
             if (!meal.title) invalidMeals.push({ mealIndex, field: 'title' });
             if (typeof meal.estimatedCalories !== 'number' || meal.estimatedCalories <= 0) {
                 invalidMeals.push({ mealIndex, field: 'estimatedCalories', value: meal.estimatedCalories });

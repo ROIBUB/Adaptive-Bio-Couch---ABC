@@ -71,6 +71,30 @@ const register = async (req, res) => {
             });
         }
 
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {
+            return sendValidationError(res, 'Invalid fitness goal', {
+                field: 'fitnessGoal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: fitnessGoal
+            });
+        }
+
+        if (!['beginner', 'intermediate', 'advanced'].includes(activityLevel)) {
+            return sendValidationError(res, 'Invalid activity level', {
+                field: 'activityLevel',
+                allowedValues: ['beginner', 'intermediate', 'advanced'],
+                value: activityLevel
+            });
+        }
+
+        if (!['male', 'female', 'other'].includes(gender)) {
+            return sendValidationError(res, 'Invalid gender', {
+                field: 'gender',
+                allowedValues: ['male', 'female', 'other'],
+                value: gender
+            });
+        }
+
         const newUser = await UsersModel.create({
             firstName, lastName, email, password,
             age, gender, height, weight,

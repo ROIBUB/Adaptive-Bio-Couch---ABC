@@ -51,6 +51,14 @@ const createExercise = async (req, res) => {
             return sendValidationError(res, 'Missing required exercise fields', { missingFields });
         }
 
+        if (!['Beginner', 'Intermediate', 'Advanced'].includes(difficultyLevel)) {
+            return sendValidationError(res, 'Invalid difficulty level', {
+                field: 'difficultyLevel',
+                allowedValues: ['Beginner', 'Intermediate', 'Advanced'],
+                value: difficultyLevel
+            });
+        }
+
         const newExercise = await ExercisesModel.create({ name, muscleGroup, difficultyLevel, equipment, description });
         return sendSuccess(res, 201, newExercise);
     } catch (err) {
@@ -73,6 +81,14 @@ const updateExercise = async (req, res) => {
         const missingFields = getMissingFields(req.body, ['name', 'muscleGroup', 'difficultyLevel']);
         if (missingFields.length > 0) {
             return sendValidationError(res, 'Missing required exercise fields', { missingFields });
+        }
+
+        if (!['Beginner', 'Intermediate', 'Advanced'].includes(difficultyLevel)) {
+            return sendValidationError(res, 'Invalid difficulty level', {
+                field: 'difficultyLevel',
+                allowedValues: ['Beginner', 'Intermediate', 'Advanced'],
+                value: difficultyLevel
+            });
         }
 
         const updated = await ExercisesModel.update(id, { name, muscleGroup, difficultyLevel, equipment, description });

@@ -111,6 +111,14 @@ const createUser = async (req, res) => {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
         }
 
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {
+            return sendValidationError(res, 'Invalid fitness goal', {
+                field: 'fitnessGoal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: fitnessGoal
+            });
+        }
+
         const newUser = await UsersModel.create({ firstName, lastName, email, password, userRole });
         await ProfilesModel.create({
             userId: newUser.userid,
@@ -166,6 +174,14 @@ const updateUser = async (req, res) => {
 
         if (!['user', 'admin', 'manager'].includes(userRole)) {
             return sendValidationError(res, 'Invalid user role', { field: 'userRole', allowedValues: ['user', 'admin', 'manager'], value: userRole });
+        }
+
+        if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {
+            return sendValidationError(res, 'Invalid fitness goal', {
+                field: 'fitnessGoal',
+                allowedValues: ['weight_loss', 'muscle_gain', 'maintenance'],
+                value: fitnessGoal
+            });
         }
 
         const updated = await UsersModel.update(id, { firstName, lastName, userRole, age, gender, height, weight, activityLevel, fitnessGoal });
