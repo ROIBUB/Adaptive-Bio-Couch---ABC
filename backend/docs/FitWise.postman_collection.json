@@ -14,7 +14,7 @@
     { "key": "workout_log_id",     "value": "1",  "type": "string", "description": "Update after Create Workout Log" },
     { "key": "daily_meal_plan_id", "value": "1",  "type": "string", "description": "Update after Get All Daily Meal Plans" },
     { "key": "check_in_id",        "value": "1",  "type": "string", "description": "Update after Create Check-In" },
-    { "key": "exercise_id",        "value": "1",  "type": "string", "description": "Seed exercises: ids 1–36" },
+    { "key": "exercise_id",        "value": "2",  "type": "string", "description": "Seed exercises: ids 1–36" },
     { "key": "food_item_id",       "value": "1",  "type": "string", "description": "Seed food items: ids 1–N" },
     { "key": "progress_id",        "value": "1",  "type": "string", "description": "Update after Create Progress" }
   ],
@@ -364,9 +364,9 @@
               { "key": "userid",      "value": "{{user_id}}", "type": "text" }
             ],
             "url": {
-              "raw": "{{base_url}}/api/exercises/1",
+              "raw": "{{base_url}}/api/exercises/2",
               "host": ["{{base_url}}"],
-              "path": ["api", "exercises", "1"]
+              "path": ["api", "exercises", "2"]
             },
             "description": "Demonstrates FORBIDDEN error response. A user cannot delete exercises.\nExpected: { \"success\": false, \"data\": null, \"error\": { \"code\": \"FORBIDDEN\", \"message\": \"You do not have permission to perform this action.\", \"details\": {} } }"
           },
@@ -546,9 +546,9 @@
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "x-user-role",  "value": "user",             "type": "text" },
-              { "key": "x-user-id",   "value": "{{user_id}}",      "type": "text" },
-              { "key": "userid",       "value": "{{user_id}}",      "type": "text" }
+              { "key": "x-user-role",  "value": "admin",             "type": "text" },
+              { "key": "x-user-id",   "value": "{{admin_id}}",      "type": "text" },
+              { "key": "userid",       "value": "{{admin_id}}",      "type": "text" }
             ],
             "body": {
               "mode": "raw",
@@ -570,9 +570,9 @@
             "method": "PUT",
             "header": [
               { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "x-user-role",  "value": "user",             "type": "text" },
-              { "key": "x-user-id",   "value": "{{user_id}}",      "type": "text" },
-              { "key": "userid",       "value": "{{user_id}}",      "type": "text" }
+              { "key": "x-user-role",  "value": "admin",             "type": "text" },
+              { "key": "x-user-id",   "value": "{{admin_id}}",      "type": "text" },
+              { "key": "userid",       "value": "{{admin_id}}",      "type": "text" }
             ],
             "body": {
               "mode": "raw",
@@ -592,9 +592,9 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-user-role", "value": "user",        "type": "text" },
-              { "key": "x-user-id",  "value": "{{user_id}}", "type": "text" },
-              { "key": "userid",      "value": "{{user_id}}", "type": "text" }
+              { "key": "x-user-role", "value": "admin",        "type": "text" },
+              { "key": "x-user-id",  "value": "{{admin_id}}", "type": "text" },
+              { "key": "userid",      "value": "{{admin_id}}", "type": "text" }
             ],
             "url": {
               "raw": "{{base_url}}/api/workout-plans/{{workout_plan_id}}",
@@ -760,9 +760,9 @@
             "method": "POST",
             "header": [
               { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "x-user-role",  "value": "user",             "type": "text" },
-              { "key": "x-user-id",   "value": "{{user_id}}",      "type": "text" },
-              { "key": "userid",       "value": "{{user_id}}",      "type": "text" }
+              { "key": "x-user-role",  "value": "admin",             "type": "text" },
+              { "key": "x-user-id",   "value": "{{admin_id}}",      "type": "text" },
+              { "key": "userid",       "value": "{{admin_id}}",      "type": "text" }
             ],
             "body": {
               "mode": "raw",
@@ -784,9 +784,9 @@
             "method": "PUT",
             "header": [
               { "key": "Content-Type", "value": "application/json", "type": "text" },
-              { "key": "x-user-role",  "value": "user",             "type": "text" },
-              { "key": "x-user-id",   "value": "{{user_id}}",      "type": "text" },
-              { "key": "userid",       "value": "{{user_id}}",      "type": "text" }
+              { "key": "x-user-role",  "value": "admin",             "type": "text" },
+              { "key": "x-user-id",   "value": "{{admin_id}}",      "type": "text" },
+              { "key": "userid",       "value": "{{admin_id}}",      "type": "text" }
             ],
             "body": {
               "mode": "raw",
@@ -807,9 +807,9 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "x-user-role", "value": "user",            "type": "text" },
-              { "key": "x-user-id",  "value": "{{user_id}}",     "type": "text" },
-              { "key": "userid",      "value": "{{user_id}}",     "type": "text" }
+              { "key": "x-user-role", "value": "admin",            "type": "text" },
+              { "key": "x-user-id",  "value": "{{admin_id}}",     "type": "text" },
+              { "key": "userid",      "value": "{{admin_id}}",     "type": "text" }
             ],
             "url": {
               "raw": "{{base_url}}/api/daily-meal-plans/{{daily_meal_plan_id}}",
