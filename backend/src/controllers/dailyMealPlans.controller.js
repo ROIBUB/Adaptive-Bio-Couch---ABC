@@ -143,12 +143,15 @@ const createDailyMealPlan = async (req, res) => {
                 estimatedProtein: meal.estimatedProtein
             });
             for (const fi of meal.foodItems) {
-                await DailyMealPlansModel.createMealFoodItem({
+                const newFoodItem = await DailyMealPlansModel.createMealFoodItem({
                     mealId: newMeal.mealId,
                     foodItemId: fi.foodItemId,
                     foodName: fi.foodName,
                     quantityGrams: fi.quantityGrams
                 });
+                if (newFoodItem === 'INVALID_FK') {
+                    return sendValidationError(res, 'Referenced food item does not exist', { field: 'foodItemId', value: fi.foodItemId });
+                }
             }
         }
 
@@ -270,12 +273,15 @@ const updateDailyMealPlan = async (req, res) => {
                 estimatedProtein: meal.estimatedProtein
             });
             for (const fi of meal.foodItems) {
-                await DailyMealPlansModel.createMealFoodItem({
+                const newFoodItem = await DailyMealPlansModel.createMealFoodItem({
                     mealId: newMeal.mealId,
                     foodItemId: fi.foodItemId,
                     foodName: fi.foodName,
                     quantityGrams: fi.quantityGrams
                 });
+                if (newFoodItem === 'INVALID_FK') {
+                    return sendValidationError(res, 'Referenced food item does not exist', { field: 'foodItemId', value: fi.foodItemId });
+                }
             }
         }
 
@@ -309,6 +315,9 @@ const deleteDailyMealPlan = async (req, res) => {
         }
 
         const deleted = await DailyMealPlansModel.remove(id);
+        if (deleted === 'FK_RESTRICT') {
+            return sendValidationError(res, 'Cannot delete this meal plan because it is assigned to one or more profiles', { dailyMealPlanId: id });
+        }
         return sendSuccess(res, 200, { dailyMealPlanId: deleted.dailyMealPlanId });
     } catch (err) {
         console.error('[DailyMealPlans]', err);

@@ -64,11 +64,7 @@ const register = async (req, res) => {
 
         const existing = await UsersModel.findByEmail(email);
         if (existing) {
-            return res.status(409).json({
-                success: false,
-                data: null,
-                error: { code: 'EMAIL_TAKEN', message: 'An account with this email already exists.', details: {} }
-            });
+            return sendValidationError(res, 'An account with this email already exists', { field: 'email', value: email });
         }
 
         if (!['weight_loss', 'muscle_gain', 'maintenance'].includes(fitnessGoal)) {

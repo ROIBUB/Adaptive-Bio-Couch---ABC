@@ -119,7 +119,15 @@ const createUser = async (req, res) => {
             });
         }
 
-        const newUser = await UsersModel.create({ firstName, lastName, email, password, userRole });
+        let newUser;
+        try {
+            newUser = await UsersModel.create({ firstName, lastName, email, password, userRole });
+        } catch (err) {
+            if (err.code === 'P2002') {
+                return sendValidationError(res, 'Email already in use', { field: 'email', value: email });
+            }
+            throw err;
+        }
         await ProfilesModel.create({
             userId: newUser.userid,
             age, gender, height,

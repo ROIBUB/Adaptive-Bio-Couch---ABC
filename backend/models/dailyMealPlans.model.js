@@ -119,6 +119,7 @@ const remove = async (id) => {
         };
     } catch (err) {
         if (err.code === 'P2025') return null;
+        if (err.code === 'P2003') return 'FK_RESTRICT';
         throw err;
     }
 };
@@ -186,15 +187,20 @@ const getMealFoodItemById = async (id) => {
 };
 
 const createMealFoodItem = async (data) => {
-    const created = await prisma.mealFoodItem.create({
-        data: {
-            meal_id: data.mealId,
-            food_item_id: data.foodItemId,
-            food_name: data.foodName,
-            quantity_grams: data.quantityGrams
-        }
-    });
-    return mapMealFoodItem(created);
+    try {
+        const created = await prisma.mealFoodItem.create({
+            data: {
+                meal_id: data.mealId,
+                food_item_id: data.foodItemId,
+                food_name: data.foodName,
+                quantity_grams: data.quantityGrams
+            }
+        });
+        return mapMealFoodItem(created);
+    } catch (err) {
+        if (err.code === 'P2003') return 'INVALID_FK';
+        throw err;
+    }
 };
 
 const updateMealFoodItem = async (id, data) => {

@@ -132,6 +132,9 @@ const createWorkoutLog = async (req, res) => {
         }
 
         const newLog = await WorkoutLogsModel.create({ userId, workoutPlanId, workoutDayId: workoutDayId || null, date, workoutTitle, durationMinutes, difficultyRating, notes });
+        if (newLog === 'INVALID_FK') {
+            return sendValidationError(res, 'Referenced workout plan does not exist', { field: 'workoutPlanId', value: workoutPlanId });
+        }
 
         for (const exercise of exercises) {
             const newExercise = await WorkoutLogsModel.createLogExercise({
@@ -139,6 +142,9 @@ const createWorkoutLog = async (req, res) => {
                 exerciseId: exercise.exerciseId,
                 exerciseName: exercise.exerciseName
             });
+            if (newExercise === 'INVALID_FK') {
+                return sendValidationError(res, 'Referenced exercise does not exist', { field: 'exerciseId', value: exercise.exerciseId });
+            }
             for (const set of exercise.sets) {
                 await WorkoutLogsModel.createLogSet({
                     workoutLogExerciseId: newExercise.id,
@@ -244,7 +250,10 @@ const updateWorkoutLog = async (req, res) => {
             await WorkoutLogsModel.removeLogExercise(e.id);
         }
 
-        await WorkoutLogsModel.update(id, { workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
+        const updateResult = await WorkoutLogsModel.update(id, { workoutPlanId, date, workoutTitle, durationMinutes, difficultyRating, notes });
+        if (updateResult === 'INVALID_FK') {
+            return sendValidationError(res, 'Referenced workout plan does not exist', { field: 'workoutPlanId', value: workoutPlanId });
+        }
 
         for (const exercise of exercises) {
             const newExercise = await WorkoutLogsModel.createLogExercise({
@@ -252,6 +261,9 @@ const updateWorkoutLog = async (req, res) => {
                 exerciseId: exercise.exerciseId,
                 exerciseName: exercise.exerciseName
             });
+            if (newExercise === 'INVALID_FK') {
+                return sendValidationError(res, 'Referenced exercise does not exist', { field: 'exerciseId', value: exercise.exerciseId });
+            }
             for (const set of exercise.sets) {
                 await WorkoutLogsModel.createLogSet({
                     workoutLogExerciseId: newExercise.id,

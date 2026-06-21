@@ -109,6 +109,7 @@ const remove = async (id) => {
         };
     } catch (err) {
         if (err.code === 'P2025') return null;
+        if (err.code === 'P2003') return 'FK_RESTRICT';
         throw err;
     }
 };

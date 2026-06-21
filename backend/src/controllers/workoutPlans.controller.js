@@ -163,6 +163,9 @@ const deleteWorkoutPlan = async (req, res) => {
         }
 
         const deleted = await WorkoutPlansModel.remove(id);
+        if (deleted === 'FK_RESTRICT') {
+            return sendValidationError(res, 'Cannot delete this workout plan because it is assigned to one or more profiles', { workoutPlanId: id });
+        }
         return sendSuccess(res, 200, { workoutPlanId: deleted.workoutPlanId });
     } catch (err) {
         console.error('[WorkoutPlans]', err);

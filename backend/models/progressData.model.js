@@ -33,16 +33,21 @@ const getByUserAndDate = async (userId, date) => {
 };
 
 const create = async (data) => {
-    const created = await prisma.progress.create({
-        data: {
-            user_id: data.userId,
-            date: new Date(data.date),
-            calories_consumed: data.caloriesConsumed,
-            workouts_completed: data.workoutsCompleted,
-            active_minutes: data.activeMinutes
-        }
-    });
-    return mapProgress(created);
+    try {
+        const created = await prisma.progress.create({
+            data: {
+                user_id: data.userId,
+                date: new Date(data.date),
+                calories_consumed: data.caloriesConsumed,
+                workouts_completed: data.workoutsCompleted,
+                active_minutes: data.activeMinutes
+            }
+        });
+        return mapProgress(created);
+    } catch (err) {
+        if (err.code === 'P2002') return 'DUPLICATE';
+        throw err;
+    }
 };
 
 const update = async (id, data) => {
@@ -59,6 +64,7 @@ const update = async (id, data) => {
         return mapProgress(updated);
     } catch (err) {
         if (err.code === 'P2025') return null;
+        if (err.code === 'P2002') return 'DUPLICATE';
         throw err;
     }
 };

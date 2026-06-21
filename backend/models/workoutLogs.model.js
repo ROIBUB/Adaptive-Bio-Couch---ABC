@@ -56,20 +56,25 @@ const getByUserId = async (userId) => {
 };
 
 const create = async (data) => {
-    const created = await prisma.workoutLog.create({
-        data: {
-            user_id: data.userId,
-            workout_plan_id: data.workoutPlanId,
-            workout_plan_day_id: data.workoutDayId || null,
-            log_date: new Date(data.date),
-            workout_title: data.workoutTitle,
-            duration_minutes: data.durationMinutes,
-            difficulty_rating: data.difficultyRating,
-            notes: data.notes || ""
-        },
-        include: logInclude
-    });
-    return mapLog(created);
+    try {
+        const created = await prisma.workoutLog.create({
+            data: {
+                user_id: data.userId,
+                workout_plan_id: data.workoutPlanId,
+                workout_plan_day_id: data.workoutDayId || null,
+                log_date: new Date(data.date),
+                workout_title: data.workoutTitle,
+                duration_minutes: data.durationMinutes,
+                difficulty_rating: data.difficultyRating,
+                notes: data.notes || ""
+            },
+            include: logInclude
+        });
+        return mapLog(created);
+    } catch (err) {
+        if (err.code === 'P2003') return 'INVALID_FK';
+        throw err;
+    }
 };
 
 const update = async (id, data) => {
@@ -89,6 +94,7 @@ const update = async (id, data) => {
         return mapLog(updated);
     } catch (err) {
         if (err.code === 'P2025') return null;
+        if (err.code === 'P2003') return 'INVALID_FK';
         throw err;
     }
 };
@@ -125,14 +131,19 @@ const getLogExerciseById = async (id) => {
 };
 
 const createLogExercise = async (data) => {
-    const created = await prisma.logExercise.create({
-        data: {
-            workout_log_id: data.workoutLogId,
-            exercise_id: data.exerciseId,
-            exercise_name: data.exerciseName
-        }
-    });
-    return mapLogExerciseFlat(created);
+    try {
+        const created = await prisma.logExercise.create({
+            data: {
+                workout_log_id: data.workoutLogId,
+                exercise_id: data.exerciseId,
+                exercise_name: data.exerciseName
+            }
+        });
+        return mapLogExerciseFlat(created);
+    } catch (err) {
+        if (err.code === 'P2003') return 'INVALID_FK';
+        throw err;
+    }
 };
 
 const updateLogExercise = async (id, data) => {
