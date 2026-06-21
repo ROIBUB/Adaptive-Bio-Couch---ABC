@@ -54,7 +54,7 @@ Install all of these before continuing:
 
 ## Installation
 
-### 1. Clone the repository
+### 1. Clone the repository (Or download the zip)
 
 ```bash
 git clone <repo-url>
