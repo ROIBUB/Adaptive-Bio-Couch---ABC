@@ -47,13 +47,13 @@ app.use(express.json())
 app.use(logger);
 const port = process.env.PORT || 3000;
 
-app.get('/', authorize(['admin']), (req, res) => {
-    res.json({
-        success: true,
-        data: "Hello Admin!",
-        error: null
-    });
-});
+// app.get('/', authorize(['admin']), (req, res) => {
+//     res.json({
+//         success: true,
+//         data: "Hello Admin!",
+//         error: null
+//     });
+// });
 // every request to /api/users is sent to users.routes.js
 app.use('/api/users', usersRoutes);
 // every request to /api/exercises is sent to exercises.routes.js
