@@ -1,5 +1,6 @@
-// The backend from Assignment 2 always runs on port 3000
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : '';
 
 // Reads the logged-in user from localStorage and builds the required headers.
 // The backend checks:

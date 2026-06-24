@@ -2,9 +2,9 @@
 .idea/
 .vscode/
 
-# Build output
-client/build/
-build/
+# # Build output
+# client/build/
+# build/
 
 # Dependencies
 node_modules/
