@@ -28,14 +28,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        origin: 'http://localhost:5173',
         methods: ['GET', 'POST'],
     },
 });
 
 // Allow the React frontend (localhost:5173) to call this API
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'http://localhost:5173');
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, x-user-role, x-user-id, userid');
     if (req.method === 'OPTIONS') return res.sendStatus(200);
@@ -47,13 +47,6 @@ app.use(express.json())
 app.use(logger);
 const port = process.env.PORT || 3000;
 
-// app.get('/', authorize(['admin']), (req, res) => {
-//     res.json({
-//         success: true,
-//         data: "Hello Admin!",
-//         error: null
-//     });
-// });
 // every request to /api/users is sent to users.routes.js
 app.use('/api/users', usersRoutes);
 // every request to /api/exercises is sent to exercises.routes.js
@@ -87,9 +80,9 @@ app.use("/api/support", supportRoutes);
 
 initSupportSocket(io);
 
-// Serve React frontend
+// Serve React frontend (must be after all API routes)
 app.use(express.static(path.join(__dirname, '../../client/build')));
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
     res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
 });
 
