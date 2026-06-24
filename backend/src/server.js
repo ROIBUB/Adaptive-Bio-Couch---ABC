@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require('path');
 
 //our server
 const express = require('express');
@@ -27,14 +28,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.CLIENT_URL || 'http://localhost:5173',
         methods: ['GET', 'POST'],
     },
 });
 
 // Allow the React frontend (localhost:5173) to call this API
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'http://localhost:5173');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, x-user-role, x-user-id, userid');
     if (req.method === 'OPTIONS') return res.sendStatus(200);
@@ -44,7 +45,7 @@ app.use((req, res, next) => {
 // to let the server get JSON and use it through req.body
 app.use(express.json())
 app.use(logger);
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.get('/', authorize(['admin']), (req, res) => {
     res.json({
@@ -85,6 +86,12 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/support", supportRoutes);
 
 initSupportSocket(io);
+
+// Serve React frontend
+app.use(express.static(path.join(__dirname, '../../client/build')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
+});
 
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
