@@ -1,6 +1,4 @@
-const BASE_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000'
-  : '';
+const BASE_URL = process.env.REACT_APP_API_URL || '';
 
 // Reads the logged-in user from localStorage and builds the required headers.
 // The backend checks:
