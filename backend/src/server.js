@@ -28,15 +28,17 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.NODE_ENV === 'production'
+            ? false  // same origin in production, no CORS needed
+            : ['http://localhost:3000', 'http://localhost:5173'],
         methods: ['GET', 'POST'],
     },
 });
 
 // Allow the React frontend (localhost:5173) to call this API
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Origin', 
+        process.env.NODE_ENV === 'production' ? '*' : 'http://localhost:5173');    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, x-user-role, x-user-id, userid');
     if (req.method === 'OPTIONS') return res.sendStatus(200);
     next();
