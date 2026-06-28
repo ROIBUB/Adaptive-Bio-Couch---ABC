@@ -52,6 +52,13 @@ const updateSettings = async (req, res) => {
             });
         }
 
+        if (!/[a-zA-Z]/.test(displayName.trim())) {
+            return sendValidationError(res, 'Display name must contain at least one letter', {
+                field: 'displayName',
+                value: displayName
+            });
+        }
+
         const updates = { displayName, email, theme };
         const updated = await SettingsModel.update(userId, updates);
         return sendSuccess(res, 200, updated);

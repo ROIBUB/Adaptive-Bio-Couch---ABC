@@ -57,6 +57,8 @@ function SettingsPage() {
     const errs = {};
     if (!form.displayName.trim()) {
       errs.displayName = 'Display name is required';
+    } else if (!/[a-zA-Z]/.test(form.displayName.trim())) {
+      errs.displayName = 'Display name must contain at least one letter';
     }
     if (!form.theme) {
       errs.theme = 'Theme is required';
